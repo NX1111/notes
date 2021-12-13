@@ -94,7 +94,7 @@ class CircleArrayQueue {
 
 ## 2.链表
 
-![image-20210322165146288](Data structure and algorithm.assets/image-20210322165146288.png)
+![image-20210322165146288](Datastructureandalgorithm.assets/image-20210322165146288.png)
 
 ### 2.1单链表
 
@@ -954,7 +954,7 @@ public class InsertSorting {
 - 交换法：每组内部采用冒泡排序（速度很慢）
 - 移动法：每组内部采用插入排序
 
-![image-20210511152306229](Data structure and algorithm.assets/image-20210511152306229.png)
+![image-20210511152306229](Datastructureandalgorithm.assets/image-20210511152306229.png)
 
 ```java
 public class ShellSorting {
@@ -1011,7 +1011,7 @@ public class ShellSorting {
 - 选取一个基准值，经过一次排序，基准值左边的数据比基准值都要小或者相等，基准值右边的数据比基准值都要大或者相等
 - 一次排序中，基准值的值不变，但位置可能会发生变化
 - 一次排序完成后，该基准值不再参与排序，左边与右边进行迭代递归
-- ![image-20210511152655933](Data structure and algorithm.assets/image-20210511152655933.png)
+- ![image-20210511152655933](Datastructureandalgorithm.assets/image-20210511152655933.png)
 
 ```java
 public class QuickSorting {
@@ -1090,7 +1090,7 @@ public class QuickSorting {
 
 分治思想（divide and conquer）
 
-![image-20210803204705136](Data structure and algorithm.assets/image-20210803204705136.png)
+![image-20210803204705136](Datastructureandalgorithm.assets/image-20210803204705136.png)
 
 ```java
 public class MergeSorting {
@@ -1176,9 +1176,9 @@ public class MergeSorting {
 - 基本思想：将所有待比较的数据统一为同样的数位长度，数位较短的数前面补0，然后，从最低位开始，依次进行一次排序，一直到最高位排序完成，数列就变成一个有序序列。
 - 有负数的数组需要对其改进
 
-![image-20210512125946805](Data structure and algorithm.assets/image-20210512125946805.png)
+![image-20210512125946805](Datastructureandalgorithm.assets/image-20210512125946805.png)
 
-![image-20210512125905584](Data structure and algorithm.assets/image-20210512125905584.png)
+![image-20210512125905584](Datastructureandalgorithm.assets/image-20210512125905584.png)
 
 ```java
 public class RadixSorting {
@@ -1232,9 +1232,9 @@ public class RadixSorting {
 
 ### 5.9常用排序算法总结和对比
 
-![image-20210729094323286](Data structure and algorithm.assets/image-20210729094323286.png)
+![image-20210729094323286](Datastructureandalgorithm.assets/image-20210729094323286.png)
 
-![image-20210512132412367](Data structure and algorithm.assets/image-20210512132412367.png)
+![image-20210512132412367](Datastructureandalgorithm.assets/image-20210512132412367.png)
 
 **相关术语解释：**
 
@@ -1675,7 +1675,7 @@ class EmpLinkedList {
     - 优点：在一定程度上对数组存储方式有优化(比如：插入一个数值结点，只需要将插入结点，链接到链表中即可， 删除效率也很好)。
     - 缺点：在进行检索时，效率仍然较低，比如(检索某个值，需要从头结点开始遍历) 
 
-  ![image-20210525190112848](Data structure and algorithm.assets/image-20210525190112848.png)
+  ![image-20210525190112848](Datastructureandalgorithm.assets/image-20210525190112848.png)
 
 - 树的常用术语(结合示意图理解):
 
@@ -1687,7 +1687,7 @@ class EmpLinkedList {
 
 - 如果该二叉树的所有叶子结点都在最后一层或者倒数第二层，而且最后一层的叶子结点在左边连续，倒数第二层的叶子结点在右边连续，我们称为完全二叉树。
 
-- ![image-20210728144043481](Data structure and algorithm.assets/image-20210728144043481.png)
+- ![image-20210728144043481](Datastructureandalgorithm.assets/image-20210728144043481.png)
 
 
 
@@ -1703,7 +1703,7 @@ class EmpLinkedList {
 
   **小结**: 看输出父结点的顺序，就确定是前序，中序还是后序
 
-  <img src="Data structure and algorithm.assets/image-20210728221811659.png" alt="image-20210728221811659" style="zoom:50%;" />
+  <img src="Datastructureandalgorithm.assets/image-20210728221811659.png" alt="image-20210728221811659" style="zoom:50%;" />
 
   前序遍历A-B-D-F-G-H-I-E-C
 
@@ -1963,7 +1963,7 @@ class HeroNode {
 
 ### 8.3 顺序存储二叉树
 
-![image-20210526202744674](Data structure and algorithm.assets/image-20210526202744674.png)
+![image-20210526202744674](Datastructureandalgorithm.assets/image-20210526202744674.png)
 
 - **数组存储方式**和**树**的存储方式可以相互转换，在遍历时也可以按照**前序遍历**，**中序遍历**和**后序遍历**的方式
 
@@ -2037,9 +2037,9 @@ class ArrBinaryTree {
 
   后序遍历的结果：{6, 14, 10, 8, 3, 1}
 
-![image-20210526203151815](Data structure and algorithm.assets/image-20210526203151815.png)
+![image-20210526203151815](Datastructureandalgorithm.assets/image-20210526203151815.png)
 
-![image-20210526203207137](Data structure and algorithm.assets/image-20210526203207137.png)
+![image-20210526203207137](Datastructureandalgorithm.assets/image-20210526203207137.png)
 
 ```java
 public class ThreadedBinaryTreeDemo {
@@ -2197,7 +2197,7 @@ class HeroNode {
 
 - 大顶堆举例说明：
 
-  ![image-20210729151251530](Data structure and algorithm.assets/image-20210729151251530.png)
+  ![image-20210729151251530](Datastructureandalgorithm.assets/image-20210729151251530.png)
 
 - 堆排序是一种**选择排序，**它的最坏，最好，平均时间复杂度均为O(nlogn)，它也是不稳定排序。
 
@@ -2295,7 +2295,7 @@ public class HeapSort {
   - 再次按照根结点权值从小到大进行排序，重复这两个步骤，直至List集合只剩下一个元素，就是赫夫曼树的根结点
   - 由数列 {13, 7, 8, 3, 29, 6, 1}构成的赫夫曼树
 
-  <img src="Data structure and algorithm.assets/image-20210729223216180.png" alt="image-20210729223216180" style="zoom:50%;" />
+  <img src="Datastructureandalgorithm.assets/image-20210729223216180.png" alt="image-20210729223216180" style="zoom:50%;" />
 
 ```java
 public class HuffmanTree {
@@ -2790,7 +2790,7 @@ public static void unZipFile(String zipFile, String dstFile) {
 
   - 在二叉排序树的构建过程中，会造成对于任何一个非叶子结点，左子树的所有结点的值比当前结点的值小，右子树的所有结点的值比当前结点的值大，相同的值一般放在右子结点。
 
-    ![image-20210802141308608](Data structure and algorithm.assets/image-20210802141308608.png)
+    ![image-20210802141308608](Datastructureandalgorithm.assets/image-20210802141308608.png)
 
   - 二叉排序树相较于顺序存储和链式存储能提高数据**存储，读取**的效率
 
@@ -2897,7 +2897,7 @@ class Node {
 ```
 
 - 二叉排序树的结点删除：
-  - ![image-20210802141912503](Data structure and algorithm.assets/image-20210802141912503.png)
+  - ![image-20210802141912503](Datastructureandalgorithm.assets/image-20210802141912503.png)
   - 删除叶子结点 (比如：2, 5, 9, 12)：
     - 若待删除结点是无父节点的叶子结点，即为根结点，直接将根结点置空
     - 找到待删除结点的父结点，将父结点的left或right属性置为空，
@@ -3155,7 +3155,7 @@ class Node {
 
   - 数列{1,2,3,4,5,6}，创建一颗二叉排序树(BST)，左子树全部为空，从形式上看，更像一个单链表，插入速度没有影响查询速度明显降低(因为需要依次比较)， 不能发挥BST的优势，因为每次还需要比较左子树，其查询速度比单链表还慢
 
-    <img src="Data structure and algorithm.assets/image-20210802193440057.png" alt="image-20210802193440057" style="zoom: 67%;" />
+    <img src="Datastructureandalgorithm.assets/image-20210802193440057.png" alt="image-20210802193440057" style="zoom: 67%;" />
 
   - 平衡二叉搜索树（Self-balancing binary search tree）又被称为AVL树，**是对二叉排序树功能的扩充**，可以**保证查询效率较高**。
 
@@ -3192,7 +3192,7 @@ public int height() {
 
 - AVL树左旋转：
 
-  <img src="Data structure and algorithm.assets/image-20210802194040450.png" alt="image-20210802194040450" style="zoom:67%;" />
+  <img src="Datastructureandalgorithm.assets/image-20210802194040450.png" alt="image-20210802194040450" style="zoom:67%;" />
 
 ```java
 //Node类的方法
@@ -3216,7 +3216,7 @@ public void leftRotate() {
 
 - AVL树右旋转：
 
-<img src="Data structure and algorithm.assets/image-20210802194427681.png" alt="image-20210802194427681" style="zoom: 80%;" />
+<img src="Datastructureandalgorithm.assets/image-20210802194427681.png" alt="image-20210802194427681" style="zoom: 80%;" />
 
 ```java
 //Node类的方法
@@ -3240,7 +3240,7 @@ public void rightRotate() {
 
 - AVL树双旋转：
 
-![image-20210802194619951](Data structure and algorithm.assets/image-20210802194619951.png)
+![image-20210802194619951](Datastructureandalgorithm.assets/image-20210802194619951.png)
 
 - 单独的进行左旋转或右旋转并不能使所有二叉树变成平衡二叉树
 
@@ -3310,7 +3310,7 @@ public void add(Node node) {
 - 多叉树：
   - 允许每个节点可以有更多的数据项和更多的子节点，就是多叉树（multiway tree）
   - 多叉树通过重新组织节点，减少树的高度，能对二叉树进行优化
-  - <img src="Data structure and algorithm.assets/image-20210802214332593.png" alt="image-20210802214332593" style="zoom:80%;" />
+  - <img src="Datastructureandalgorithm.assets/image-20210802214332593.png" alt="image-20210802214332593" style="zoom:80%;" />
 
 #### b）2-3树
 
@@ -3320,7 +3320,7 @@ public void add(Node node) {
   - 有三个子节点的节点（含两个关键字）叫三节点，三节点要么没有子节点，要么有三个子节点
   - 2-3树是由二节点和三节点构成的树。
 - 2-3树构建举例{16, 24, 12, 32, 14, 26, 34, 10, 8, 28, 38, 20} **符合二叉排序树的规则**：
-  - ![image-20210802214730847](Data structure and algorithm.assets/image-20210802214730847.png)
+  - ![image-20210802214730847](Datastructureandalgorithm.assets/image-20210802214730847.png)
   - 当按照规则插入一个数到某个节点时，不能满足上面2-3树的三个特点，就需要拆，先向上拆，如果上层满，则拆本层，拆后仍然需要满足上面3个特点
   - 对于三节点的子树的值大小仍然遵守(BST 二叉排序树)的规则
 
@@ -3330,7 +3330,7 @@ public void add(Node node) {
 
 - B树通过**重新组织节点，降低树的高度**，并且减少i/o读写次数来提升效率
 
-<img src="Data structure and algorithm.assets/image-20210802214917153.png" alt="image-20210802214917153" style="zoom:80%;" />
+<img src="Datastructureandalgorithm.assets/image-20210802214917153.png" alt="image-20210802214917153" style="zoom:80%;" />
 
 - 文件系统及数据库系统的设计者利用了磁盘预读原理，将一个节点的大小设为等于一个页(页得大小通常为4k)，这样每个节点只需要一次I/O就可以完全载入
 
@@ -3344,7 +3344,7 @@ public void add(Node node) {
   - 搜索有可能在非叶子结点结束
   - 其搜索性能等价于在关键字全集内做一次二分查找
 
-  ![image-20210802215328730](Data structure and algorithm.assets/image-20210802215328730.png)
+  ![image-20210802215328730](Datastructureandalgorithm.assets/image-20210802215328730.png)
 
 #### d）B+树
 
@@ -3359,7 +3359,7 @@ public void add(Node node) {
     更适合文件索引系统
   - B树和B+树各有自己的应用场景，不能说B+树完全比B树好，反之亦然
 
-  ![image-20210802215452159](Data structure and algorithm.assets/image-20210802215452159.png)
+  ![image-20210802215452159](Datastructureandalgorithm.assets/image-20210802215452159.png)
 
 #### e）B*树
 
@@ -3372,7 +3372,7 @@ public void add(Node node) {
 
   
 
-![image-20210802215615450](Data structure and algorithm.assets/image-20210802215615450.png)
+![image-20210802215615450](Datastructureandalgorithm.assets/image-20210802215615450.png)
 
 
 
@@ -3391,9 +3391,9 @@ public void add(Node node) {
   - 有向图
   - 带权图
 
-  ![image-20210803165148688](Data structure and algorithm.assets/image-20210803165148688.png)
+  ![image-20210803165148688](Datastructureandalgorithm.assets/image-20210803165148688.png)
 
-  ![image-20210803165214467](Data structure and algorithm.assets/image-20210803165214467.png)
+  ![image-20210803165214467](Datastructureandalgorithm.assets/image-20210803165214467.png)
 
   
 
@@ -3405,7 +3405,7 @@ public void add(Node node) {
 
   邻接矩阵是表示图形中顶点之间相邻关系的矩阵，对于n个顶点的图而言，矩阵是的row和col表示的是1....n个点。0-未连通，1-连通（路径的权值）
 
-  <img src="Data structure and algorithm.assets/image-20210803165434134.png" alt="image-20210803165434134" style="zoom: 67%;" />
+  <img src="Datastructureandalgorithm.assets/image-20210803165434134.png" alt="image-20210803165434134" style="zoom: 67%;" />
 
 - 邻接表
 
@@ -3413,7 +3413,7 @@ public void add(Node node) {
 
   邻接表的实现只关心存在的边，不关心不存在的边。因此没有空间浪费，邻接表由数组+链表组成
 
-  ![image-20210803165935507](Data structure and algorithm.assets/image-20210803165935507.png) 
+  ![image-20210803165935507](Datastructureandalgorithm.assets/image-20210803165935507.png) 
 
 
 
@@ -3435,7 +3435,7 @@ public void add(Node node) {
 
   5.查找结点v的w邻接结点的下一个邻接结点，转到步骤3。
 
-![image-20210803170432781](Data structure and algorithm.assets/image-20210803170432781.png)
+![image-20210803170432781](Datastructureandalgorithm.assets/image-20210803170432781.png)
 
 
 
@@ -3717,7 +3717,7 @@ public class BinarySearchNoRecur {
     - 先把最上面的盘 A->B
     - 把最下边的盘 A->C
     - 把B塔的所有盘 从 B->C 
-    - ![image-20210804102911540](Data structure and algorithm.assets/image-20210804102911540.png)
+    - ![image-20210804102911540](Datastructureandalgorithm.assets/image-20210804102911540.png)
 
 ```java
 public class DAQ {
@@ -3766,13 +3766,13 @@ public class DAQ {
 
   - 问题描述：
 
-    ![image-20210804145154514](Data structure and algorithm.assets/image-20210804145154514.png)
+    ![image-20210804145154514](Datastructureandalgorithm.assets/image-20210804145154514.png)
 
   - 解题思路：每次遍历到的第i个物品，根据w[i]和val[i]来确定是否需要将该物品放入背包中。即对于给定的n个物品，设val[i]、w[i]分别为第i+1(从0开始)个物品的价值和体积，C为背包的容量。再令v[i] [j]表示在前 i 个物品中能够装入容量为 j 的背包中的最大价值。
 
     - (1)  v[i] [0]=v[0] [j]=0; //表示填入表第一行和第一列是0
 
-      ![image-20210804183103594](Data structure and algorithm.assets/image-20210804183103594.png)
+      ![image-20210804183103594](Datastructureandalgorithm.assets/image-20210804183103594.png)
 
     - (2) 当w[i-1]> j 时：令v[i] [j]=v[i-1] [j]   // 当准备加入新增的商品的容量大于当前背包的容量时，就直接使用上一个单元格的装入策略
 
@@ -3780,7 +3780,7 @@ public class DAQ {
 
       令v[i] [j]=max{v[i-1] [j], val[i-1]+v[i-1] [j-w[i-1]]}  //新的单元格的装入策略由  1）上一个单元格的装入策略  2）当前商品加入背包与上一层商品&&背包容量减去当前商品体积的装入策略  **两者间的价值更大者**决定
 
-      ![image-20210804183124961](Data structure and algorithm.assets/image-20210804183124961.png)
+      ![image-20210804183124961](Datastructureandalgorithm.assets/image-20210804183124961.png)
 
     - 背包问题最优解回溯（从最后一个解v[i] [j]开始）：
 
@@ -3788,7 +3788,7 @@ public class DAQ {
       - v[i] [j]=val[i-1]+v[i-1] [j-w[i-1]]时，说明装了第 i 个商品，该商品是最优解组成的一部分，随后我们得回到装该商品之前，即回到v[i-1] [j-w[i-1]]；
       - 一直遍历到i＝0结束为止，所有解的组成都会找到。
 
-      ![image-20210804183744802](Data structure and algorithm.assets/image-20210804183744802.png)
+      ![image-20210804183744802](Datastructureandalgorithm.assets/image-20210804183744802.png)
 
 ```java
 public class KnapsackProblem {
@@ -3863,9 +3863,9 @@ public class KnapsackProblem {
 
   - 如果失配（即s1[i] != s2[j]），令i = i - (j - 1)，j = 0。**相当于每次失配时，i 回溯最初位置，j 被置为0**。
 
-  - ![image-20210805145442763](Data structure and algorithm.assets/image-20210805145442763.png)
+  - ![image-20210805145442763](Datastructureandalgorithm.assets/image-20210805145442763.png)
 
-    ![image-20210805145500145](Data structure and algorithm.assets/image-20210805145500145.png)
+    ![image-20210805145500145](Datastructureandalgorithm.assets/image-20210805145500145.png)
 
 ```java
 public class ViolenceMatch {
@@ -3913,7 +3913,7 @@ public class ViolenceMatch {
   - 获取模式串的部分匹配表（**使用了KMP后续算法的原理**）：
 
     - next 数组各值的含义：代表包括当前字符在内的字符串中，有多大长度的相同前缀后缀。例如如果next [j] = k，代表包括 j 在内的字符串中有最大长度为*k* 的相同前缀后缀。
-    - ![image-20210805150109856](Data structure and algorithm.assets/image-20210805150109856.png)
+    - ![image-20210805150109856](Datastructureandalgorithm.assets/image-20210805150109856.png)
 
   - 遍历文本串，i 为文本串的指针，j 为模式串的指针；
 
@@ -3921,9 +3921,9 @@ public class ViolenceMatch {
 
   - 如果失配（即s1[i] != s2[j]），令i 不变，j = next[j - 1]，**相当于每次失配时，i 不动，j 回溯到 前 j-1 个元素子串的相同前缀的后一个位置**。
 
-  - ![image-20210805150738117](Data structure and algorithm.assets/image-20210805150738117.png)
+  - ![image-20210805150738117](Datastructureandalgorithm.assets/image-20210805150738117.png)
 
-    <img src="Data structure and algorithm.assets/image-20210805150752631.png" alt="image-20210805150752631"  />
+    <img src="Datastructureandalgorithm.assets/image-20210805150752631.png" alt="image-20210805150752631"  />
 
 
 
@@ -4005,7 +4005,7 @@ public class KMP {
 
 - 应用-集合覆盖：存在如下表的需要付费的广播台，以及广播台信号可以覆盖的地区。 **如何选择最少的广播台**，让所有的地区都可以接收到信号
 
-  - <img src="Data structure and algorithm.assets/image-20210805193444352.png" alt="image-20210805193444352" style="zoom:80%;" />
+  - <img src="Datastructureandalgorithm.assets/image-20210805193444352.png" alt="image-20210805193444352" style="zoom:80%;" />
 
   - 思路分析：
 
@@ -4118,10 +4118,10 @@ public class GreedyAlgorithm {
 - 普里姆算法是求**带权的无向连通图**的**最小生成树**(Minimum Cost Spanning Tree/MST)的算法（**最短连通**）。
 - 给定一个带权的无向连通图，如何选取一棵生成树（N个顶点，一定有N-1条边），使树上所有边上权的总和为最小，这叫最小生成树 。
 
-![image-20210807232021381](Data structure and algorithm.assets/image-20210807232021381.png)
+![image-20210807232021381](Datastructureandalgorithm.assets/image-20210807232021381.png)
 
 - 应用场景-修路问题：
-  - ![image-20210807233107547](Data structure and algorithm.assets/image-20210807233107547.png)
+  - ![image-20210807233107547](Datastructureandalgorithm.assets/image-20210807233107547.png)
   - 各个站点的距离用边线表示(权) ，如何修路保证各个村庄都能连通，并且总的修建公路总里程最短?
 - Prim算法思路分析与图解：
   - 在包含n个顶点的连通图中，找出只有(n-1)条边包含所有n个顶点的连通子图，也就是所谓的**极小连通子图**
@@ -4130,7 +4130,7 @@ public class GreedyAlgorithm {
   - 若集合 U 中顶点 ui 与集合 (V-U) 中的顶点 vj 之间存在边，则寻找这些边中权值最小的边，将顶点 vj 加入集合U中，将边（ui,vj）加入集合D中，标记visited[vj]=1，**这种构造方法已经保证不会构成回路**
   - 重复步骤上一个步骤，直到U与V相等，即所有顶点都被标记为访问过，此时D中有n-1条边
 
-![image-20210807233014282](Data structure and algorithm.assets/image-20210807233014282.png)
+![image-20210807233014282](Datastructureandalgorithm.assets/image-20210807233014282.png)
 
 ```java
 public class PrimAlgorithm {
@@ -4249,18 +4249,18 @@ class MGraph {
 - 应用场景-修路问题：
 
   - 各个站点的距离用边线表示(权) ，如何修路保证各个村庄都能连通，并且总的修建公路总里程最短?
-  - <img src="Data structure and algorithm.assets/image-20210808203743814.png" alt="image-20210808203743814" style="zoom:50%;" />
+  - <img src="Datastructureandalgorithm.assets/image-20210808203743814.png" alt="image-20210808203743814" style="zoom:50%;" />
 
 - 基本思想：按照权值从小到大的顺序选择n-1条边，并保证在选择边时不构成回路
 
 - 图解：
 
-  ![微信截图_20210807233707](Data structure and algorithm.assets/微信截图_20210807233707.png)
+  ![微信截图_20210807233707](Datastructureandalgorithm.assets/微信截图_20210807233707.png)
 
 - 保证在选择边时不构成回路：
   - 即在添加边时边的两个顶点不能指向同一个终点
   - 顶点的终点是指在**当前最小生成树中与其连通的最大顶点**，将顶点数组映射到【0,1,2...数组】，**在添加边时要存储ends[start]=end**（start>end），以便查找顶点的终点
-  - ![image-20210807234900478](Data structure and algorithm.assets/image-20210807234900478.png)
+  - ![image-20210807234900478](Datastructureandalgorithm.assets/image-20210807234900478.png)
 
 ```java
 public class KruskalDemo {
@@ -4434,7 +4434,7 @@ class Kedge implements Comparable<Kedge> {
 - 迪杰斯特拉(Dijkstra)算法是**典型最短路径算法**，用于计算一个结点到其他结点的最短路径。 它的主要特点是以起始点为中心向外层层扩展(**广度优先**搜索思想+**贪心**思想)，直到扩展到终点为止。
 
 - 应用场景-最短路径问题：
-  - ![image-20210808154049427](Data structure and algorithm.assets/image-20210808154049427.png)
+  - ![image-20210808154049427](Datastructureandalgorithm.assets/image-20210808154049427.png)
   - 各个村庄的距离用边线表示(权)，计算出D村庄到其它各个村庄的最短距离? 
 - 算法思路：
   - 通过Dijkstra计算图G中的最短路径时，需要指定一个起点D(即从顶点D开始计算)。
@@ -4444,7 +4444,7 @@ class Kedge implements Comparable<Kedge> {
   - 重复第4步操作，直到遍历完所有顶点。
 - 算法思路图解：
 
-![无标题](Data structure and algorithm.assets/无标题.png)
+![无标题](Datastructureandalgorithm.assets/无标题.png)
 
 ```java
 public class DijkstraDemo {
@@ -4550,14 +4550,14 @@ class KGraph {
 
 - 迪杰斯特拉算法通过选定的被访问顶点，求出从出发访问顶点到其他顶点的最短路径；而**弗洛伊德算法**中每一个顶点都是出发访问点，所以需要将每一个顶点看做被访问顶点，**求出从每一个顶点到其他顶点的最短路径**。
 - 应用场景-最短路径问题：
-  - ![image-20210808204020088](Data structure and algorithm.assets/image-20210808204020088.png)
+  - ![image-20210808204020088](Datastructureandalgorithm.assets/image-20210808204020088.png)
   - 各个村庄的距离用边线表示(权)，计算每个村庄到其它各个村庄的最短距离? 
 - 算法思路和图解：
   - 顶点 vi 到顶点 vk 的最短路径已知为 Lik，顶点 vk 到 vj 的最短路径已知为 Lkj，顶点 vi 到 vj 的路径为 Lij，则 vi 到 vj 的最短路径为：min((Lik+Lkj),Lij)
   - **三层分别遍历**中间顶点，出发顶点和终点顶点{'A', 'B', 'C', 'D', 'E', 'F', 'G'...}，注意**出发顶点与中间顶点、中间顶点与终点顶点并不要求直连**
-  - ![image-20210808204701749](Data structure and algorithm.assets/image-20210808204701749.png)
+  - ![image-20210808204701749](Datastructureandalgorithm.assets/image-20210808204701749.png)
   - 把A作为中间顶点的所有情况都进行遍历后得到
-  - ![image-20210808204754758](Data structure and algorithm.assets/image-20210808204754758.png)
+  - ![image-20210808204754758](Datastructureandalgorithm.assets/image-20210808204754758.png)
 
 ```java
 public class FloydDemo {
@@ -4642,7 +4642,7 @@ class FGraph {
 
 - 马踏棋盘：将马随机放在国际象棋的8×8棋盘Board[0～7][0～7]的某个方格中，马按走棋规则(马走日字)进行移动。要求每个方格只进入一次，走遍棋盘上全部64个方格
 
-![image-20210808232049122](Data structure and algorithm.assets/image-20210808232049122.png)
+![image-20210808232049122](Datastructureandalgorithm.assets/image-20210808232049122.png)
 
 - 马踏棋盘问题(骑士周游问题)实际上是图的深度优先搜索(DFS)的应用，可以用**回溯**（循环加递归，实质就是深度优先搜索）来解决，用**贪心算法**来进行优化
 
