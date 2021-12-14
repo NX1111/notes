@@ -9,5 +9,4 @@
 * [SpringBoot](./docs/SpringBoot.md)
 * [community社区项目](./docs/community.md)
 * [how-to-use-docsify](./docs/how-to-use-docsify.md)
-* [dgsg](./docs/1.md)
 
