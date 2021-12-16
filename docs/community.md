@@ -1,4 +1,4 @@
-# IT-Community
+# NXSP-Community
 
 ## 1、项目准备
 
@@ -15,8 +15,6 @@
 - **模板引擎**（这里特指用于Web开发的模板引擎）是为了使**用户界面与业务数据（内容）分离**而产生的，它可以生成特定格式的文档，用于网站的模板引擎就会生成一个标准的html文档。从字面上理解`模板引擎`，最重要的就是模板二字，这个意思就是做好一个模板后套入对应位置的数据，最终以html的格式展示出来，这就是模板引擎的作用。
 - **Thymeleaf动静分离的特点：** Thymeleaf选用html作为模板页，这是任何一款其他模板引擎做不到的！Thymeleaf使用html通过一些特定标签语法代表其含义，但并未破坏html结构，即使无网络、不通过后端渲染也能在浏览器成功打开，大大方便界面的测试和修改。
 - **Thymeleaf开箱即用的特点**： Thymeleaf提供标准和Spring标准两种方言，可以直接套用模板实现JSTL、 OGNL表达式效果，避免每天套模板、改JSTL、改标签的困扰。同时开发人员也可以扩展和创建自定义的方言。
-
-
 
 ### 1.2 搭建开发环境
 
@@ -36,11 +34,11 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <groupId>com.it.community</groupId>
+    <groupId>com.nxsp.community</groupId>
     <artifactId>community</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>community</name>
-    <description>it community</description>
+    <description>nxsp community</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -144,8 +142,8 @@ spring:
   #连接池配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    password: 123456
-    url: jdbc:mysql://localhost:3306/community?false&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    password: 333
+    url: jdbc:mysql://localhost:3308/community?false&useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
     username: root
     type: com.zaxxer.hikari.HikariDataSource  #HikariDataSource连接池
     hikari:
@@ -164,7 +162,6 @@ spring:
 #  #日志存储位置与文件名
 #  file:
 #    name: f:/community.log
-
 #MybatisProperties
 mybatis:
   #mapper配置类所在位置classpath代表resources根目录(注解方式添加@Mapper注解，扫描进spring容器即可)
@@ -189,6 +186,89 @@ mybatis:
 
 
 ### 1.4 项目所需数据库表
+
+创建项目数据库community和表user、comment等
+
+```mysql
+SET NAMES utf8 ;
+DROP TABLE IF EXISTS `comment`;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `comment` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `entity_type` int(11) DEFAULT NULL,
+  `entity_id` int(11) DEFAULT NULL,
+  `target_id` int(11) DEFAULT NULL,
+  `content` text,
+  `status` int(11) DEFAULT NULL,
+  `create_time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_user_id` (`user_id`) /*!80000 INVISIBLE */,
+  KEY `index_entity_id` (`entity_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `discuss_post`;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `discuss_post` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` varchar(45) DEFAULT NULL,
+  `title` varchar(100) DEFAULT NULL,
+  `content` text,
+  `type` int(11) DEFAULT NULL COMMENT '0-普通; 1-置顶;',
+  `status` int(11) DEFAULT NULL COMMENT '0-正常; 1-精华; 2-拉黑;',
+  `create_time` timestamp NULL DEFAULT NULL,
+  `comment_count` int(11) DEFAULT NULL,
+  `score` double DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_user_id` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `login_ticket`;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `login_ticket` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `ticket` varchar(45) NOT NULL,
+  `status` int(11) DEFAULT '0' COMMENT '0-有效; 1-无效;',
+  `expired` timestamp NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_ticket` (`ticket`(20))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `message`;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `message` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `from_id` int(11) DEFAULT NULL,
+  `to_id` int(11) DEFAULT NULL,
+  `conversation_id` varchar(45) NOT NULL,
+  `content` text,
+  `status` int(11) DEFAULT NULL COMMENT '0-未读;1-已读;2-删除;',
+  `create_time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_from_id` (`from_id`),
+  KEY `index_to_id` (`to_id`),
+  KEY `index_conversation_id` (`conversation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+DROP TABLE IF EXISTS `user`;
+ SET character_set_client = utf8mb4 ;
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(50) DEFAULT NULL,
+  `password` varchar(50) DEFAULT NULL,
+  `salt` varchar(50) DEFAULT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `type` int(11) DEFAULT NULL COMMENT '0-普通用户; 1-超级管理员; 2-版主;',
+  `status` int(11) DEFAULT NULL COMMENT '0-未激活; 1-已激活;',
+  `activation_code` varchar(100) DEFAULT NULL,
+  `header_url` varchar(200) DEFAULT NULL,
+  `create_time` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_username` (`username`(20)),
+  KEY `index_email` (`email`(20))
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8;
+```
 
 
 
@@ -231,16 +311,16 @@ mybatis:
     ```yml
     logging:
       level:
-        #日志记录器(Logger)的日志级别(com.it.community范围为debug)，可以打印预编译的sql
+        #日志记录器(Logger)的日志级别(com.nxsp.community范围为debug)，可以打印预编译的sql
         com:
-          it:
+          nxsp:
             community: debug
       #日志存储位置与文件名
       file:
-        name: f:/community.log
+        name: E:/work/data/logger.log
     ```
 
-  - 2、或者使用Logback XML 文件
+  - 2、==或者使用Logback XML 文件==
 
     Sping Boot中默认使用logback, 我们可以在application.properties或者application.yml中设置日志级别。如果想使用XML配置Logback,我们需要在类路径下创建logback-spring.xml文件
     src\main\resources\logback-spring.xml
@@ -250,7 +330,7 @@ mybatis:
     <configuration>
         <contextName>community</contextName>
         <!--日志文件输出地址和目录-->
-        <property name="LOG_PATH" value="C:/work/data"/>
+        <property name="LOG_PATH" value="E:/work/data"/>
         <property name="APPDIR" value="community"/>
     
         <!-- error file -->
@@ -330,8 +410,8 @@ mybatis:
             </filter>
         </appender>
     
-        <!--项目com.it.community的日志级别为debug-->
-        <logger name="com.it.community" level="debug"/>
+        <!--项目com.nxsp.community的日志级别为debug-->
+        <logger name="com.nxsp.community" level="debug"/>
     
         <root level="info">
             <appender-ref ref="FILE_ERROR"/>
