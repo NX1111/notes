@@ -713,6 +713,12 @@ CREATE TABLE `user` (
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-mail</artifactId>
   </dependency>
+  
+  <dependency>
+              <groupId>org.apache.commons</groupId>
+              <artifactId>commons-lang3</artifactId>
+              <version>3.12.0</version>
+          </dependency>
   ```
 
   > 邮箱参数配置，application.yml
@@ -735,11 +741,27 @@ CREATE TABLE `user` (
       default-encoding: utf-8
   ```
 
+  > 邮箱参数配置，application.properties
+
+  ```properties
+  # MailProperties
+  spring.mail.host=smtp.qq.com
+  spring.mail.port=465
+  spring.mail.username=1539853554@qq.com
+  spring.mail.password=acynutmgisyfiidc
+  spring.mail.protocol=smtps
+  spring.mail.properties.mail.smtp.ssl.enable=true
+  ```
+
   > 使用 JavaMailSender 发送邮件
 
+  ==这里的username注意与demo.html文件里面的username的一致==
+
   ```java
-  @SpringBootTest(classes = CommunityApplication.class)
-  public class MailTest {
+  @RunWith(SpringRunner.class)
+  @SpringBootTest
+  @ContextConfiguration(classes = CommunityApplication.class)
+  public class MailTests {
   
       @Autowired
       private MailClient mailClient;
@@ -748,19 +770,19 @@ CREATE TABLE `user` (
       private TemplateEngine templateEngine;
   
       @Test
-      public void test() {
-          mailClient.sendMail("qxiao@zju.edu.cn", "spring", "mail");
+      public void testTextMail() {
+          mailClient.sendMail("niuxu1997@163.com", "TEST", "Welcome.");
       }
-  
+      
       @Test
-      public void test1() {
+      public void testHtmlMail() {
           Context context = new Context();
-          //存入数据，嵌入模板
-          context.setVariable("username", "sunday");
-  
+          //存入数据，嵌入模板,注意与demo.html文件里面的username的一致
+          context.setVariable("usernames", "sunday");
           //利用/mail/demo模板和thymeleaf模板引擎生成html网页（邮件的内容）
           String content = templateEngine.process("/mail/demo", context);
-          mailClient.sendMail("qxiao@zju.edu.cn", "spring", content);
+          System.out.println(content);
+          mailClient.sendMail("niuxu1997@163.com", "HTML", content);
       }
   
   }
@@ -773,10 +795,10 @@ CREATE TABLE `user` (
   <html lang="en" xmlns:th="http://www.thymeleaf.org">
   <head>
       <meta charset="UTF-8">
-      <title>spring mail</title>
+      <title>邮件示例</title>
   </head>
   <body>
-      <p>欢迎，<span style="color: red" th:text="${username}"></span>！</p>
+      <p>欢迎，<span style="color: red" th:text="${usernames}"></span>！</p>
   </body>
   </html>
   ```
@@ -839,7 +861,6 @@ CREATE TABLE `user` (
   </body>
   </html>
   ```
-
 
 
 
