@@ -713,7 +713,7 @@ CREATE TABLE `user` (
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-mail</artifactId>
   </dependency>
-  
+  <!---->
   <dependency>
               <groupId>org.apache.commons</groupId>
               <artifactId>commons-lang3</artifactId>
@@ -755,7 +755,7 @@ CREATE TABLE `user` (
 
   > 使用 JavaMailSender 发送邮件
 
-  ==这里的username注意与demo.html文件里面的username的一致==
+  ==这里的username注意与demo.html文件里面的username的一致==，如果报错Error resolving template [/site/operate-result]，应该是资源没有加载到target，可以删除target，重新创建target，参考博客：[Error resolving template]( https://blog.csdn.net/fengzyf/article/details/83341479?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-2.opensearchhbase&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-2.opensearchhbase) 
 
   ```java
   @RunWith(SpringRunner.class)
@@ -866,7 +866,7 @@ CREATE TABLE `user` (
 
 ### 2.3 注册功能
 
-- 访问注册页面 - 点击顶部区域内的链接，通过LoginController打开index.html注册页面，使头部可以复用
+- 访问注册页面 - 点击顶部区域内的链接，通过LoginController打开index.html注册页面，使==头部可以复用==
 
   ```java
   // 访问注册页面，目的是不直接在前端暴露页面实际地址
@@ -876,6 +876,8 @@ CREATE TABLE `user` (
       return "/site/register";
   }
   ```
+
+  index.html文件头部复用
 
   ```html
   <!-- 头部 th:fragment="header" 使头部可以复用-->
@@ -1083,7 +1085,6 @@ CREATE TABLE `user` (
       user.setCreateTime(new Date()); // 设置注册时间
       // 此处mybatis获取自动生成的id值并进行回填
       userDao.insert(user);
-  
       // 激活邮件,thymeleaf模板引擎
       Context context = new Context();
       context.setVariable("email", user.getEmail());
@@ -1102,10 +1103,10 @@ CREATE TABLE `user` (
   > controller层调用service层方法并负责把提示消息从service传递到前端，并转发页面
   
   ```java
+  //浏览器向服务器发起请求Post
   @PostMapping("/register")
   public String register(Model model, User user) {
       //作为参数的User user会随着注入model并在请求转发时再次被传走
-  
       Map<String, Object> map = userService.register(user);
       // map没有内容，注册成功，注册成功后跳转到中转页面/site/operate-result
       if (map == null || map.isEmpty()) {
@@ -1121,7 +1122,7 @@ CREATE TABLE `user` (
   }
   ```
   
-  > 中转页面
+  > 中转页面operate-result.html
   
   ```html
   <!-- 内容 -->
@@ -1208,11 +1209,13 @@ CREATE TABLE `user` (
   }
   ```
 
-  >controller层调用service层方法并负责把提示消息从service传递到前端，并转发页面
-
+  >controller层调用service层方法并负责把提示消息从service传递到前端，并转发页面，
+  >
+  >当浏览器发起请求的时候，userId和code会被赋予id值和激活码值
+  
   ```java
   // http://localhost:8080/community/activation/id值/激活码值
-  @GetMapping("/activation/{userId}/{code}")
+  @GetMapping("/activation/{userId}/{code}")//当浏览器发起请求的时候，userId和code会被赋予id值和激活码值
   public String activation(Model model, @PathVariable("userId") int userId, @PathVariable("code") String code) {
       int result = userService.activation(userId, code);
       if (result == ACTIVATION_SUCCESS) {
@@ -1233,7 +1236,7 @@ CREATE TABLE `user` (
   ```
 
   > 激活相关全局常数工具类CommunityConstant
-
+  
   ```java
   /**
    * 激活成功
@@ -1293,7 +1296,7 @@ CREATE TABLE `user` (
   ```java
   @Configuration
   public class KaptchaConfig {
-  
+   
   
       // 将kaptchaProducer装配到容器
       @Bean
@@ -1350,8 +1353,15 @@ CREATE TABLE `user` (
      <!--js实现点击链接时调用js的refresh_kaptcha()方法-->
      <a href="javascript:refresh_kaptcha();" class="font-size-12 align-bottom">刷新验证码</a>
   </div>
+  
+  <script>
+  		function refresh_kaptcha() {
+  			var path = CONTEXT_PATH + "/kaptcha?p=" + Math.random();
+  			$("#kaptcha").attr("src", path);
+  		}
+  	</script>
   ```
-
+  
   ```html
   <!--用jquery实现refresh_kaptcha()方法-->
   <script>
@@ -1386,63 +1396,64 @@ CREATE TABLE `user` (
 
 
 
--  登录
+- 登录
 
   > service层验证账号、密码、验证码，登录成功生成登录凭证存入数据库
 
   ```java
-  /**
-   * Description: 用户登录方法
-   *
-   * @param username:
-   * @param password:
-   * @param expiredSeconds: 过期时间
-   * @return java.util.Map<java.lang.String,java.lang.Object>:
-   */
-  public Map<String, Object> login(String username, String password, long expiredSeconds) {
-      Map<String, Object> map = new HashMap<>();
+      /**
+       * Description: 用户登录方法
+       * @param username:
+       * @param password:
+       * @param expiredSeconds: 过期时间
+       * @return java.util.Map<java.lang.String,java.lang.Object>:
+       */
+      public Map<String, Object> login(String username, String password, long expiredSeconds) {
+          Map<String, Object> map = new HashMap<>();
   
-      // 空值处理
-      if (StringUtils.isBlank(username)) {
-          map.put("usernameMsg", "账号不能为空！");
+          // 空值处理
+          if (StringUtils.isBlank(username)) {
+              map.put("usernameMsg", "账号不能为空！");
+              return map;
+          }
+          if (StringUtils.isBlank(password)) {
+              map.put("passwordMsg", "密码不能为空！");
+              return map;
+          }
+          // 验证账号是否存在,是否激活
+          User user = userMapper.selectByName(username);
+          if (user == null) {
+              map.put("usernameMsg", "该账号不存在！");
+              return map;
+          }
+          if (user.getStatus() == 0) {
+              map.put("usernameMsg", "该账号未激活");
+              return map;
+          }
+  
+          // 验证密码
+          // 传入的明文密码加密后再比较
+          String passowrd = CommunityUtil.md5(password + user.getSalt());
+          if (!user.getPassword().equals(passowrd)) {
+              map.put("passwordMsg", "密码不正确！");
+              return map;
+          }
+          // 登录成功，生成登录凭证
+          LoginTicket loginTicket = new LoginTicket();
+          loginTicket.setUserId(user.getId());
+          loginTicket.setTicket(CommunityUtil.generateUUID());
+          loginTicket.setStatus(0);
+          /**
+           *System.currentTimeMillis() + expiredSeconds * 1000
+           * 可以这样解读：System.currentTimeMillis()相当于是毫秒为单位
+           * 但是，后头乘了1000，就变成了以秒为单位
+           */
+          loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000));
+          loginTicketMapper.insertLoginTicket(loginTicket);
+          map.put("ticket", loginTicket.getTicket());
           return map;
       }
-      if (StringUtils.isBlank(password)) {
-          map.put("passwordMsg", "密码不能为空！");
-          return map;
-      }
   
-      // 验证账号是否存在,是否激活
-      User user = userDao.queryByUsername(username);
-      if (user == null) {
-          map.put("usernameMsg", "该账号不存在！");
-          return map;
-      }
-      if (user.getStatus() == 0) {
-          map.put("usernameMsg", "该账号未激活");
-          return map;
-      }
-  
-      // 验证密码
-      // 传入的明文密码加密后再比较
-      String passowrd = CommunityUtil.md5(password + user.getSalt());
-      if (!user.getPassword().equals(passowrd)) {
-          map.put("passwordMsg", "密码不正确！");
-          return map;
-      }
-  
-      // 登录成功，生成登录凭证
-      LoginTicket loginTicket = new LoginTicket();
-      loginTicket.setUserId(user.getId());
-      loginTicket.setTicket(CommunityUtil.generateUUID());
-      loginTicket.setStatus(0);
-      loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000));
-      loginTicketDao.insert(loginTicket);
-  
-      map.put("ticket", loginTicket.getTicket());
-  
-      return map;
-  }
   ```
 
   > controller层，登录成功时，登录凭证中的ticket发放给客户端。失败时，跳转回登录页。
@@ -1501,15 +1512,15 @@ CREATE TABLE `user` (
   > service层修改数据库的登录凭证
 
   ```java
-  /**
-   * Description:  用户登出方法
-   * @param ticket:
-   * @return void:
-   */
-  public void logout(String ticket) {
-      // 改为无效状态
-      loginTicketDao.updateStatusByTicket(ticket, 1);
-  }
+   /**
+       * Description:  用户登出方法
+       * @param ticket:
+       * @return void:
+       */
+      public void logout(String ticket) {
+          // 改为无效状态
+          loginTicketMapper.updateStatus(ticket, 1);
+      }
   ```
 
   > controller层获取cookie调用service层方法，跳转到登录页面
