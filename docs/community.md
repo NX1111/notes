@@ -1650,7 +1650,7 @@ CREATE TABLE `user` (
   
       @Override
       public void addInterceptors(InterceptorRegistry registry) {
-          //配置拦截规则，不拦截静态资源以外的所有资源
+          //配置拦截规则，不拦截静态资源，拦截其他所有资源
           registry.addInterceptor(loginTicketInterceptor)
                   .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
       }
@@ -1741,7 +1741,7 @@ CREATE TABLE `user` (
   >
   > ​	表单：enctype=“multipart/form-data” 
   >
-  > ​	Spring MVC：通过 MultipartFile 处理上传文件
+  > ​	==Spring MVC：通过 MultipartFile 处理上传文件==
 
   ```html
   <!-- 上传头像 -->
@@ -1806,7 +1806,7 @@ CREATE TABLE `user` (
           return "/site/setting";
       }
   
-      // 生成随机文件名
+      // 生成随机文件名，防止很多人上传重名文件，导致文件被覆盖
       filename = CommunityUtil.generateUUID() + suffix;
       // 确定文件存放的路径
       File dest = new File(uploadPath + "/" + filename);
@@ -1837,21 +1837,19 @@ CREATE TABLE `user` (
 
   >文件存放位置：application.yml
 
-  ```yml
-  # 自定义配置
-  community:
-    path:
-      # 文件上传存放位置地址
-      upload-path: e:/community/data/upload
+  ```properties
+  # community 域名
+  community.path.domain=http://localhost:8080
+  community.path.upload=E:/work/data/upload
   ```
-
+  
   >获取头像：前端index.html头部和UserController
 
   ```html
   <!--当前用户的头像、用户名-->
   <img th:src="${loginUser.headerUrl}" class="rounded-circle" style="width:30px;"/>
   ```
-
+  
   ```java
   // 外界从头像存储位置获取头像（来向浏览器输出服务器存储的图片）
   @GetMapping("header/{filename}")
@@ -1903,10 +1901,10 @@ CREATE TABLE `user` (
         </div>
      </div>
      <div class="form-group row mt-4">
-        <label for="new-password" class="col-sm-2 col-form-label text-right">新密码:</label>
+        <label for="password" class="col-sm-2 col-form-label text-right">新密码:</label>
         <div class="col-sm-10">
            <input type="password" th:class="|form-control ${newPasswordMsg!=null?'is-invalid':''}|"
-                 name="newPassword" th:value="${param.newPassword}" id="new-password" placeholder="请输入新的密码!" required>
+                 name="newPassword" th:value="${param.newPassword}" id="password" placeholder="请输入新的密码!" required>
            <div class="invalid-feedback" th:text="${newPasswordMsg}">
               密码长度不能小于8位!
            </div>
@@ -1942,7 +1940,7 @@ CREATE TABLE `user` (
   });
   
   function check_data() {
-     var pwd1 = $("#new-password").val();
+     var pwd1 = $("#password").val();
      var pwd2 = $("#confirm-password").val();
      if(pwd1 != pwd2) {
         $("#confirm-password").addClass("is-invalid");
@@ -1960,42 +1958,42 @@ CREATE TABLE `user` (
 
   ```java
   /**
-   * Description: 修改密码
-   *
-   * @param userId:
-   * @param oldPassword:
-   * @param newPassword:
-   * @return java.util.Map<java.lang.String, java.lang.Object>:
-   */
-  public Map<String, Object> updatePassword(int userId, String oldPassword, String newPassword) {
+       * Description: 修改密码
+       *
+       * @param userId:
+       * @param oldPassword:
+       * @param newPassword:
+       * @return java.util.Map<java.lang.String, java.lang.Object>:
+       */
+      public Map<String, Object> updatePassword(int userId, String oldPassword, String newPassword) {
   
-      Map<String, Object> map = new HashMap<>();
+          Map<String, Object> map = new HashMap<>();
   
-      // 空值处理
-      if (StringUtils.isBlank(oldPassword)) {
-          map.put("oldPasswordMsg", "原密码不能为空!");
+          // 空值处理
+          if (StringUtils.isBlank(oldPassword)) {
+              map.put("oldPasswordMsg", "原密码不能为空!");
+              return map;
+          }
+          if (StringUtils.isBlank(newPassword)) {
+              map.put("newPasswordMsg", "新密码不能为空!");
+              return map;
+          }
+  
+          // 验证原始密码
+          User user = userMapper.selectById(userId);
+          oldPassword = CommunityUtil.md5(oldPassword + user.getSalt());
+          if (!user.getPassword().equals(oldPassword)) {
+              map.put("oldPasswordMsg", "原密码输入有误!");
+              return map;
+          }
+  
+          // 更新salt
+          user.setSalt(CommunityUtil.generateUUID().substring(0, 5));
+          userMapper.updateSalt(userId,user.getSalt());
+          //更新密码
+          userMapper.updatePassword(userId ,CommunityUtil.md5(newPassword + user.getSalt()));
           return map;
       }
-      if (StringUtils.isBlank(newPassword)) {
-          map.put("newPasswordMsg", "新密码不能为空!");
-          return map;
-      }
-  
-      // 验证原始密码
-      User user = userDao.queryById(userId);
-      oldPassword = CommunityUtil.md5(oldPassword + user.getSalt());
-      if (!user.getPassword().equals(oldPassword)) {
-          map.put("oldPasswordMsg", "原密码输入有误!");
-          return map;
-      }
-  
-      // 更新密码
-      user.setSalt(CommunityUtil.generateUUID().substring(0, 5));
-      user.setPassword(CommunityUtil.md5(newPassword + user.getSalt()));
-      userDao.update(user);
-  
-      return map;
-  }
   ```
 
   > UserController从当前线程中获取user作为service层密码验证条件，传递错误消息到前端
@@ -2008,20 +2006,20 @@ CREATE TABLE `user` (
   private HostHolder hostHolder;
   
   // 修改密码
-  @PostMapping("/updatePassword")
-  public String updatePassword(String oldPassword, String newPassword, Model model) {
-      User user = hostHolder.getUser();
-      Map<String, Object> map = userService.updatePassword(user.getId(), oldPassword, newPassword);
-      if (map == null || map.isEmpty()) {
-          // 成功修改密码则重定向到登出功能，登出再重定向到登录页面
-          return "redirect:/logout";
-      } else {
-          model.addAttribute("oldPasswordMsg", map.get("oldPasswordMsg"));
-          model.addAttribute("newPasswordMsg", map.get("newPasswordMsg"));
-          // 出现错误，返回设置页面
-          return "/site/setting";
+      @PostMapping("/updatePassword")
+      public String updatePassword(String oldPassword, String newPassword, Model model) {
+          User user = hostHolder.getUser();
+          Map<String, Object> map = userService.updatePassword(user.getId(), oldPassword, newPassword);
+          if (map == null || map.isEmpty()) {
+              // 成功修改密码则重定向到登出功能，登出再重定向到登录页面
+              return "redirect:/logout";
+          } else {
+              model.addAttribute("oldPasswordMsg", map.get("oldPasswordMsg"));
+              model.addAttribute("newPasswordMsg", map.get("newPasswordMsg"));
+              // 出现错误，返回设置页面
+              return "/site/setting";
+          }
       }
-  }
   ```
 
 
@@ -2259,7 +2257,7 @@ CREATE TABLE `user` (
                       // 进入下一个位置
                       begin++;
                       position = begin;
-                      // 重新指向根节点
+                      //树形结构指针重新指向rootNode根节点
                       tempNode = root;
                   }
                   // 发现敏感词，将begin~position字符串替换
@@ -2271,12 +2269,12 @@ CREATE TABLE `user` (
                       // 重新指向根节点
                       tempNode = root;
                   }
-                  // 检查到敏感词部分，继续检查下一个字符
+                  // 检查到部分敏感词，还没有检测到敏感词尾部，继续检查下一个字符
                   else {
                       position++;
                   }
               }
-              // position遍历越界仍未匹配到敏感词
+              // position遍历越界，跳出While循坏，仍未匹配到敏感词
               else{
                   sb.append(text.charAt(begin));
                   // 进入下一个位置
@@ -2299,141 +2297,188 @@ CREATE TABLE `user` (
 
 - AJAX
 
-  >Asynchronous JavaScript and XML 
-  >
-  >异步的JavaScript与XML，不是一门新技术，只是一个新的术语。 
-  >
-  >使用AJAX，网页能够将增量更新呈现在页面上，而不需要刷新整个页面。
-  >
-  >虽然X代表XML，但目前JSON的使用比XML更加普遍。
+  Asynchronous JavaScript and XML 
+  
+  异步的JavaScript与XML，不是一门新技术，只是一个新的术语。 
+  
+  使用AJAX，网页能够将增量更新呈现在页面上，而不需要刷新整个页面。
+  
+  虽然X代表XML，但目前JSON的使用比XML更加普遍。
 
 - 使用jQuery发送AJAX请求，实现发布帖子的功能
 
-  > DiscussPostService添加帖子（过滤敏感词和转义html标签）
+> AJAX小实例
 
-  ```java
-  @Resource
-  private DiscussPostDao discussPostDao;
-  
-  @Resource
-  private SensitiveFilter sensitiveFilter;
-  
-  /**
-   * Description: 添加帖子（过滤敏感词）
-   * @param discussPost:
-   * @return int:
-   */
-  public int addDiscussPost(DiscussPost discussPost) {
-      if (discussPost == null) {
-          throw new IllegalArgumentException("参数不能为空！");
-      }
-  
-      // 转义HTML标记(恶意注册的时候，会使用诸如 <script>alert('papapa')</script>，转义标签)
-      discussPost.setTitle(HtmlUtils.htmlEscape(discussPost.getTitle()));
-      discussPost.setContent(HtmlUtils.htmlEscape(discussPost.getContent()));
-      // 过滤敏感词
-      discussPost.setTitle(sensitiveFilter.filter(discussPost.getTitle()));
-      discussPost.setContent(sensitiveFilter.filter(discussPost.getContent()));
-  
-      return discussPostDao.insert(discussPost);
-  }
-  ```
+- 引入依赖
 
-  >DisscussPostController调用add方法，向前端传递消息
+```xml
+<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>fastjson</artifactId>
+			<version>1.2.58</version>
+		</dependency>
+```
 
-  ```java
-  @Controller
-  @RequestMapping("/discuss")
-  public class DisscussPostController {
-  
-      @Resource
-      private DiscussPostService discussPostService;
-  
-      @Resource
-      private HostHolder hostHolder;
-  
-      @PostMapping("/add")
-      @ResponseBody
-      public String addDiscussPost(String title, String context) {
-          User user = hostHolder.getUser();
-          if (user == null) {
-              return CommunityUtil.getJSONString(403, "你还没有登录！");
-          }
-  
-          DiscussPost post = new DiscussPost();
-          // type、status、commentCount、score默认为0
-          post.setUserId(user.getId());
-          post.setTitle(title);
-          post.setContent(context);
-          post.setCreateTime(new Date());
-          post.setType(0);
-          post.setStatus(0);
-          post.setCommentCount(0);
-          post.setScore(0.0);
-          discussPostService.insert(post);
-          // 报错统一处理
-          return CommunityUtil.getJSONString(0, "发布成功！");
-  
-      }
-  }
-  ```
+- 编写工具类
 
-  > index.html，发布按钮和引用jQuery和index.js
-
-  ```java
-  <!--用户登录后才显示我要发布按钮，点击后出现弹窗-->
-  <button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal"
-        th:if="${loginUser!=null}"
-        data-target="#publishModal">我要发布</button>
-  
-  <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
-  <script th:src="@{js/index.js}"></script>
-  ```
-
-  > index.js中用jQuery实现AJAX
-
-  ```js
-  /*绑定单击事件，调用publish函数*/
-  $(function(){
-     $("#publishBtn").click(publish);
-  });
-  
-  function publish() {
-     $("#publishModal").modal("hide");
-  
-     // 获取标题和内容
-     var title = $("#recipient-name").val();
-     var content = $("#message-text").val();
-     // 发送异步请求（POST）
-     $.post(
-        /*url*/
-        CONTEXT_PATH+"/discuss/add",
-        /*data*/
-        {"title":title,"context":content},
-        /*成功后的回调函数*/
-        function (data) {
-           data = $.parseJSON(data);
-           // 在提示框显示返回消息
-           $("#hintBody").text(data.msg);
-           // 显示提示框
-           $("#hintBody").modal("show");
-           // 2s后，自动隐藏提示框
-           setTimeout(function(){
-              $("#hintBody").modal("hide");
-              // 如果添加成功，刷新页面显示新帖子
-              if (data.code == 0) {
-                 window.location.reload();
-              }
-           }, 2000);
+```java
+public static String getJSONString(int code , String msg , Map<String , Object> map){
+    JSONObject json = new JSONObject();
+    json.put("code", code);
+    json.put("msg", msg);
+    if (map != null) {
+        for (String key : map.keySet()) {
+            json.put(key, map.get(key));
         }
-     );
-  
-     $("#hintModal").modal("show");
-     setTimeout(function(){
-        $("#hintModal").modal("hide");
-     }, 2000);
-  }
-  ```
+    }
+    return json.toJSONString();
+}
+
+public static String getJSONString(int code, String msg) {
+    return getJSONString(code, msg, null);
+}
+
+public static String getJSONString(int code) {
+    return getJSONString(code, null, null);
+}
+```
+- 编写控制层
+```java
+ // ajax示例
+    @RequestMapping(path = "/ajax", method = RequestMethod.POST)
+    @ResponseBody
+    public String testAjax(String name, int age) {
+        System.out.println(name);
+        System.out.println(age);
+        return CommunityUtil.getJSONString(0, "操作成功!");
+    }
+```
+
+> DiscussPostService添加帖子（过滤敏感词和转义html标签）
+
+```java
+@Resource
+private DiscussPostDao discussPostDao;
+
+@Resource
+private SensitiveFilter sensitiveFilter;
+
+/**
+ * Description: 添加帖子（过滤敏感词）
+ * @param discussPost:
+ * @return int:
+ */
+public int addDiscussPost(DiscussPost discussPost) {
+    if (discussPost == null) {
+        throw new IllegalArgumentException("参数不能为空！");
+    }
+
+    // 转义HTML标记(恶意注册的时候，会使用诸如 <script>alert('papapa')</script>，转义标签)
+    discussPost.setTitle(HtmlUtils.htmlEscape(discussPost.getTitle()));
+    discussPost.setContent(HtmlUtils.htmlEscape(discussPost.getContent()));
+    // 过滤敏感词
+    discussPost.setTitle(sensitiveFilter.filter(discussPost.getTitle()));
+    discussPost.setContent(sensitiveFilter.filter(discussPost.getContent()));
+
+    return discussPostDao.insert(discussPost);
+}
+```
+
+>DisscussPostController调用add方法，向前端传递消息
+
+```java
+@Controller
+@RequestMapping("/discuss")
+public class DisscussPostController {
+
+    @Resource
+    private DiscussPostService discussPostService;
+
+    @Resource
+    private HostHolder hostHolder;
+
+    @PostMapping("/add")
+    @ResponseBody
+    public String addDiscussPost(String title, String context) {
+        User user = hostHolder.getUser();
+        if (user == null) {
+            return CommunityUtil.getJSONString(403, "你还没有登录！");
+        }
+
+        DiscussPost post = new DiscussPost();
+        // type、status、commentCount、score默认为0
+        post.setUserId(user.getId());
+        post.setTitle(title);
+        post.setContent(context);
+        post.setCreateTime(new Date());
+        post.setType(0);
+        post.setStatus(0);
+        post.setCommentCount(0);
+        post.setScore(0.0);
+        discussPostService.insert(post);
+        // 报错统一处理
+        return CommunityUtil.getJSONString(0, "发布成功！");
+
+    }
+}
+```
+
+> index.html，发布按钮和引用jQuery和index.js
+
+```java
+<!--用户登录后才显示我要发布按钮，点击后出现弹窗-->
+<button type="button" class="btn btn-primary btn-sm position-absolute rt-0" data-toggle="modal"
+      th:if="${loginUser!=null}"
+      data-target="#publishModal">我要发布</button>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+<script th:src="@{js/index.js}"></script>
+```
+
+> index.js中用jQuery实现AJAX
+
+```js
+/*绑定单击事件，调用publish函数*/
+$(function(){
+   $("#publishBtn").click(publish);
+});
+
+function publish() {
+   $("#publishModal").modal("hide");
+
+   // 获取标题和内容
+   var title = $("#recipient-name").val();
+   var content = $("#message-text").val();
+   // 发送异步请求（POST）
+   $.post(
+      /*url*/
+      CONTEXT_PATH+"/discuss/add",
+      /*data*/
+      {"title":title,"context":content},
+      /*成功后的回调函数*/
+      function (data) {
+         data = $.parseJSON(data);
+         // 在提示框显示返回消息
+         $("#hintBody").text(data.msg);
+         // 显示提示框
+         $("#hintBody").modal("show");
+         // 2s后，自动隐藏提示框
+         setTimeout(function(){
+            $("#hintBody").modal("hide");
+            // 如果添加成功，刷新页面显示新帖子
+            if (data.code == 0) {
+               window.location.reload();
+            }
+         }, 2000);
+      }
+   );
+
+   $("#hintModal").modal("show");
+   setTimeout(function(){
+      $("#hintModal").modal("hide");
+   }, 2000);
+}
+```
 
 
 
