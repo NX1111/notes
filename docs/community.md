@@ -2353,6 +2353,33 @@ public static String getJSONString(int code) {
         return CommunityUtil.getJSONString(0, "操作成功!");
     }
 ```
+- 预制ajax-demo.html
+```html
+<body>
+    <p>
+        <input type="button" value="发送" onclick="send();">
+    </p>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js" crossorigin="anonymous"></script>
+    <script>
+        function send() {
+            //三个参数：访问路径、向服务器提交的数据、回调函数（匿名，data是服务器返回给浏览器的数据）
+            $.post(
+                "/community/alpha/ajax",
+                {"name":"张三","age":23},
+                function(data) {
+                    console.log(typeof(data));
+                    console.log(data);
+                    data = $.parseJSON(data);
+                    console.log(typeof(data));
+                    console.log(data.code);
+                    console.log(data.msg);
+                }
+            );
+        }
+    </script>
+</body>
+```
 
 > DiscussPostService添加帖子（过滤敏感词和转义html标签）
 
@@ -2488,15 +2515,14 @@ function publish() {
 
   ```java
   /**
-   * 通过ID查询单条数据
+   * 通过ID查询单条帖子数据
    *
    * @param id 主键
    * @return 实例对象
    */
-  @Override
-  public DiscussPost queryById(Integer id) {
-      return this.discussPostDao.queryById(id);
-  }
+  public DiscussPost findDiscussPostById(int id) {
+          return discussPostMapper.selectDiscussPostById(id);
+      }
   ```
 
 
@@ -2522,7 +2548,7 @@ function publish() {
 - index.html，在帖子标题上增加访问详情页面的链接
 
   ```html
-  <!--超链接到帖子详情页，常量拼变量 |  |-->
+  <!--超链接到帖子详情页，常量和变量拼接在一起用 |  |-->
   <a th:href="@{|/discuss/detail/${map.post.id}|}" th:utext="${map.post.title}">备战春招，面试刷题跟他复习，一个月全搞定！</a>
   ```
 
@@ -2580,7 +2606,7 @@ function publish() {
 
 常见的并发异常 
 
-- 第一类丢失更新、第二类丢失更新、脏读、不可重复读、幻读。
+- 第一类丢失更新 、第二类丢失更新、脏读、不可重复读、幻读。
 
   ![image-20210922105451755](community.assets/image-20210922105451755.png)
 
@@ -2626,39 +2652,158 @@ function publish() {
 
   > 声明式事务 - 通过XML配置，声明某方法的事务特征。 - 通过注解，声明某方法的事务特征。
 
+  ```java
+      @Autowired
+      private UserMapper userMapper;
+  
+      @Autowired
+      private DiscussPostMapper discussPostMapper;
+  
+  // REQUIRED: 支持当前事务(外部事务),如果不存在则创建新事务.
+      // REQUIRES_NEW: 创建一个新事务,并且暂停当前事务(外部事务).
+      // NESTED: 如果当前存在事务(外部事务),则嵌套在该事务中执行(独立的提交和回滚),否则就会REQUIRED一样.
+      @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+      public Object save1() {
+          // 新增用户
+          User user = new User();
+          user.setUsername("alpha");
+          user.setSalt(CommunityUtil.generateUUID().substring(0, 5));
+          user.setPassword(CommunityUtil.md5("123" + user.getSalt()));
+          user.setEmail("alpha@qq.com");
+          user.setHeaderUrl("http://image.nowcoder.com/head/99t.png");
+          user.setCreateTime(new Date());
+          userMapper.insertUser(user);
+  
+          // 新增帖子
+          DiscussPost post = new DiscussPost();
+          post.setUserId(user.getId());
+          post.setTitle("Hello");
+          post.setContent("新人报道!");
+          post.setCreateTime(new Date());
+          discussPostMapper.insertDiscussPost(post);
+  
+          Integer.valueOf("abc");
+          return "ok";
+      }
+  ```
+  
   > 编程式事务 - 通过 TransactionTemplate 管理事务， 并通过它执行数据库的操作。
-
-
+  
+  ```java
+      @Autowired
+      private TransactionTemplate transactionTemplate;
+  
+  public Object save2() {
+          transactionTemplate.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
+          transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+  
+          return transactionTemplate.execute(new TransactionCallback<Object>() {
+              @Override
+              public Object doInTransaction(TransactionStatus status) {
+                  // 新增用户
+                  User user = new User();
+                  user.setUsername("beta");
+                  user.setSalt(CommunityUtil.generateUUID().substring(0, 5));
+                  user.setPassword(CommunityUtil.md5("123" + user.getSalt()));
+                  user.setEmail("beta@qq.com");
+                  user.setHeaderUrl("http://image.nowcoder.com/head/999t.png");
+                  user.setCreateTime(new Date());
+                  userMapper.insertUser(user);
+  
+                  // 新增帖子
+                  DiscussPost post = new DiscussPost();
+                  post.setUserId(user.getId());
+                  post.setTitle("你好");
+                  post.setContent("我是新人!");
+                  post.setCreateTime(new Date());
+                  discussPostMapper.insertDiscussPost(post);
+  
+                  Integer.valueOf("abc");
+  
+                  return "ok";
+              }
+          });
+      }
+  ```
+  
+  > Test.java
+  
+  ```java
+  @RunWith(SpringRunner.class)
+  @SpringBootTest
+  @ContextConfiguration(classes = CommunityApplication.class)
+  public class TransactionTests {
+  
+      @Autowired
+      private AlphaService alphaService;
+  
+      @Test
+      public void testSave1() {
+          Object obj = alphaService.save1();
+          System.out.println(obj);
+      }
+  
+      @Test
+      public void testSave2() {
+          Object obj = alphaService.save2();
+          System.out.println(obj);
+      }
+  
+  }
+  ```
 
 ### 3.5 显示评论
 
 ![image-20210927094801848](community.assets/image-20210927094801848.png)
 
+- 踩雷
+
+  [Thymeleaf踩雷之SpelEvaluationException: EL1007E: Property or field 'map.user.heaUrl' canno be found on null]([(37条消息) Thymeleaf踩雷之SpelEvaluationException: EL1007E: Property or field 'data' canno be found on null_Escorts的博客-CSDN博客](https://blog.csdn.net/Escorts/article/details/102788497))
+
+  ```html
+  <p th:text="${resultVO}"></p>
+  ```
+
+  试一下先判断下 resultVO 非空，排除值为空的可能！
+
+  ```html
+  <th:block th:if="${resultVO != null}">
+     <p th:text="${resultVO.data}"></p>
+  </th:block>
+  ```
+
+  ```html
+  <!--看到一个说只要在前端加个问号就行，，试了下，可以 -->
+  <span th:text="${u2?.userName}">小红</span>
+  ```
+
+  
+
 - service层CommentService
 
   ```java
   /**
-   * Description: 通过状态(=0)和Entity查询Comment的数量
-   *
-   * @param entityType:
-   * @param entityId:
-   * @return int:
-   */
-  public int queryCountByStatusAndEntity(int entityType, int entityId) {
-      return commentDao.queryCountByStatusAndEntity(entityType, entityId);
-  }
+       * Description: 通过状态(1帖子评论和2回复)和Entity查询Comment
+       * @param entityType:
+       * @param entityId:
+       * @param offset:
+       * @param limit:
+       * @return java.util.List<com.it.community.entity.Comment>:
+       */
+      public List<Comment> findCommentsByEntity(int entityType, int entityId, int offset, int limit) {
+          return commentMapper.selectCommentsByEntity(entityType, entityId, offset, limit);
+      }
   
-  /**
-   * Description: 通过状态(=0)和Entity查询Comment
-   * @param entityType:
-   * @param entityId:
-   * @param offset:
-   * @param limit:
-   * @return java.util.List<com.it.community.entity.Comment>:
-   */
-  public List<Comment> findCommentsByEntity(int entityType, int entityId, int offset, int limit) {
-      return commentDao.selectCommentsByEntity(entityType, entityId, offset, limit);
-  }
+      /**
+       * Description: 通过状态(1帖子评论和2回复)和Entity查询Comment的数量
+       *
+       * @param entityType:
+       * @param entityId:
+       * @return int:
+       */
+      public int findCommentCount(int entityType, int entityId) {
+          return commentMapper.selectCountByEntity(entityType, entityId);
+      }
   ```
 
 
@@ -2666,72 +2811,76 @@ function publish() {
 - Controller层DisscussPostController
 
   ```java
-  @GetMapping("/detail/{discussPostId}")
-  public String getDiscussPost(@PathVariable("discussPostId") int discussPostId, Model model,
-                               @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum) {
-      // 帖子
-      DiscussPost post = discussPostService.queryById(discussPostId);
-      model.addAttribute("post", post);
-      // 通过userId查询对应的user数据
-      User user = userService.queryById(post.getUserId());
-      model.addAttribute("user", user);
+  @RequestMapping(path = "/detail/{discussPostId}", method = RequestMethod.GET)
+      public String getDiscussPost(@PathVariable("discussPostId") int discussPostId, Model model, Page page) {
+          // 帖子
+          DiscussPost post = discussPostService.findDiscussPostById(discussPostId);
+          model.addAttribute("post", post);
+          // 作者
+          User user = userService.findUserById(post.getUserId());
+          model.addAttribute("user", user);
   
-      // 评论分页信息
-      page.setLimit(5);
-      page.setPath("/discuss/detail/" + discussPostId);
-      page.setRows(post.getCommentCount());
-      
-      // 评论: 给帖子的评论
-      // 回复: 给评论的评论
-      // 评论列表
-      List<Comment> commentList = commentService.findCommentsByEntity(
-          ENTITY_TYPE_POST, post.getId(), page.getOffset(), page.getLimit());
-      // 将查出来的Comment与对应的User信息一起封装到Map，再组装成为List
-      List<Map<String, Object>> commentVoList = new ArrayList<>();
-      if (commentList != null) {
-          for (Comment comment : commentList) {
-              Map<String, Object> commentVo = new HashMap<>();
-              // 评论
-              commentVo.put("comment", comment);
-              // 此处的user是评论者，前处的user是发帖者
-              commentVo.put("user", userService.queryById(comment.getUserId()));
-              // 回复(不分页)
-              List<Comment> replyList = commentService.queryByStatusAndEntity(ENTITY_TYPE_COMMENT, comment.getId());
-              // 将查出来的回复与对应的User信息一起封装到Map，再组装成为List、
-              List<Map<String, Object>> replyVoList = new ArrayList<>();
-              if (replyList != null) {
-                  for (Comment reply : replyList) {
-                      Map<String, Object> replyVo = new HashMap<>();
-                      // 回复
-                      replyVo.put("reply", reply);
-                      // 回复者
-                      replyVo.put("user", userService.queryById(reply.getUserId()));
-                      // 被回复者
-                      User target = reply.getTargetId() == 0 ? null : userService.queryById(reply.getTargetId());
-                      replyVo.put("target", target);
+          // 评论分页信息
+          page.setLimit(5);
+          page.setPath("/discuss/detail/" + discussPostId);
+          page.setRows(post.getCommentCount());
   
-                      replyVoList.add(replyVo);
+          // 评论: 给帖子的评论
+          // 回复: 给评论的评论
+          // 给帖子的评论列表
+          //post.getId()表示entity_id，这条评论所指向的帖子的id
+          List<Comment> commentList = commentService.findCommentsByEntity(
+                  ENTITY_TYPE_POST, post.getId(), page.getOffset(), page.getLimit());
+  
+          // 评论VO列表
+          //将查出来的Comment与对应的User信息一起封装到Map，再组装成为List
+          List<Map<String, Object>> commentVoList = new ArrayList<>();
+          if (commentList != null) {
+              for (Comment comment : commentList) {
+                  // 评论VO
+                  Map<String, Object> commentVo = new HashMap<>();
+                  // 向Map里添加评论
+                  commentVo.put("comment", comment);
+                  // 添加评论该帖子的作者
+                  commentVo.put("user", userService.findUserById(comment.getUserId()));
+                  // 回复（不分页）
+                  List<Comment> replyList = commentService.findCommentsByEntity(
+                          ENTITY_TYPE_COMMENT, comment.getId(), 0, Integer.MAX_VALUE);
+                  // 回复VO列表
+                  // 将查出来的回复与对应的User信息一起封装到Map，再组装成为List、
+                  List<Map<String, Object>> replyVoList = new ArrayList<>();
+                  if (replyList != null) {
+                      for (Comment reply : replyList) {
+                          Map<String, Object> replyVo = new HashMap<>();
+                          // 回复
+                          replyVo.put("reply", reply);
+                          // 作者
+                          replyVo.put("user", userService.findUserById(reply.getUserId()));
+                          // 被回复者目标
+                          User target = reply.getTargetId() == 0 ? null : userService.findUserById(reply.getTargetId());
+                          replyVo.put("target", target);
+  
+                          replyVoList.add(replyVo);
+                      }
                   }
+                  commentVo.put("replys", replyVoList);
+  
+                  // 回复数量
+                  int replyCount = commentService.findCommentCount(ENTITY_TYPE_COMMENT, comment.getId());
+                  commentVo.put("replyCount", replyCount);
+  
+                  commentVoList.add(commentVo);
               }
-              commentVo.put("replies", replyVoList);
-              // 回复数量
-              int replyCount = commentService.queryCountByStatusAndEntity(ENTITY_TYPE_COMMENT, comment.getId());
-              commentVo.put("replyCount", replyCount);
-  
-              commentVoList.add(commentVo);
           }
+          //将数据存入request域并请求转发
+          model.addAttribute("comments", commentVoList);
+          // 跳转到帖子详情页面
+          return "/site/discuss-detail";
       }
-  
-      //将数据存入request域并请求转发
-      model.addAttribute("comments", commentVoList);
-  
-      // 跳转到帖子详情页面
-      return "/site/discuss-detail";
-  }
   ```
-
+  
   > CommunityConstant
-
+  
   ```java
   public interface CommunityConstant {
   
@@ -2752,7 +2901,7 @@ function publish() {
 - discuss-detail.html
 
   ```html
-  		<!-- 回帖 -->
+  <!-- 回帖 -->
   			<div class="container mt-3">
   				<!-- 回帖数量 -->
   				<div class="row">
@@ -2765,7 +2914,6 @@ function publish() {
   				</div>
   				<!-- 回帖列表 -->
   				<ul class="list-unstyled mt-4">
-  					<!-- 循环显示回帖 -->
   					<li class="media pb-3 pt-3 mb-3 border-bottom" th:each="cvo:${comments}">
   						<a href="profile.html">
   							<img th:src="${cvo.user.headerUrl}" class="align-self-start mr-4 rounded-circle user-header" alt="用户头像" >
@@ -2774,7 +2922,6 @@ function publish() {
   							<div class="mt-0">
   								<span class="font-size-12 text-success" th:utext="${cvo.user.username}">掉脑袋切切</span>
   								<span class="badge badge-secondary float-right floor">
-  									<!-- 评论楼数，Stat获取循环次数 -->
   									<i th:text="${page.offset + cvoStat.count}">1</i>#
   								</span>
   							</div>
@@ -2791,15 +2938,14 @@ function publish() {
   							</div>
   							<!-- 回复列表 -->
   							<ul class="list-unstyled mt-4 bg-gray p-3 font-size-12 text-muted">
-  								<!-- 循环显示回复（给评论的评论）-->
-  								<li class="pb-3 pt-3 mb-3 border-bottom" th:each="rvo:${cvo.replies}">
-  									<!-- 有两种情况，无回复人和有回复人 -->
+  
+  								<li class="pb-3 pt-3 mb-3 border-bottom" th:each="rvo:${cvo.replys}">
   									<div>
   										<span th:if="${rvo.target==null}">
   											<b class="text-info" th:text="${rvo.user.username}">寒江雪</b>:&nbsp;&nbsp;
   										</span>
   										<span th:if="${rvo.target!=null}">
-  											<i class="text-info" th:text="${rvo.user.username}">Sissi</i>回复
+  											<i class="text-info" th:text="${rvo.user.username}">Sissi</i> 回复
   											<b class="text-info" th:text="${rvo.target.username}">寒江雪</b>:&nbsp;&nbsp;
   										</span>
   										<span th:utext="${rvo.reply.content}">这个是直播时间哈，觉得晚的话可以直接看之前的完整录播的~</span>
@@ -2809,34 +2955,42 @@ function publish() {
   										<ul class="d-inline float-right">
   											<li class="d-inline ml-2"><a href="#" class="text-primary">赞(1)</a></li>
   											<li class="d-inline ml-2">|</li>
-  											<!-- 回复按钮 -->
   											<li class="d-inline ml-2"><a th:href="|#huifu-${rvoStat.count}|" data-toggle="collapse" class="text-primary">回复</a></li>
   										</ul>
-  										<!-- 点击回复出现回复框 动态生成（对评论的评论回复，有回复人target）-->
   										<div th:id="|huifu-${rvoStat.count}|" class="mt-4 collapse">
-  											<div>
-  												<input type="text" class="input-size" th:placeholder="|回复${rvo.user.username}|"/>
-  											</div>
-  											<div class="text-right mt-2">
-  												<button type="button" class="btn btn-primary btn-sm" onclick="#">&nbsp;&nbsp;回&nbsp;&nbsp;复&nbsp;&nbsp;</button>
-  											</div>										
+  											<form method="post" th:action="@{|/comment/add/${post.id}|}">
+  												<div>
+  													<input type="text" class="input-size" name="content" th:placeholder="|回复${rvo.user.username}|"/>
+  													<input type="hidden" name="entityType" value="2">
+  													<input type="hidden" name="entityId" th:value="${cvo.comment.id}">
+  													<input type="hidden" name="targetId" th:value="${rvo.user.id}">
+  												</div>
+  												<div class="text-right mt-2">
+  													<button type="submit" class="btn btn-primary btn-sm" onclick="#">&nbsp;&nbsp;回&nbsp;&nbsp;复&nbsp;&nbsp;</button>
+  												</div>
+  											</form>
   										</div>
   									</div>								
   								</li>
-  								<!-- 添加评论的回复输入框（对评论的评论，无回复人target） -->
+  
+  								<!-- 回复输入框 -->
   								<li class="pb-3 pt-3">
-  									<div>
-  										<input type="text" class="input-size" placeholder="请输入你的观点"/>
-  									</div>
-  									<div class="text-right mt-2">
-  										<button type="button" class="btn btn-primary btn-sm" onclick="#">&nbsp;&nbsp;回&nbsp;&nbsp;复&nbsp;&nbsp;</button>
-  									</div>
+  									<form method="post" th:action="@{|/comment/add/${post.id}|}">
+  										<div>
+  											<input type="text" class="input-size" name="content" placeholder="请输入你的观点"/>
+  											<input type="hidden" name="entityType" value="2">
+  											<input type="hidden" name="entityId" th:value="${cvo.comment.id}">
+  										</div>
+  										<div class="text-right mt-2">
+  											<button type="submit" class="btn btn-primary btn-sm" onclick="#">&nbsp;&nbsp;回&nbsp;&nbsp;复&nbsp;&nbsp;</button>
+  										</div>
+  									</form>
   								</li>
   							</ul>
   						</div>
   					</li>
   				</ul>
-  				<!-- 分页，复用首页 -->
+  				<!-- 分页 -->
   				<nav class="mt-5" th:replace="index::pagination">
   					<ul class="pagination justify-content-center">
   						<li class="page-item"><a class="page-link" href="#">首页</a></li>
