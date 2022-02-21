@@ -3023,29 +3023,25 @@ function publish() {
   @Resource
   private DiscussPostService discussPostService;
   
-  /**
-   * Description: 添加评论
-   *
-   * @param comment:
-   * @return int:
-   */
-  @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
-  public int addComment(Comment comment) {
-      if (comment == null) {
-          throw new IllegalArgumentException("参数不能为空！");
-      }
+   @Transactional(isolation = Isolation.READ_COMMITTED, propagation = Propagation.REQUIRED)
+      public int addComment(Comment comment) {
+          if (comment == null) {
+              throw new IllegalArgumentException("参数不能为空!");
+          }
   
-      // 转义html字符和过滤敏感词
-      comment.setContent(HtmlUtils.htmlEscape(comment.getContent()));
-      comment.setContent(sensitiveFilter.filter(comment.getContent()));
-      // 添加评论
-      int rows = commentDao.insert(comment);
-      // 更新帖子评论数量（对评论的评论则不增加）
-      if (comment.getEntityType() == ENTITY_TYPE_POST) {
-          int count = commentDao.queryCountByStatusAndEntity(comment.getEntityType(), comment.getEntityId());
-          discussPostService.updateCommentCountById(comment.getEntityId(), count);
+          // 先添加评论，过滤敏感词和html标签
+          comment.setContent(HtmlUtils.htmlEscape(comment.getContent()));
+          comment.setContent(sensitiveFilter.filter(comment.getContent()));
+          int rows = commentMapper.insertComment(comment);
+  
+          // 再更新回帖评论数量，对评论的回复不增加
+          if (comment.getEntityType() == ENTITY_TYPE_POST) {
+              int count = commentMapper.selectCountByEntity(comment.getEntityType(), comment.getEntityId());
+              discussPostService.updateCommentCount(comment.getEntityId(), count);
+          }
+  
+          return rows;
       }
-      return rows;
   }
   ```
 
@@ -3146,107 +3142,239 @@ function publish() {
 
 ### 3.7 私信列表
 
-- 私信列表：查询当前用户的会话列表， 每个会话只显示一条最新的私信，支持分页显示。
-
-  > Service层MessageService
+- 创建实体类
 
   ```java
-  /**
-   * Description: 查询当前用户的会话列表，针对每个会话只返回一条最新的私信
-   *
-   * @param userId:
-   * @param offset:
-   * @param limit:
-   * @return java.util.List<com.it.community.entity.Message>:
-   */
-  List<Message> selectConversations(int userId, int offset, int limit);
+  public class Message {
   
-  /**
-   * Description: 查询当前用户的会话数量
-   *
-   * @param userId:
-   * @return int:
-   */
-  int queryConversationCountByUserId(int userId);
-  
-  /**
-   * Description: 查询某个会话所包含的私信列表
-   *
-   * @param conversationId:
-   * @param offset:
-   * @param limit:
-   * @return java.util.List<com.it.community.entity.Message>:
-   */
-  List<Message> selectLetters(String conversationId, int offset, int limit);
-  
-  /**
-   * Description: 查询某个会话所包含的私信数量
-   *
-   * @param conversationId:
-   * @return int:
-   */
-  int queryLettersCountByConversationId(String conversationId);
-  
-  
-  /**
-   * Description: 查询未读私信数量(所有的和单个会话的)
-   *
-   * @param userId:
-   * @param conversationId:
-   * @return int:
-   */
-  int queryLettersCountByUserId(int userId, String conversationId);
+      private int id;
+      private int fromId;
+      private int toId;
+      private String conversationId;
+      private String content;
+      private int status;
+      private Date createTime;
+  }
   ```
-  
-  > Controller层MessageController
-  
+
+- Mapper接口
+
   ```java
-  // 显示私信列表
-  @GetMapping("/list")
-  public String getLetterList(Model model, @RequestParam(value = "pageNum", required = false,
-          defaultValue = "1") Integer pageNum) {
+  @Mapper
+  @Repository
+  public interface MessageMapper {
   
-      User user = hostHolder.getUser();
-      // 分页信息
-      page.setLimit(5);
-      page.setPath("/letter/list");
-      page.setRows(messageService.queryConversationCountByUserId(user.getId()));
+      // 查询当前用户的会话列表,针对每个会话只返回一条最新的私信l,group by conversation_id  通过聚合函数max(id) 获取最新的一条私信
+      List<Message> selectConversations(int userId, int offset, int limit);
   
-      // 会话列表
-      List<Message> conversationList = messageService.findConversations(
-              user.getId(), page.getOffset(), page.getLimit());
-      List<Map<String, Object>> conversations = new ArrayList<>();
-      if (conversationList != null) {
-          for (Message message : conversationList) {
-              Map<String, Object> map = new HashMap<>();
-              // 每个会话只返回一条最新的私信
-              map.put("conversation", message);
-              // 每个会话的消息数量
-              map.put("letterCount", messageService.queryLettersCountByConversationId(message.getConversationId()));
-              // 每个会话的未读消息数量
-              map.put("unreadCount", messageService.queryLettersCountByUserId(user.getId(), message.getConversationId()));
-              // 会话的另一方的信息
-              int targetId = user.getId() == message.getFromId() ? message.getToId() : message.getFromId();
-              map.put("target", userService.queryById(targetId));
+      // 查询当前用户的会话数量.
+      int selectConversationCount(int userId);
   
-              conversations.add(map);
-          }
-      }
-      // 整个用户的所有未读消息数量
-      int letterUnreadCount = messageService.queryLettersCountByUserId(user.getId(), null);
-      //将数据存入request域并请求转发
-      model.addAttribute("conversations", conversations);
-      model.addAttribute("letterUnreadCount", letterUnreadCount);
+      // 查询某个会话所包含的私信列表.
+      List<Message> selectLetters(String conversationId, int offset, int limit);
   
-      //resources/templates下
-      return "/site/letter";
+      // 查询某个会话所包含的私信数量.
+      int selectLetterCount(String conversationId);
+  
+      // 查询未读私信的数量，conversationId可以作用也可以不作用，实现两种业务（当前用户总的未读私信数量，以及当前用户与其他用户的私信未读数量）
+      int selectLetterUnreadCount(int userId, String conversationId);
+  
+      // 新增消息
+      int insertMessage(Message message);
+  
+      // 修改消息的状态
+      int updateStatus(List<Integer> ids, int status);
+  
   }
   ```
   
-  > 前端letter.html
+- 配置xml
+	
+  [group by用法参考此链接](https://blog.csdn.net/u014717572/article/details/80687042)
   
+  `status` int(11) DEFAULT NULL COMMENT '0-未读;1-已读;2-删除;',
+  
+  ```xml
+  <mapper namespace="com.nxsp.community.dao.MessageMapper">
+  
+      <sql id="selectFields">
+          id, from_id, to_id, conversation_id, content, status, create_time
+      </sql>
+  
+      <sql id="insertFields">
+          from_id, to_id, conversation_id, content, status, create_time
+      </sql>
+  
+      <select id="selectConversations" resultType="Message">
+          select <include refid="selectFields"></include>
+          from message
+          where id in (
+              select max(id) from message
+              where status != 2
+              and from_id != 1
+              and (from_id = #{userId} or to_id = #{userId})
+              group by conversation_id
+          )
+          order by id desc
+          limit #{offset}, #{limit}
+      </select>
+  
+      <select id="selectConversationCount" resultType="int">
+          select count(m.maxid) from (
+              select max(id) as maxid from message
+              where status != 2
+              and from_id != 1
+              and (from_id = #{userId} or to_id = #{userId})
+              group by conversation_id
+          ) as m
+      </select>
+  
+      <select id="selectLetters" resultType="Message">
+          select <include refid="selectFields"></include>
+          from message
+          where status != 2
+          and from_id != 1
+          and conversation_id = #{conversationId}
+          order by id desc
+          limit #{offset}, #{limit}
+      </select>
+  
+      <select id="selectLetterCount" resultType="int">
+          select count(id)
+          from message
+          where status != 2
+          and from_id != 1
+          and conversation_id = #{conversationId}
+      </select>
+  
+      <select id="selectLetterUnreadCount" resultType="int">
+          select count(id)
+          from message
+          where status = 0
+          and from_id != 1
+          and to_id = #{userId}
+          <if test="conversationId!=null">
+              and conversation_id = #{conversationId}
+          </if>
+      </select>
+  
+      <insert id="insertMessage" parameterType="Message" keyProperty="id">
+          insert into message(<include refid="insertFields"></include>)
+          values(#{fromId},#{toId},#{conversationId},#{content},#{status},#{createTime})
+      </insert>
+  
+      <update id="updateStatus">
+          update message set status = #{status}
+          where id in
+          <foreach collection="ids" item="id" open="(" separator="," close=")">
+              #{id}
+	        </foreach>
+	    </update>
+	
+	</mapper>
+	```
+	
+- 私信列表：查询当前用户的会话列表， 每个会话只显示一条最新的私信，支持分页显示。
+> Service层MessageService
+ ```java
+  /**
+   * Description: 查询当前用户的会话列表，针对每个会话只返回一条最新的私信
+   * @param userId:
+   * @param offset:
+   * @param limit:
+   * @return java.util.List<com.it.community.entity.Message>:
+   */
+      public List<Message> findConversations(int userId, int offset, int limit) {
+        return messageMapper.selectConversations(userId, offset, limit);
+    }
+
+
+  /**
+   * Description: 查询当前用户的会话数量
+   * @param userId:
+   * @return int:
+   */
+    public int findConversationCount(int userId) {
+        return messageMapper.selectConversationCount(userId);
+    }
+
+
+  /**
+   * Description: 查询某个会话所包含的私信列表
+   * @param conversationId:
+   * @param offset:
+   * @param limit:
+   * @return java.util.List<com.it.community.entity.Message>:
+   */
+    public List<Message> findLetters(String conversationId, int offset, int limit) {
+        return messageMapper.selectLetters(conversationId, offset, limit);
+    }
+
+  /**
+   * Description: 查询某个会话所包含的私信数量
+   * @param conversationId:
+   * @return int:
+   */
+     public int findLetterCount(String conversationId) {
+        return messageMapper.selectLetterCount(conversationId);
+    }
+
+
+  /**
+   * Description: 查询未读私信数量(所有的和单个会话的)
+   * @param userId:
+   * @param conversationId:
+   * @return int:
+   */
+   public int findLetterUnreadCount(int userId, String conversationId) {
+        return messageMapper.selectLetterUnreadCount(userId, conversationId);
+    }
+ ```
+
+
+  > Controller层MessageController
+
+  ```java
+  // 私信列表
+      @RequestMapping(path = "/letter/list", method = RequestMethod.GET)
+      public String getLetterList(Model model, Page page) {
+          User user = hostHolder.getUser();
+          // 分页信息
+          page.setLimit(5);
+          page.setPath("/letter/list");
+          page.setRows(messageService.findConversationCount(user.getId()));
+  
+          // 会话列表
+          List<Message> conversationList = messageService.findConversations(
+                  user.getId(), page.getOffset(), page.getLimit());
+          List<Map<String, Object>> conversations = new ArrayList<>();
+          if (conversationList != null) {
+              for (Message message : conversationList) {
+                  Map<String, Object> map = new HashMap<>();
+                  map.put("conversation", message);
+                  map.put("letterCount", messageService.findLetterCount(message.getConversationId()));
+                  map.put("unreadCount", messageService.findLetterUnreadCount(user.getId(), message.getConversationId()));
+                  //显示对应用户的头像，排除当前登录的用户
+                  int targetId = user.getId() == message.getFromId() ? message.getToId() : message.getFromId();
+                  map.put("target", userService.findUserById(targetId));
+  
+                  conversations.add(map);
+              }
+          }
+          model.addAttribute("conversations", conversations);
+  
+          // 查询未读消息数量
+          int letterUnreadCount = messageService.findLetterUnreadCount(user.getId(), null);
+          model.addAttribute("letterUnreadCount", letterUnreadCount);
+  
+          return "/site/letter";
+      }
+  ```
+
+  > 前端letter.html
+
   ```html
-  <!-- 选项,私信和系统通知切换以及未读消息的显示 -->
+  <!-- 选项,私信和系统通知切换以及未读消息的显示，已读 -->
   <ul class="nav nav-tabs mb-3">
      <li class="nav-item">
         <a class="nav-link position-relative active" th:href="@{/letter/list}">
@@ -3258,7 +3386,7 @@ function publish() {
      </li>
   </ul>
   ```
-  
+
   ```html
   <!-- 私信列表 -->
   <ul class="list-unstyled">
@@ -3308,77 +3436,74 @@ function publish() {
 
   ```java
   // 显示私信详情
-  @GetMapping("/detail/{conversationId}")
-  public String getLetterDetail(@PathVariable("conversationId") String conversationId,
-                                Model model,
-                                @RequestParam(value = "pageNum", required = false, defaultValue = "1") Integer pageNum) {
+      @RequestMapping(path = "/letter/detail/{conversationId}", method = RequestMethod.GET)
+      public String getLetterDetail(@PathVariable("conversationId") String conversationId, Page page, Model model) {
+          // 分页信息
+          page.setLimit(5);
+          page.setPath("/letter/detail/" + conversationId);
+          page.setRows(messageService.findLetterCount(conversationId));
   
-      User user = hostHolder.getUser();
-      // 分页信息
-      page.setLimit(5);
-      page.setPath("/letter/detail/" + conversationId);
-      page.setRows(messageService.queryLettersCountByConversationId(conversationId));
-  
-      // 私信列表
-      List<Message> letterList = messageService.findLetters(conversationId, page.getOffset(), page.getLimit());
-      List<Map<String, Object>> letters = new ArrayList<>();
-      if (letterList != null) {
-          for (Message message : letterList) {
-              Map<String, Object> map = new HashMap<>();
-              // 单条私信
-              map.put("letter", message);
-              // 私信发送方（自己或会话另一方，有来有回）
-              map.put("fromUser", userService.queryById(message.getFromId()));
-  
-              letters.add(map);
-          }
-      }
-      // 会话的另一方
-      model.addAttribute("target", getLetterTarget(conversationId));
-      // 将数据存入request域并请求转发
-      model.addAttribute("letters", letters);
-  
-      // 设置未读消息为已读
-      List<Integer> ids = getLetterIds(letterList);
-      if (!ids.isEmpty()) {
-          messageService.readMessage(ids);
-      }
-  
-      // resources/templates下
-      return "/site/letter-detail";
-  }
-  
-  // 返回当前用户为接收方且消息是未读状态的消息id集合
-  private List<Integer> getLetterIds(List<Message> letterList) {
-      List<Integer> ids = new ArrayList<>();
-      if (letterList != null) {
-          for (Message message : letterList) {
-              // 如果当前用户是消息的接受方且消息是未读状态
-              // 此处返回值为Integer，不能直接使用==判断
-              if (hostHolder.getUser().getId().equals(message.getToId()) && message.getStatus() == 0) {
-                  ids.add(message.getId());
+          // 私信列表
+          List<Message> letterList = messageService.findLetters(conversationId, page.getOffset(), page.getLimit());
+          List<Map<String, Object>> letters = new ArrayList<>();
+          if (letterList != null) {
+              for (Message message : letterList) {
+                  Map<String, Object> map = new HashMap<>();
+                  // 单条私信
+                  map.put("letter", message);
+                  // 私信发送方（自己或会话另一方，有来有回）
+                  map.put("fromUser", userService.findUserById(message.getFromId()));
+                  letters.add(map);
               }
           }
-      }
-      return ids;
-  }
+          model.addAttribute("letters", letters);
   
-  // 从conversationId获取Letter的Target（对方）
-  private User getLetterTarget(String conversationId) {
-      String[] ids = conversationId.split("_");
-      int id0 = Integer.parseInt(ids[0]);
-      int id1 = Integer.parseInt(ids[1]);
+          // 私信目标
+          // 会话的另一方
+          model.addAttribute("target", getLetterTarget(conversationId));
   
-      if (hostHolder.getUser().getId() == id0) {
-          return userService.queryById(id1);
-      } else {
-          return userService.queryById(id0);
+          //设置未读消息为已读
+          List<Integer> ids = getLetterIds(letterList);
+          if (!ids.isEmpty()) {
+              messageService.readMessage(ids);
+          }
+  
+          return "/site/letter-detail";
       }
-  }
+  
+      // 从conversationId获取Letter的Target（对方）
+      private User getLetterTarget(String conversationId) {
+          String[] ids = conversationId.split("_");
+          int id0 = Integer.parseInt(ids[0]);
+          int id1 = Integer.parseInt(ids[1]);
+  
+          if (hostHolder.getUser().getId() == id0) {
+              return userService.findUserById(id1);
+          } else {
+              return userService.findUserById(id0);
+          }
+      }
+  
+      // 返回当前用户为接收方且消息是未读状态的消息id集合
+      private List<Integer> getLetterIds(List<Message> letterList) {
+          List<Integer> ids = new ArrayList<>();
+  
+          if (letterList != null) {
+              for (Message message : letterList) {
+                  // 如果当前用户是消息的接受方且消息是未读状态
+                  // 此处返回值为Integer，不能直接使用==判断
+                  if (hostHolder.getUser().getId() == message.getToId() && message.getStatus() == 0) {
+                      ids.add(message.getId());
+                  }
+              }
+          }
+  
+          return ids;
+      }
   ```
   
   > 前端letter-detail.html
-
+  
   ```html
   <!-- 私信列表 -->
   <ul class="list-unstyled mt-4">
@@ -3529,7 +3654,7 @@ function publish() {
 
 
 
-- Spring的统一异常处理方案：
+- Spring的统一异常处理方案（为了记录日志）：
 
   > >@ControllerAdvice
   >
@@ -3642,14 +3767,19 @@ function publish() {
       private static final Logger logger = LoggerFactory.getLogger(ServiceAspect.class);
   
       // 声明切点
-      @Pointcut("execution(* com.it.community.service.impl.*.*(..))")
+      // 第一个*表示方法的返回值：所有的返回值都行
+      // com.nxsp.community.service: 包名
+      // 第二个.*：包下的所有类
+      // 第二个.*: 类的所有方法
+      // （..）: 所有的参数
+      @Pointcut("execution(* com.nxsp.community.service.*.*(..))")
       public void pointcut() {
   
       }
   
       @Before("pointcut()")
       public void before(JoinPoint joinPoint) {
-          // 用户[1.2.3.4],在[xxx],访问了[com.it.community.service.xxx()].
+          // 用户[1.2.3.4],在[xxx],访问了[com.nxsp.community.service.xxx()].
           // 获取ip地址
           ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
           HttpServletRequest request = attributes.getRequest();
@@ -3679,7 +3809,9 @@ function publish() {
 
 
 
-- Redis在dos命令行的操作命令
+- Redis在dos命令行的常用命令
+
+  flushdb 刷新清除库 、select 0 从redis的16个库中选择一个库进行操作、test:count是Redis的key，冒号相当于下划线、lpush表示从左侧压入数据、lindex表示从左侧索引，初始索引是0、rpop表示从右侧弹出数据、sadd test:teacher aaa bbb ccc ddd 添加数据到集合中、scard test:teacher 统计集合中有多少元素、spop表示从集合中随机的弹出元素、smembers test:students 罗列出集合中所有的元素、
 
 ![image-20210929154500167](community.assets/image-20210929154500167.png)
 
@@ -3687,6 +3819,44 @@ function publish() {
 
 
 
+- 引入pom.xml
+
+  ```xml
+   <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-redis -->
+          <dependency>
+              <groupId>org.springframework.boot</groupId>
+              <artifactId>spring-boot-starter-data-redis</artifactId>
+          </dependency>
+  ```
+  
+  
+  
+- Redis的配置类RedisConfig
+
+  ```java
+  @Configuration
+  public class RedisConfig  {
+  
+      @Bean
+      public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory){
+          RedisTemplate<String, Object> template = new RedisTemplate<>();
+          template .setConnectionFactory(factory);
+          //设置key的序列化方式
+          template.setKeySerializer(RedisSerializer.string());
+          //设置value
+          template.setValueSerializer(RedisSerializer.json());
+          //设置hash的key的序列化方式
+          template.setHashKeySerializer(RedisSerializer.string());
+          //设置hash的value的序列化方式
+          template.setHashValueSerializer(RedisSerializer.json());
+  
+          template.afterPropertiesSet();
+          return template;
+      }
+  
+  }
+  ```
+  
 - Redis在IDEA的操作命令
 
   ```java
@@ -3795,32 +3965,46 @@ function publish() {
   >LikeService提供直接操作Redis数据库的方法
 
   ```java
-  @Service("likeService")
-  public class LikeServiceImpl implements LikeService {
+  @Service
+  public class LikeService {
   
-      @Resource
+      @Autowired
       private RedisTemplate redisTemplate;
   
   
       /**
-       * Description: 点赞功能，双击取消
+       * Description: 点赞功能，取消点赞
        *
        * @param userId:     点赞者id
        * @param entityType: 待点赞的实体类型
        * @param entityId:   待点赞的实体Id
        * @return void:
        */
-      public void like(int userId, int entityType, int entityId) {
-          // 生成当前实体的点赞在Redis中的key
-          String entityLikeKey = RedisKeyUtil.getEntityLikeKey(entityType, entityId);
-          // 判断Redis中是否有此用户对当前实体的点赞(集合set)
-          if (redisTemplate.opsForSet().isMember(entityLikeKey, userId)) {
-              // 有点赞，双击取消点赞
-              redisTemplate.opsForSet().remove(entityLikeKey, userId);
-          } else {
-              // 没有点赞，记录点赞
-              redisTemplate.opsForSet().add(entityLikeKey, userId);
-          }
+      public void like(int userId, int entityType, int entityId, int entityUserId) {
+          redisTemplate.execute(new SessionCallback() {
+              @Override
+              public Object execute(RedisOperations operations) throws DataAccessException {
+                  // 生成当前实体的点赞在Redis中的key
+                  String entityLikeKey = RedisKeyUtil.getEntityLikeKey(entityType, entityId);
+                  String userLikeKey = RedisKeyUtil.getUserLikeKey(entityUserId);
+                  // 判断Redis中是否有此用户对当前实体的点赞(集合set)
+                  boolean isMember = operations.opsForSet().isMember(entityLikeKey, userId);
+  
+                  operations.multi();
+  
+                  if (isMember) {
+                      // 有点赞，双击取消点赞
+                      operations.opsForSet().remove(entityLikeKey, userId);
+                      operations.opsForValue().decrement(userLikeKey);
+                  } else {
+                      // 没有点赞，记录点赞
+                      operations.opsForSet().add(entityLikeKey, userId);
+                      operations.opsForValue().increment(userLikeKey);
+                  }
+  
+                  return operations.exec();
+              }
+          });
       }
   
       /**
@@ -3835,7 +4019,7 @@ function publish() {
           String entityLikeKey = RedisKeyUtil.getEntityLikeKey(entityType, entityId);
           return redisTemplate.opsForSet().size(entityLikeKey);
       }
-  
+      
       /**
        * Description: 查询某人对某实体的点赞状态
        *
@@ -3845,15 +4029,23 @@ function publish() {
        * @return int: 1--已点赞；0--未点赞
        */
       public int findEntityLikeStatus(int userId, int entityType, int entityId) {
-          // 生成当前实体的点赞在Redis中的key
           String entityLikeKey = RedisKeyUtil.getEntityLikeKey(entityType, entityId);
           return redisTemplate.opsForSet().isMember(entityLikeKey, userId) ? 1 : 0;
       }
+  
+      // 查询某个用户获得的赞
+      public int findUserLikeCount(int userId) {
+          String userLikeKey = RedisKeyUtil.getUserLikeKey(userId);
+          Integer count = (Integer) redisTemplate.opsForValue().get(userLikeKey);
+          return count == null ? 0 : count.intValue();
+      }
+  
   }
+  
   ```
-
+  
   > LikeController提供异步请求更新点赞状态和数量的方法
-
+  
   ```java
   @Controller
   public class LikeController {
@@ -3886,8 +4078,10 @@ function publish() {
   
   }
   ```
-
+  
   > discuss-detail.html修改帖子，评论，回复处的前端逻辑，使其调用discuss.js发起ajax请求进行局部更新
+  >
+  > ==this记录是哪里点赞=
 
   ```html
   <!-- 超链接失效，当作单击事件触发js中的like()方法 -->
@@ -3914,7 +4108,7 @@ function publish() {
   ```
 
   > discuss.js提供前端onclick响应like()方法，发起ajax请求
-
+  
   ```js
   function like(btn,entityType,entityId) {
       $.post(
@@ -3934,9 +4128,9 @@ function publish() {
       );
   }
   ```
-
+  
   > 修改LoginRequiredInterceptor，使其能与Ajax异步请求兼容，@LoginRequired对Controller层异步请求也生效
-
+  
   ```java
   @Component
   public class LoginRequiredInterceptor implements HandlerInterceptor {
@@ -3981,9 +4175,9 @@ function publish() {
   
   }
   ```
-
+  
   > 同时在global.js中新增ajax请求完成时调用的函数，实现拦截Ajax异步请求
-
+  
   ```js
   /*通用的ajax请求完成时调用的函数，在回调函数之前。
   这个函数会得到两个参数：XMLHttpRequest对象和一个描述请求成功的类型的字符串。
