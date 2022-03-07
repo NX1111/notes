@@ -3811,7 +3811,7 @@ function publish() {
 
 - Redis在dos命令行的常用命令
 
-  flushdb 刷新清除库 、select 0 从redis的16个库中选择一个库进行操作、test:count是Redis的key，冒号相当于下划线、lpush表示从左侧压入数据、lindex表示从左侧索引，初始索引是0、rpop表示从右侧弹出数据、sadd test:teacher aaa bbb ccc ddd 添加数据到集合中、scard test:teacher 统计集合中有多少元素、spop表示从集合中随机的弹出元素、smembers test:students 罗列出集合中所有的元素、
+  flushdb 刷新清除库 、select 0 从redis的16个库中选择一个库进行操作、test:count是Redis的key，冒号相当于下划线、lpush表示从左侧压入数据、lindex表示从左侧索引，初始索引是0、rpop表示从右侧弹出数据、sadd test:teacher aaa bbb ccc ddd 添加数据到集合中、scard test:teacher 统计集合中有多少元素、spop表示从集合中随机的弹出元素、smembers test:students 罗列出集合中所有的元素、zadd表示有序集合，某一个值绑定一个数值大小，可以进行排序、zrank表示从小到大排序0,1,2...、keys *列出当前库中所有的key名字、type显示key 的类型、del删除、exists是否存在某一个key值
 
 ![image-20210929154500167](community.assets/image-20210929154500167.png)
 
@@ -3930,7 +3930,7 @@ function publish() {
               redisOperations.opsForSet().add(redisKey, "aaa");
               redisOperations.opsForSet().add(redisKey, "bbb");
               redisOperations.opsForSet().add(redisKey, "ccc");
-  
+              //不要在redis中做查询，查询无效
               // 提交事务
               return redisOperations.exec();
           }
@@ -4545,6 +4545,12 @@ function publish() {
 
   > FollowService
 
+  ZSetOperations提供了一系列方法对有序集合进行操作 添加元素(有序集合是按照元素的score值由小到大进行排列)
+  
+  ```java
+  redisTemplate.opsForZSet().add(key, value, score)
+  ```
+  
   ```java
   @Service("followService")
   public class FollowServiceImpl implements FollowService {
@@ -4655,9 +4661,9 @@ function publish() {
   
   }
   ```
-
+  
   > FollowController
-
+  
   ```java
   @Controller
   public class FollowController {
@@ -4691,9 +4697,9 @@ function publish() {
       }
   }
   ```
-
+  
   > 修改UserController的getProfile()方法
-
+  
   ```java
   @Resource
   private UserService userService;
@@ -4736,9 +4742,9 @@ function publish() {
       return "/site/profile";
   }
   ```
-
+  
   > 修改profile.html
-
+  
   ```html
   <!-- 个人信息 -->
   <div class="media mt-5">
@@ -4765,9 +4771,9 @@ function publish() {
      </div>
   </div>
   ```
-
+  
   > profile.js通过识别class属性来判断调用follow()或unfollow()方法
-
+  
   ```js
   $(function(){
      $(".follow-btn").click(follow);
@@ -4808,10 +4814,11 @@ function publish() {
            }
         );
      }
-  }
   ```
 
+ zrange follower:3:111 0 -1   查询用户ID为111的用户的粉丝
 
+ zrange followee:169:3 0 -1  查询用户ID为169的用户关注了哪些用户
 
 ### 4.5 关注列表、粉丝列表
 
@@ -5502,7 +5509,7 @@ function publish() {
   bin\windows\kafka-server-start.bat config\server.properties
   ```
 
-  >在bin\windows下创建主题
+  >在bin\windows下创建主题，一个分区，一个副本 主题名字test
 
   ```
   kafka-topics.bat --create --bootstrap-server localhost:9092 --replication-factor 1 --partitions 1  --topic test
@@ -5535,7 +5542,7 @@ function publish() {
 
 
 
-- Spring整合Kafka
+- Spring整合Kafka（记得开启本机kafka所有服务）
 
   > 引入依赖
 
@@ -5952,6 +5959,8 @@ function publish() {
 
   > MessageController
 
+  前端报错：EL1008E: Property or field 'message' cannot be found on object of type 'java.util.HashMap'，不管message是否是空，先传给前端，在前端处理null的逻辑，不然前端的map没有key，就会报错。
+  
   ```java
   // 显示系统通知列表
   @GetMapping("/notice/list")
@@ -5961,8 +5970,9 @@ function publish() {
       // 查询评论类最新一条通知
       Message message = messageService.findLatestNotice(user.getId(), TOPIC_COMMENT);
       Map<String, Object> messageVO = new HashMap<>();
+      messageVO.put("message", message);
       if (message != null) {
-          messageVO.put("message", message);
+          
   
           // 解构通知message的content中信息(对象类转化为JSON字符串会有一些转义字符)
           String content = HtmlUtils.htmlUnescape(message.getContent());
@@ -5985,8 +5995,9 @@ function publish() {
       // 查询点赞类通知(与评论类类似，复用message和messageVO)
       message = messageService.findLatestNotice(user.getId(), TOPIC_LIKE);
       messageVO = new HashMap<>();
+      messageVO.put("message", message);
       if (message != null) {
-          messageVO.put("message", message);
+          
   
           // 解构通知message的content中信息
           String content = HtmlUtils.htmlUnescape(message.getContent());
@@ -6009,9 +6020,10 @@ function publish() {
       // 查询关注类通知
       message = messageService.findLatestNotice(user.getId(), TOPIC_FOLLOW);
       messageVO = new HashMap<>();
+      //先存message，防止前端Map没有Key，取数据报错
+      messageVO.put("message", message);
       if (message != null) {
-          messageVO.put("message", message);
-  
+         
           // 解构通知message的content中信息
           String content = HtmlUtils.htmlUnescape(message.getContent());
           Map<String, Object> data = JSONObject.parseObject(content, HashMap.class);
@@ -6039,9 +6051,11 @@ function publish() {
       return "/site/notice";
   }
   ```
-
-  > notice.html(同时提供通知详情页面链接)
-
+  
+  > notice.html(同时提供通知详情页面链接
+  
+  时间格式化：th:text="${#dates.format(likeNotice.message.createTime,'yyyy-MM-dd HH:mm:ss')}"
+  
   ```html
   <!-- 内容 -->
   <div class="main">
@@ -6291,7 +6305,7 @@ function publish() {
   
       @Override
       public void addInterceptors(InterceptorRegistry registry) {
-          //配置拦截规则，不拦截静态资源
+          //配置拦截规则，不拦截静态资源                                                                                                                                                                                                                                                                                                              
           registry.addInterceptor(messageInterceptor)
                   .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
       }
@@ -6325,6 +6339,10 @@ function publish() {
 
 
 - 通过DOS命令行和Postman访问ES
+
+  curl -X GET "localhost:9200/_cat/health?v"
+
+  curl -X GET "localhost:9200/_cat/nodes?v"
 
   ![image-20211007105859810](community.assets/image-20211007105859810.png)
 
@@ -6493,7 +6511,7 @@ function publish() {
   
       @Test
       public void testSearchByTemplate() {
-          // 构建查询条件
+          // 构建查询条件，从title、content中搜索
           SearchQuery searchQuery = new NativeSearchQueryBuilder()
                   .withQuery(QueryBuilders.multiMatchQuery("互联网寒冬", "title", "content"))
                   .withSort(SortBuilders.fieldSort("type").order(SortOrder.DESC))
@@ -6921,7 +6939,7 @@ function publish() {
 
   > 添加依赖
 
-  ```
+  ```xml
   <dependency>
      <groupId>org.springframework.boot</groupId>
      <artifactId>spring-boot-starter-security</artifactId>
@@ -7232,6 +7250,7 @@ function publish() {
                           if ("XMLHttpRequest".equalsIgnoreCase(s)) {
                               // 如果是异步请求，返回403，交由js解析提示错误消息
                               httpServletResponse.setContentType("application/plain;charset=utf-8");
+                             //向前台输出字符流
                               PrintWriter writer = httpServletResponse.getWriter();
                               writer.write(CommunityUtil.getJSONString(403, "你还没有登录！"));
                           } else {
@@ -7427,7 +7446,16 @@ function publish() {
 
   >DisscussPostController
 
+  ​	
+  
+  ```mysql
+  type int(11) DEFAULT NULL COMMENT   '0-普通; 1-置顶;'
+  status int(11) DEFAULT NULL COMMENT '0-正常; 1-精华; 2-拉黑;'
   ```
+  
+  
+  
+  ```java
   // 拉黑（删除）
   @PostMapping("/delete")
   @ResponseBody
@@ -7479,20 +7507,20 @@ function publish() {
       return CommunityUtil.getJSONString(0);
   }
   ```
-
+  
   > 消费发帖事件的逻辑已经有了，处理删帖事件的逻辑
   >
   > com.it.community.util.CommunityConstant
   >
   > com.it.community.event.EventConsumer
-
+  
   ```java
   /**
    * 主题：删帖
    */
   String TOPIC_DELETE = "delete";
   ```
-
+  
   ```java
   // 消费删帖事件
   @KafkaListener(topics = {TOPIC_DELETE})
@@ -7513,9 +7541,9 @@ function publish() {
   
   }
   ```
-
+  
   > discuss-detail.html
-
+  
   ```html
   <div class="float-right">
      <!--隐藏域方便discuss.js获取帖子id-->
@@ -7530,9 +7558,9 @@ function publish() {
         th:disabled="${post.status==2}">删除</button>
   </div>
   ```
-
+  
   > discuss.js
-
+  
   ```js
   /*页面加载完后绑定单击事件，与调用like()形式不同，作用相同*/
   $(function(){
@@ -7786,7 +7814,7 @@ function publish() {
       redisTemplate.opsForValue().setBit(redisKey4, 5, true);
       redisTemplate.opsForValue().setBit(redisKey4, 6, true);
   
-      // 相当于多个字节相应的每个位进行位运算
+      // 相当于多个字节相应的每个位进行位运算，运算结果会存入另外一个key中，需要声明另外一个key
       String redisKey = "test:bm:or";
       Object obj = redisTemplate.execute(new RedisCallback() {
           @Override
@@ -7905,6 +7933,7 @@ function publish() {
           // Calendar用于遍历日期
           Calendar calendar = Calendar.getInstance();
           calendar.setTime(start);
+          //日期小于end的时候继续循环，获得每一个日期对应的RedisKey
           while (!calendar.getTime().after(end)) {
               String key = RedisKeyUtil.getUVKey(df.format(calendar.getTime()));
               keyList.add(key);
@@ -7970,9 +7999,9 @@ function publish() {
       }
   }
   ```
-
+  
   > 使用拦截器DataInterceptor来统计网站数据
-
+  
   ```java
   @Component
   public class DataInterceptor implements HandlerInterceptor {
@@ -7999,9 +8028,9 @@ function publish() {
       }
   }
   ```
-
+  
   > WebMvcConfig配置拦截器
-
+  
   ```java
   @Resource
   private DataInterceptor dataInterceptor;
@@ -8014,9 +8043,9 @@ function publish() {
               .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
   }
   ```
-
+  
   > DataController与外部交互网站统计数据，同时在Spring Security中配置只有管理员能访问/data/**
-
+  
   ```java
   @Controller
   public class DataController {
@@ -8061,9 +8090,9 @@ function publish() {
       }
   }
   ```
-
+  
   > admin/data.html
-
+  
   ```html
   <!-- 网站UV -->
   <div class="container pl-5 pr-5 pt-3 pb-3 mt-3">
@@ -8355,7 +8384,7 @@ function publish() {
   public class QuartzConfig {
   
       // FactoryBean可简化Bean的实例化过程:
-      // 1.通过FactoryBean封装Bean的实例化过程.
+      // 1.spring通过FactoryBean底层封装Bean的实例化过程.
       // 2.将FactoryBean装配到Spring容器里.
       // 3.将FactoryBean注入给其他的Bean.
       // 4.该Bean得到的是FactoryBean所管理的对象实例.
@@ -8781,7 +8810,7 @@ function publish() {
 
   > 引入依赖
 
-  ```
+  ```xml
   <!--七牛云-->
   <dependency>
       <groupId>com.qiniu</groupId>
@@ -9127,13 +9156,17 @@ function publish() {
   >​	将数据缓存在应用服务器上，性能最好
   >
   >​	常用缓存工具：Ehcache、Guava、Caffeine等
-
+  >
+  >不建议用spring整合缓存工具，因为Spring是用一个缓存管理器管理所有的缓存，但是我们的网站可能有帖子、评论等多种缓存，Spring对所有缓存统一设置过期时间，可变性较低。Spring 用多个缓存管理器设置多个缓存比较麻烦。
+  
   > 分布式缓存
   >
   > ​	将数据缓存在NoSQL数据库上，跨服务器
   >
   > ​	常用缓存工具：MemCache、Redis等
-
+  
+  先看一级缓存（本地缓存），有：直接返回 ，没有：就去二级缓存（Redis)，二级缓存也没有，那么直接去database中找数据，并且一级一级把数据同步存储二级缓存和一级缓存上。缓存需要设置过期时间
+  
   ![image-20211016195931047](community.assets/image-20211016195931047.png)
 
 
@@ -9215,7 +9248,6 @@ function publish() {
   
   /**
    * Description: 通过userId查询所有数据总数（排除拉黑status != 2）
-   *
    * @param userId:
    * @return int:
    */
@@ -9379,6 +9411,16 @@ function publish() {
   >
   > 监控方式：HTTP 或 JMX
 
+  ```xml
+  <dependency>
+  			<groupId>org.springframework.boot</groupId>
+  			<artifactId>spring-boot-starter-actuator</artifactId>
+  		</dependency>
+  
+  ```
+  
+  
+  
   > application.yml
 
   ```yml
@@ -9390,9 +9432,9 @@ function publish() {
           include: "*"  # 将所有的监控endpoint暴露出来
           exclude: info,caches  # 不暴露info,caches
   ```
-
+  
   > 自定义端点com.it.community.actuator.DatabaseEndpoint
-
+  
   ```java
   // 监控数据库连接是否正常
   @Component
@@ -9403,6 +9445,7 @@ function publish() {
       @Resource
       private DataSource dataSource;
   
+      //表示get请求
       @ReadOperation
       public String checkConnection() {
           try (
@@ -9420,6 +9463,24 @@ function publish() {
 
 
 ### 8.3 项目部署
+
+
+
+```
+wget https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.4.3/elasticsearch-analysis-ik-6.4.3.zip
+```
+
+```
+systemctl start redis
+systemctl start mysqld
+[root@NXEDO01 kafka_2.12-2.3.0]# bin/zookeeper-server-start.sh -daemon config/zookeeper.properties
+[root@NXEDO01 kafka_2.12-2.3.0]# nohup bin/kafka-server-start.sh config/server.properties 1>/dev/null 2>&1 &
+elasticsearch的启动要需要新建用户组合用户，并赋予用户权限
+[nx1@NXEDO01 elasticsearch-6.4.3]$ bin/elasticsearch -d 后台执行elasticsearch
+
+```
+
+
 
 ![image-20211018222755945](community.assets/image-20211018222755945.png)
 
