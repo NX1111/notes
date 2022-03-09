@@ -9468,15 +9468,38 @@ function publish() {
 
 ```
 wget https://github.com/medcl/elasticsearch-analysis-ik/releases/download/v6.4.3/elasticsearch-analysis-ik-6.4.3.zip
+tar -zvxf apache-maven-3.6.1-bin.tar.gz -C /opt
+yum install -y mysql80-community-release-el7-5.noarch.rpm
+yum install -y mysql-community-server.x86_64
+systemctl start mysqld
+grep 'password' /var/log/mysqld.log 
+yum -install -y redis.x86_64
+systemctl start redis
 ```
 
 ```
 systemctl start redis
 systemctl start mysqld
 [root@NXEDO01 kafka_2.12-2.3.0]# bin/zookeeper-server-start.sh -daemon config/zookeeper.properties
+JDK版本11适配，kafka
 [root@NXEDO01 kafka_2.12-2.3.0]# nohup bin/kafka-server-start.sh config/server.properties 1>/dev/null 2>&1 &
 elasticsearch的启动要需要新建用户组合用户，并赋予用户权限
+[root@ecs-67945 config]# groupadd nx
+[root@ecs-67945 config]# useradd nx1 -p 123456 -g nx
+[root@ecs-67945 config]# cd /opt
+[root@ecs-67945 opt]# chown -R nx1:nx *
+[root@ecs-67945 opt]# cd /tmp
+[root@ecs-67945 tmp]# chown -R nx1:nx *
+[root@ecs-67945 tmp]# su - nx1
+[nx1@ecs-67945 ~]$ cd /opt/elasticsearch-6.4.3/
 [nx1@NXEDO01 elasticsearch-6.4.3]$ bin/elasticsearch -d 后台执行elasticsearch
+
+[root@ecs-67945 /]# vim /etc/nginx/nginx.conf
+
+maven：
+mvn clean package -Dmaven.test.skip=true
+移动文件到：tomacat/webapps目录下
+mv ROOT.war /opt/apache-tomcat-9.0.59/webapps/
 
 ```
 
