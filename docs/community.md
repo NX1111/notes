@@ -3811,13 +3811,15 @@ function publish() {
 
 - Redis在dos命令行的常用命令
 
-  flushdb 刷新清除库 、select 0 从redis的16个库中选择一个库进行操作、test:count是Redis的key，冒号相当于下划线、lpush表示从左侧压入数据、lindex表示从左侧索引，初始索引是0、rpop表示从右侧弹出数据、sadd test:teacher aaa bbb ccc ddd 添加数据到集合中、scard test:teacher 统计集合中有多少元素、spop表示从集合中随机的弹出元素、smembers test:students 罗列出集合中所有的元素、zadd表示有序集合，某一个值绑定一个数值大小，可以进行排序、zrank表示从小到大排序0,1,2...、keys *列出当前库中所有的key名字、type显示key 的类型、del删除、exists是否存在某一个key值
+  flushdb 刷新清除库 、select 0 从redis的16个库中选择一个库进行操作、test:count是Redis的key，冒号相当于下划线、lpush表示从左侧压入数据、lrem指定的元素个数（lrem test:ids 1 101）lrange 从最后一个下标开始取值，最后一个下标索引是0、lindex表示从左侧索引，初始索引是0、rpop表示从右侧弹出数据、sadd test:teacher aaa bbb ccc ddd 添加数据到集合中、scard test:teacher 统计集合中有多少元素、spop表示从集合中随机的弹出元素、smembers test:students 罗列出集合中所有的元素、zadd表示有序集合，某一个值绑定一个数值大小，可以进行排序、zrank表示从小到大排序0,1,2...、keys *列出当前库中所有的key名字、type显示key 的类型、del删除、exists是否存在某一个key值、set中的值不能重复
 
 ![image-20210929154500167](community.assets/image-20210929154500167.png)
 
 ![image-20210929154523060](community.assets/image-20210929154523060.png)
 
 
+
+<img src="community.assets\1}72MHJTLAKRRN4~SED`DNG.png" alt="1" style="zoom: 80%;" />
 
 - 引入pom.xml
 

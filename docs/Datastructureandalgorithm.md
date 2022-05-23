@@ -149,30 +149,107 @@ class SingleLinkedList {
 
 
 
-单链表反转
+#### 单链表反转
 
-- 先定义一个新结点  private HeroNode reverseHead = new HeroNode(0, "", "")；
-
-- 从头到尾遍历原来的链表，每遍历一个，将其插入reverseHead后；
-
-- head.next = reverseHead。
+- 链表是真实存在于内存中的，在栈中可以存在多个指向链表的指针，手动将其中的一个指针赋值为null，其他指针依然指向该链表。只有真实地修改了链表的结构，其他指向的链表的全指针才会部发生改变，
 
 ```java
-public static void reverse(HeroNode head) {
-    if (head.next == null || head.next.next == null) {
-        return;
+ public ListNode reverseList(ListNode head) {
+        if (head == null || head.next == null) return head;
+        ListNode pre = null;//前一个节点
+        ListNode cur = head;//当前节点
+        ListNode temp = null;//后一个节点
+        while(cur != null ){
+            temp  = cur.next;//后一个节点赋值
+            cur.next = pre;//当前节点的下一个节点指向当前节点的前一个节点
+            pre = cur;//前一个节点向后移动，当前节点变为前一个节点
+            cur = temp;//当前节点向后移动，后一个节点变为当前节点
+        }
+        return pre;
+
+
     }
-    HeroNode reverseHead =new HeroNode(0,"","");
-    HeroNode temp = head.next;
-    HeroNode temp1 = null;
-    while (temp != null) {
-        //for (int i = 0; i < getNodeNum(head); i++) {
-        temp1 = temp.next;
-        temp.next = reverseHead.next;
-        reverseHead.next = temp;
-        temp = temp1;
+
+```
+
+#### 链表指定区间反转
+
+- 将一个节点数为 size 链表 m 位置到 n 位置之间的区间反转，要求时间复杂度 O(n)*O*(*n*)，空间复杂度 O(1)*O*(1)。
+  例如：
+  给出的链表为 1\to 2 \to 3 \to 4 \to 5 \to NULL1→2→3→4→5→*N**U**L**L*, m=2,n=4*m*=2,*n*=4,
+  返回 1\to 4\to 3\to 2\to 5\to NULL1→4→3→2→5→*N**U**L**L*.
+
+  数据范围： 链表长度 0 < size \le 10000<*s**i**z**e*≤1000，0 < m \le n \le size0<*m*≤*n*≤*s**i**z**e*，链表中每个节点的值满足 |val| \le 1000∣*v**a**l*∣≤1000
+
+  要求：时间复杂度 O(n)*O*(*n*) ，空间复杂度 O(n)*O*(*n*)
+
+  进阶：时间复杂度 O(n)*O*(*n*)，空间复杂度 O(1)*O*(1)
+
+```java
+public class Solution {
+    public ListNode reverseBetween(ListNode head, int m, int n) {
+        ListNode dummy = new ListNode(0);
+        dummy.next = head;
+        ListNode preStart = dummy;
+        ListNode start = head;
+        for (int i = 1; i < m; i ++ ) {
+            preStart = start;
+            start = start.next;
+        }
+        // reverse
+        for (int i = 0; i < n - m; i ++ ) {
+            ListNode temp = start.next;
+            start.next = temp.next;
+            temp.next = preStart.next;
+            preStart.next = temp;
+        }
+        return dummy.next;
     }
-    head.next = reverseHead.next;
+}
+	
+```
+
+#### 链表中的节点每K个一组翻转
+
+- 将给出的链表中的节点每 k 个一组翻转，返回翻转后的链表
+  如果链表中的节点数不是 k 的倍数，将最后剩下的节点保持原样
+  你不能更改节点中的值，只能更改节点本身。
+
+  数据范围： \ 0 \le n \le 2000 0≤*n*≤2000 ， 1 \le k \le 20001≤*k*≤2000 ，链表中每个元素都满足 0 \le val \le 10000≤*v**a**l*≤1000
+  要求空间复杂度 O(1)*O*(1)，时间复杂度 O(n)*O*(*n*)
+
+  例如：
+
+  给定的链表是 1\to2\to3\to4\to51→2→3→4→5
+
+  对于 k = 2*k*=2 , 你应该返回 2\to 1\to 4\to 3\to 52→1→4→3→5
+
+  对于 k = 3*k*=3 , 你应该返回 3\to2 \to1 \to 4\to 53→2→1→4→5
+
+```java
+public class Solution {
+    public static ListNode reverseKGroup(ListNode head, int k) {
+		if(head == null || head.next == null || k < 2) return head;
+		ListNode dummy = new ListNode(0);
+		dummy.next = head;
+		ListNode pre = dummy, cur = head, temp;
+		int len = 0;
+		while (head != null) {
+			len ++ ;
+			head = head.next;
+		}
+		for (int i = 0; i < len / k; i ++ ) {
+			for (int j = 1; j < k; j ++ ) {
+				temp = cur.next;
+				cur.next = temp.next;
+				temp.next = pre.next;
+				pre.next = temp;
+			}
+			pre = cur;
+			cur = cur.next;
+		}
+		return dummy.next;
+	}
 }
 ```
 
@@ -844,7 +921,7 @@ for(int i=1; i<n; i++) {
 
 
 
-### 5.2冒泡排序BubbleSorting
+### 5.2冒泡排序BubbleSorting   (n^2)
 
 ```java
 public class BubbleSort {
@@ -878,7 +955,7 @@ public class BubbleSort {
 
 
 
-### 5.3简单选择排序SelectSorting
+### 5.3简单选择排序SelectSorting   n^2   n*(n+1)/2
 
 - 第一次从arr[0]到arr[n-1]中选取最小值后，再与arr[0]交换
 - 第二次从arr[1]到arr[n-1]中选取最小值后，再与arr[1]交换
@@ -1006,7 +1083,7 @@ public class ShellSorting {
 
 
 
-### 5.6快速排序QuickSorting
+### 5.6快速排序QuickSorting(最坏n^2 , 最好是nlogn)
 
 - 选取一个基准值，经过一次排序，基准值左边的数据比基准值都要小或者相等，基准值右边的数据比基准值都要大或者相等
 - 一次排序中，基准值的值不变，但位置可能会发生变化
@@ -1086,11 +1163,13 @@ public class QuickSorting {
 
 
 
-### 5.7归并排序MergeSorting
+### 5.7归并排序MergeSorting (nlogn)
 
 分治思想（divide and conquer）
 
 ![image-20210803204705136](Datastructureandalgorithm.assets/image-20210803204705136.png)
+
+![img](Datastructureandalgorithm.assets\v2-9541d116b9ad191437cb0f9acce7baf6_b.webp)
 
 ```java
 public class MergeSorting {
