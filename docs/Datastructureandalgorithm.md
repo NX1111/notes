@@ -96,60 +96,7 @@ class CircleArrayQueue {
 
 ![image-20210322165146288](Datastructureandalgorithm.assets/image-20210322165146288.png)
 
-### 2.1单链表
-
-结点类（每个对象就是一个结点）
-
-```java
-class HeroNode {
-    public int no;
-    public String name;
-    public String nickName;
-    public HeroNode next;
-
-    public HeroNode(int no, String name, String nickName) {
-        this.no = no;
-        this.name = name;
-        this.nickName = nickName;
-    }
-}
-```
-
-
-
-管理结点的类（添加，删除，查找等等）
-
-```java
-class SingleLinkedList {
-    //头结点，不存放数据
-    private HeroNode head = new HeroNode(0, "", "");
-    int nodeNum = 0;
-    
-    //添加结点到单向链表,使用一个辅助结点（头结点不能动）
-    //按序号添加
-    public void add(HeroNode heroNode) {
-        HeroNode temp = head;
-        while (true) {
-            if (heroNode.no == temp.no) {       //已经有该序号
-                System.out.println("已有此人");
-                break;
-            } else if (temp.next == null) {     //temp后为空直接添加
-                temp.next = heroNode;
-                break;
-            } else if (heroNode.no < temp.next.no) {
-                //向后遍历，遇见no比temp.next小的停止，插入temp与temp.next之间
-                heroNode.next = temp.next;
-                temp.next = heroNode;
-                break;
-            }
-            temp = temp.next;
-        }
-    }
-```
-
-
-
-#### 单链表反转
+### 单链表反转
 
 - 链表是真实存在于内存中的，在栈中可以存在多个指向链表的指针，手动将其中的一个指针赋值为null，其他指针依然指向该链表。只有真实地修改了链表的结构，其他指向的链表的全指针才会部发生改变，
 
@@ -172,7 +119,7 @@ class SingleLinkedList {
 
 ```
 
-#### 链表指定区间反转
+### 链表指定区间反转
 
 - 将一个节点数为 size 链表 m 位置到 n 位置之间的区间反转，要求时间复杂度 O(n)*O*(*n*)，空间复杂度 O(1)*O*(1)。
   例如：
@@ -209,7 +156,7 @@ public class Solution {
 	
 ```
 
-#### 链表中的节点每K个一组翻转
+### 链表中的节点每K个一组翻转
 
 - 将给出的链表中的节点每 k 个一组翻转，返回翻转后的链表
   如果链表中的节点数不是 k 的倍数，将最后剩下的节点保持原样
@@ -253,9 +200,259 @@ public class Solution {
 }
 ```
 
+### 合并两个有序链表
+
+- 输入两个递增的链表，单个链表的长度为n，合并这两个链表并使新链表中的节点仍然是递增排序的。
+
+  数据范围： 0 \le n \le 10000≤*n*≤1000，-1000 \le 节点值 \le 1000−1000≤节点值≤1000
+  要求：空间复杂度 O(1)*O*(1)，时间复杂度 O(n)*O*(*n*)
+
+  如输入{1,3,5},{2,4,6}时，合并后的链表为{1,2,3,4,5,6}，所以对应的输出为{1,2,3,4,5,6}
+
+- 普通思路（一个链表依次添加）
+
+```java
+public class Solution {
+    public ListNode Merge(ListNode list1,ListNode list2) {
+        ListNode res = new ListNode(0);
+        ListNode head = res;
+        while(list1 != null && list2 != null){
+            if(list1.val < list2.val){
+                res.next = list1;
+                list1 = list1.next;
+            }else{
+                res.next = list2;
+                list2 = list2.next;
+            }
+            res = res.next;  
+        }
+        if(list1 == null && list2 !=null){
+            res.next = list2;
+        }else if(list1 != null && list2 ==null){
+            res.next = list1;
+        }
+        return head.next;
+    }
+}
+```
+
+- 递归法：
+
+```java
+     //合并两个有序链表（和力扣的21题一样）
+    public ListNode merge(ListNode l1,ListNode l2){
+        if(l1==null)return l2;
+        if(l2==null) return l1;
+        if(l1.val<l2.val) {
+            l1.next=merge(l1.next,l2);
+            return l1;
+        }else{
+            l2.next=merge(l1,l2.next);
+            return l2;
+        }
+    }
+```
+
+### 合并K组有序链表（分而治之）
+
+- 合并 k 个升序的链表并将结果作为一个升序的链表返回其头节点。
+
+  输入：
+
+  [{1,2,3},{4,5,6,7}]
+
+  返回值：
+
+  {1,2,3,4,5,6,7}
+
+```java
+public class Solution {
+        //合并K个有序链表的方法
+    public ListNode mergeKLists(ArrayList<ListNode> lists) {
+        return mergeList(lists,0,lists.size()-1);
+    }
+    public ListNode mergeList(ArrayList<ListNode> lists,int left,int right){
+        if(left==right) return lists.get(left);
+        if(left>right) return null;
+        int mid=left+(right-left)/2;
+        return merge(mergeList(lists,left,mid),mergeList(lists,mid+1,right));
+    }
+        //合并两个有序链表（和力扣的21题一样）
+    public ListNode merge(ListNode l1,ListNode l2){
+        if(l1==null)return l2;
+        if(l2==null) return l1;
+        if(l1.val<l2.val) {
+            l1.next=merge(l1.next,l2);
+            return l1;
+        }else{
+            l2.next=merge(l1,l2.next);
+            return l2;
+        }
+    }
+}
+
+```
+
+### 快慢指针链表有环
+
+- 自己的：
+
+```java
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        if(head==null || head.next == null) return false;
+        ListNode slow = head , fast = head.next;
+        while(slow != null && fast != null){
+            if(slow==fast) return true;
+            slow = slow.next;
+            if(fast.next == null) return false;
+            fast = fast.next.next;
+        }
+        return false;
+    }
+}
+```
+
+- 别人的：
+
+```java
+public class Solution {
+    public boolean hasCycle(ListNode head) {
+        if(head==null)
+            return false;
+        ListNode fast=head;
+        ListNode slow=head;
+        while(fast!=null&&fast.next!=null){
+            fast=fast.next.next;
+            slow=slow.next;
+            if(fast==slow)
+                return true;
+        }
+        return false; 
+    }
+}
+
+```
+
+### 环形链表的入口节点
+
+- Hash表法
+
+```java
+public ListNode EntryNodeOfLoop(ListNode pHead) {
+        // 使用set来记录出现的结点
+        HashSet<ListNode> set = new HashSet<>();
+        while(pHead != null){
+           // 当set中包含结点，说明第一次出现重复的结点，即环的入口结点
+            if(set.contains(pHead)){
+                return pHead;
+            }
+            // set中加入未重复的结点
+            set.add(pHead);
+            pHead = pHead.next;
+        }
+        return null;
+    }
+```
+
+- 公式推导
+
+<img src="Datastructureandalgorithm.assets\环形入口节点.png" alt="环形入口节点推导" style="zoom:80%;" />
+
+```java
+public ListNode EntryNodeOfLoop(ListNode pHead) {
+        if(pHead == null) return null;
+        // 定义快慢指针
+        ListNode slow = pHead;
+        ListNode fast = pHead;
+        while(fast != null && fast.next != null){
+            // 快指针是满指针的两倍速度
+            fast = fast.next.next;
+            slow = slow.next;
+            // 记录快慢指针第一次相遇的结点
+            if(slow == fast) break;
+        }
+        // 若是快指针指向null，则不存在环
+        if(fast == null || fast.next == null) return null;
+        // 重新指向链表头部
+        fast = pHead;
+        // 与第一次相遇的结点相同速度出发，相遇结点为入口结点
+        while(fast != slow){
+            fast = fast.next;
+            slow = slow.next;
+        }
+        return fast;
+    }
+```
+
+### 链表截取倒数第K个节点
+
+- 输入一个长度为 n 的链表，设链表中的元素的值为 ai ，返回该链表中倒数第k个节点。
+
+  如果该链表长度小于k，请返回一个长度为 0 的链表。
+
+  数据范围：0 \leq n \leq 10^50≤*n*≤105，0 \leq a_i \leq 10^90≤*a**i*≤109，0 \leq k \leq 10^90≤*k*≤109
+
+  要求：空间复杂度 O(n)*O*(*n*)，时间复杂度 O(n)*O*(*n*)
+
+  进阶：空间复杂度 O(1)*O*(1)，时间复杂度 O(n)*O*(*n*)
+
+  例如输入{1,2,3,4,5},2时，对应的链表结构如下图所示：
+
+  <img src="Datastructureandalgorithm.assets\5407F55227804F31F5C5D73558596F2C.png" alt="链表倒数K个节点" style="zoom:30%;" />
+
+  其中蓝色部分为该链表的最后2个结点，所以返回倒数第2个结点（也即结点值为4的结点）即可，系统会打印后面所有的节点来比较。
+
+- 快慢指针法
+
+  <img src="Datastructureandalgorithm.assets/B27699765EEF6CA0E75AF0D1A4B9BCAC.png" alt="img" style="zoom:67%;" />
+
+```java
+ public ListNode FindKthToTail (ListNode pHead, int k) {
+        // write code here
+        if(pHead == null || k ==0) return null;
+         ListNode slow = pHead , fast = pHead;
+        for(int i = 1 ; i < k ; i++){
+            if(fast.next == null) return null; 
+            fast = fast.next;
+        }
+        while(fast.next != null){
+            slow = slow.next;
+            fast = fast.next;
+        }
+        return slow;
+        
+    }
+```
+
+- 先全部入栈
+- 出栈前面K个元素
+
+<img src="Datastructureandalgorithm.assets\C9E011A3DA1FB56916001C45812DEAA7.png" style="zoom:50%;" />
+
+```java
+ public ListNode FindKthToTail (ListNode pHead, int k) {
+        // write code here
+       if(pHead == null || k == 0) return null;
+        Stack<ListNode> stack = new Stack();
+        while(pHead != null){
+            stack.push(pHead);
+            pHead = pHead.next;
+        }
+        ListNode res = null;
+        if(stack.size() < k) return null;
+        for(int i = 0 ; i < k ; i++){
+           ListNode temp =  stack.pop();
+            temp.next = res;
+            res = temp;
+        }
+        return res;
+ }
+```
 
 
-逆序打印单链表
+
+### 逆序打印单链表
 
 - 创建一个栈，将各结点压入栈，先进后出
 - 遍历这个栈然后输出
@@ -4865,104 +5062,131 @@ public class HouseChessboard {
 
 - **解题思路：**
 
-  1. **DFS 和回溯算法区别**
-     DFS 是一个劲的往某一个方向搜索，而回溯算法建立在 DFS 基础之上的，但不同的是在搜索过程中，达到结束条件后，恢复状态，回溯上一层，再次搜索。因此回溯算法与 DFS 的区别就是有无状态重置
+- **DFS 和回溯算法区别**
+   DFS 是一个劲的往某一个方向搜索，而回溯算法建立在 DFS 基础之上的，但不同的是在搜索过程中，达到结束条件后，恢复状态，回溯上一层，再次搜索。因此回溯算法与 DFS 的区别就是有无状态重置
 
-  2. **何时使用回溯算法**
-     当问题需要 "回头"，以此来查找出所有的解的时候，使用回溯算法。即满足结束条件或者发现不是正确路径的时候(走不通)，要撤销选择，回退到上一个状态，继续尝试，直到找出所有解为止
+- **何时使用回溯算法**
+   当问题需要 "回头"，以此来查找出所有的解的时候，使用回溯算法。即满足结束条件或者发现不是正确路径的时候(走不通)，要撤销选择，回退到上一个状态，继续尝试，直到找出所有解为止
 
-  3. **怎么样写回溯算法(从上而下，※代表难点，根据题目而变化)**
+- **怎么样写回溯算法(从上而下，※代表难点，根据题目而变化)**
 
-     1. 画出递归树，找到状态变量(回溯函数的参数)，这一步非常重要※
-     2. 根据题意，确立结束条件
-     3. 找准选择列表(与函数参数相关),与第一步紧密关联※
-     4. 判断是否需要剪枝
-     5. 作出选择，递归调用，进入下一层
-     6. 撤销选择
+   1. 画出递归树，找到状态变量(回溯函数的参数)，这一步非常重要※
+   2. 根据题意，确立结束条件
+   3. 找准选择列表(与函数参数相关),与第一步紧密关联※
+   4. 判断是否需要剪枝
+   5. 作出选择，递归调用，进入下一层
+   6. 撤销选择
 
-  4. **回溯问题的类型**
-     这里先给出，我总结的回溯问题类型，并给出相应的 leetcode题目(一直更新)，然后再说如何去编写。特别关注搜索类型的，搜索类的搞懂，你就真的搞懂回溯算法了,，是前面两类是基础，帮助你培养思维
+- **回溯问题的类型**
 
-     | 类型       | 题目链接                                                     |
-     | ---------- | ------------------------------------------------------------ |
-     | 子集、组合 | [子集](https://leetcode-cn.com/problems/subsets/)、[子集\|\|](https://leetcode-cn.com/problems/subsets-ii/)、[组合](https://leetcode-cn.com/problems/combinations/)、[组合总数](https://leetcode-cn.com/problems/combination-sum/)、[组合总数\|\|](https://leetcode-cn.com/problems/combination-sum-ii/) |
-     | 全排列     | [全排列](https://leetcode-cn.com/problems/permutations/)、全排列\|\|、字符串的全排列、字母大小写全排列 |
-     | 搜索       | 解数独、单词搜索、N皇后、分割回文串、二进制手表              |
+   | 类型       | 题目链接                                                     |
+   | ---------- | ------------------------------------------------------------ |
+   | 子集、组合 | [子集](https://leetcode-cn.com/problems/subsets/)、[子集\|\|](https://leetcode-cn.com/problems/subsets-ii/)、[组合](https://leetcode-cn.com/problems/combinations/)、[组合总数](https://leetcode-cn.com/problems/combination-sum/)、[组合总数\|\|](https://leetcode-cn.com/problems/combination-sum-ii/) |
+   | 全排列     | [全排列](https://leetcode-cn.com/problems/permutations/)、[全排列 II](https://leetcode-cn.com/problems/permutations-ii/)、[字符串的全排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)、[字母大小写全排列](https://leetcode-cn.com/problems/letter-case-permutation/) |
+   | 搜索       | [解数独](https://leetcode-cn.com/problems/sudoku-solver/)、[单词搜索](https://leetcode-cn.com/problems/word-search/)、[N皇后](https://leetcode-cn.com/problems/eight-queens-lcci/)、[分割回文串](https://leetcode-cn.com/problems/palindrome-partitioning/)、[二进制手表](https://leetcode-cn.com/problems/binary-watch/) |
 
-     **注意：子集、组合与排列是不同性质的概念。子集、组合是无关顺序的，而排列是和元素顺序有关的，如 [1，2] 和 [2，1] 是同一个组合(子集)，但 [1,2] 和 [2,1] 是两种不一样的排列！！！！因此被分为两类问题**
+- **回到子集、组合类型问题上来**
 
-  5. **回到子集、组合类型问题上来(ABC 三道例题)**
-     **A、 子集 - 给定一组不含重复元素的整数数组 nums，返回该数组所有可能的子集（幂集）。**
-     **解题步骤如下**
+   - [**子集**](https://leetcode-cn.com/problems/subsets/)
+
+     给你一个整数数组 `nums` ，数组中的元素**互不相同 **。返回该数组所有可能的**子集**（幂集）。
+
+     解集不能包含重复的子集。你可以按任意顺序返回解集。
+
+     ```java
+     输入：nums = [1,2,3]
+     输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+     ```
+
      
-     ①递归树
-     
-     ![d8e07f0c876d9175df9f679fcb92505d20a81f09b1cb559afc59a20044cc3e8c-子集问题递归树](Datastructureandalgorithm.assets\d8e07f0c876d9175df9f679fcb92505d20a81f09b1cb559afc59a20044cc3e8c-子集问题递归树.png)
-     
-     观察上图可得，选择列表里的数，都是选择路径(红色框)后面的数，比如[1]这条路径，他后面的选择列表只有"2、3"，[2]这条路径后面只有"3"这个选择，那么这个时候，就应该使用一个参数start，来标识当前的选择列表的起始位置。也就是标识每一层的状态，因此被形象的称为"状态变量",最终函数签名如下：
-     
-     C++
 
-```c++
+**解题步骤如下**
+
+**①递归树**
+
+<img src="Datastructureandalgorithm.assets\d8e07f0c876d9175df9f679fcb92505d20a81f09b1cb559afc59a20044cc3e8c-子集问题递归树.png" alt="d8e07f0c876d9175df9f679fcb92505d20a81f09b1cb559afc59a20044cc3e8c-子集问题递归树" style="zoom:60%;" />
+
+观察上图可得，选择列表里的数，都是选择路径(红色框)后面的数，比如[1]这条路径，他后面的选择列表只有"2、3"，[2]这条路径后面只有"3"这个选择，那么这个时候，就应该使用一个参数start，来标识当前的选择列表的起始位置。也就是标识每一层的状态，因此被形象的称为"状态变量",最终函数名如下：
+
+```java
 //nums为题目中的给的数组
 //path为路径结果，要把每一条 path 加入结果集
-void backtrack(vector<int>nums,vector<int>&path,int start)
+void backtrack(int[] nums,List<Integer> path,int start)
+```
+**②找结束条件**
+​此题所有路径都应该加入结果集，所以不存在结束条件。或者说当 start 参数越过数组边界的时候，程序就自己跳过下一层递归了，因此不需要手写结束条件,直接加入结果集:
+
+```java
+res为结果集，是全局变量List<List<Integer>> res,到时候要返回
+res.add(path);//把每一条路径加入结果集
 ```
 
-​					**②找结束条件**
-​	此题非常特殊，所有路径都应该加入结果集，所以不存在结束条件。或者说当 start 参数越过数组边界的时候，程序就自己跳过下一层递归了，因此不需要手写结束条件,直接加入结果集C++
+**③找选择列表**
+在①中已经提到过了，子集问题的选择列表，是上一条选择路径之后的数
 
-```c++
-res为结果集，是全局变量vector<vector<int>>res,到时候要返回的
-res.push_back(path);//把每一条路径加入结果集
-```
-
-③找选择列表
-在①中已经提到过了，子集问题的选择列表，是上一条选择路径之后的数,即
-
-C++
-
-```c++
+```java
 for(int i=start;i<nums.size();i++)
 ```
 
-④判断是否需要剪枝
+**④判断是否需要剪枝**
 从递归树中看到，路径没有重复的，也没有不符合条件的，所以不需要剪枝
 
-⑤做出选择(即for 循环里面的)
-C++
+**⑤做出选择(即for 循环里面的)**
 
-```c++
-void backtrack(vector<int>nums,vector<int>&path,int start)
+```java
+void backtrack(int[] nums,List<Integer> path, int start)
 {
-    for(int i=start;i<nums.size();i++)
+    for(int i=start;i<nums.length;i++)
     {
-        path.push_back(nums[i]);//做出选择
+        path.add(nums[i]);//做出选择
         backtrack(nums,path,i+1);//递归进入下一层，注意i+1，标识下一个选择列表的开始位置，最重要的一步
     }
 }
 ```
 
-⑤撤销选择
+**⑤撤销选择**
 整体的 backtrack 函数如下
 
-C++
-
-```c++
-void backtrack(vector<int>nums,vector<int>&path,int start)
+```java
+void backtrack(int[] nums,List<Integer> path, int start)
 {
-    res.push_back(path);
+    res.add(path);
     for(int i=start;i<nums.size();i++)
     {
         path.push_back(nums[i]);//做出选择
         backtrack(nums,path,i+1);//递归进入下一层，注意i+1，标识下一个选择列表的开始位置，最重要的一步
-        path.pop_back();//撤销选择
+        path.remove(path.size() - 1);//撤销选择
     }
 }
 ```
 
-**B、子集 II(剪枝思想)--问题描述:**
-**给定一个可能 包含重复元素 的整数数组 nums，返回该数组所有可能的子集（幂集）。**
+**完整AC代码：**
+
+```java
+class Solution {
+   public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> res = new ArrayList<>();
+        backtrack(0, nums, res, new ArrayList<Integer>());
+        return res;
+    }
+
+    private void backtrack(int i, int[] nums, List<List<Integer>> res, ArrayList<Integer> tmp) {
+        res.add(new ArrayList<>(tmp));
+        for (int j = i; j < nums.length; j++) {
+            tmp.add(nums[j]);
+            backtrack(j + 1, nums, res, tmp);
+            tmp.remove(tmp.size() - 1);
+        }
+    }
+
+}
+```
+
+
+
+- **子集II**
+
+**B:子集 II(剪枝思想)--问题描述:给定一个可能 包含重复元素 的整数数组 nums，返回该数组所有可能的子集（幂集**
 输入: [1,2,2]
 输出:
 [
@@ -4977,14 +5201,14 @@ void backtrack(vector<int>nums,vector<int>&path,int start)
 **解题步骤**
 ①递归树
 
-![1ccf07d0ab33b4b28c2bedb316e262f1d344dffefb4debde33fda98da1e8429e](Datastructureandalgorithm.assets\1ccf07d0ab33b4b28c2bedb316e262f1d344dffefb4debde33fda98da1e8429e.png)
+<img src="Datastructureandalgorithm.assets\1ccf07d0ab33b4b28c2bedb316e262f1d344dffefb4debde33fda98da1e8429e.png" alt="1ccf07d0ab33b4b28c2bedb316e262f1d344dffefb4debde33fda98da1e8429e" style="zoom:67%;" />
 
 可以发现，树中出现了大量重复的集合，②和③和第一个问题一样，不再赘述，我们直接看第四步
 
 ④判断是否需要剪枝，需要先对数组排序，使用排序函数 sort(nums.begin(),nums.end())
 显然我们需要去除重复的集合，即需要剪枝，把递归树上的某些分支剪掉。那么应去除哪些分支呢？又该如何编码呢？
 
-![7dd0461942d17bc38860b05a2b6a6461feae54ad141c64bfaace9127e1a29651](Datastructureandalgorithm.assets\7dd0461942d17bc38860b05a2b6a6461feae54ad141c64bfaace9127e1a29651.png)
+<img src="Datastructureandalgorithm.assets\7dd0461942d17bc38860b05a2b6a6461feae54ad141c64bfaace9127e1a29651.png" alt="7dd0461942d17bc38860b05a2b6a6461feae54ad141c64bfaace9127e1a29651" style="zoom:67%;" />
 
 观察上图不难发现，应该去除当前选择列表中，与上一个数重复的那个数，引出的分支，如 “2，2” 这个选择列表，第二个 “2” 是最后重复的，应该去除这个 “2” 引出的分支
 
@@ -5058,7 +5282,7 @@ void backtrack(vector<int>& nums,vector<int>&path,int start)
 **解题步骤**
 ①递归树
 
-![95513b4b31c8570d7c3b4b29cb09169e1ae981800602ec44ff3cfa20d662b72a](Datastructureandalgorithm.assets\95513b4b31c8570d7c3b4b29cb09169e1ae981800602ec44ff3cfa20d662b72a.png)
+<img src="Datastructureandalgorithm.assets\95513b4b31c8570d7c3b4b29cb09169e1ae981800602ec44ff3cfa20d662b72a.png" alt="95513b4b31c8570d7c3b4b29cb09169e1ae981800602ec44ff3cfa20d662b72a" style="zoom:67%;" />
 
 (绿色箭头上面的是路径，红色框[]则为结果，黄色框为选择列表)
 从上图看出，组合问题和子集问题一样，1,2 和 2,1 `是同一个组合，因此 需要引入start参数标识，每个状态中选择列表的起始位置。另外，每个状态还需要一个 sum 变量，来记录当前路径的和，函数签名如下
@@ -5066,7 +5290,7 @@ void backtrack(vector<int>& nums,vector<int>&path,int start)
 C++
 
 ```c++
-void backtrack(vector<int>& nums,vector<int>&path,int start,int sum,int target)
+void backtrack(vector<int>& nums,vector<int>& path,int start,int sum,int target)
 ```
 
 ②找结束条件
