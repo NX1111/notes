@@ -5081,24 +5081,24 @@ public class HouseChessboard {
 
    | 类型       | 题目链接                                                     |
    | ---------- | ------------------------------------------------------------ |
-   | 子集、组合 | [子集](https://leetcode-cn.com/problems/subsets/)、[子集\|\|](https://leetcode-cn.com/problems/subsets-ii/)、[组合](https://leetcode-cn.com/problems/combinations/)、[组合总数](https://leetcode-cn.com/problems/combination-sum/)、[组合总数\|\|](https://leetcode-cn.com/problems/combination-sum-ii/) |
+   | 子集、组合 | [子集](https://leetcode-cn.com/problems/subsets/)、[子集\|\|](https://leetcode-cn.com/problems/subsets-ii/)、[组合](https://leetcode-cn.com/problems/combinations/)、[组合总和](https://leetcode-cn.com/problems/combination-sum/)、[组合总数\|\|](https://leetcode-cn.com/problems/combination-sum-ii/) |
    | 全排列     | [全排列](https://leetcode-cn.com/problems/permutations/)、[全排列 II](https://leetcode-cn.com/problems/permutations-ii/)、[字符串的全排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)、[字母大小写全排列](https://leetcode-cn.com/problems/letter-case-permutation/) |
    | 搜索       | [解数独](https://leetcode-cn.com/problems/sudoku-solver/)、[单词搜索](https://leetcode-cn.com/problems/word-search/)、[N皇后](https://leetcode-cn.com/problems/eight-queens-lcci/)、[分割回文串](https://leetcode-cn.com/problems/palindrome-partitioning/)、[二进制手表](https://leetcode-cn.com/problems/binary-watch/) |
 
 - **回到子集、组合类型问题上来**
 
-   - [**子集**](https://leetcode-cn.com/problems/subsets/)
+### [子集](https://leetcode-cn.com/problems/subsets/)
 
-     给你一个整数数组 `nums` ，数组中的元素**互不相同 **。返回该数组所有可能的**子集**（幂集）。
+   给你一个整数数组 `nums` ，数组中的元素**互不相同 **。返回该数组所有可能的**子集**（幂集）。
 
-     解集不能包含重复的子集。你可以按任意顺序返回解集。
+   解集不能包含重复的子集。你可以按任意顺序返回解集。
 
-     ```java
-     输入：nums = [1,2,3]
-     输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
-     ```
+   ```java
+   输入：nums = [1,2,3]
+   输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+   ```
 
-     
+   
 
 **解题步骤如下**
 
@@ -5153,7 +5153,7 @@ void backtrack(int[] nums,List<Integer> path, int start)
     res.add(path);
     for(int i=start;i<nums.size();i++)
     {
-        path.push_back(nums[i]);//做出选择
+        path.add(nums[i]);//做出选择
         backtrack(nums,path,i+1);//递归进入下一层，注意i+1，标识下一个选择列表的开始位置，最重要的一步
         path.remove(path.size() - 1);//撤销选择
     }
@@ -5184,9 +5184,9 @@ class Solution {
 
 
 
-- **子集II**
+### [子集II](https://leetcode-cn.com/problems/subsets-ii/)
 
-**B:子集 II(剪枝思想)--问题描述:给定一个可能 包含重复元素 的整数数组 nums，返回该数组所有可能的子集（幂集**
+**B:子集 II(剪枝思想)--问题描述:给定一个可能包含重复元素的整数数组nums，返回该数组所有可能的子集（幂集**
 输入: [1,2,2]
 输出:
 [
@@ -5210,19 +5210,13 @@ class Solution {
 
 <img src="Datastructureandalgorithm.assets\7dd0461942d17bc38860b05a2b6a6461feae54ad141c64bfaace9127e1a29651.png" alt="7dd0461942d17bc38860b05a2b6a6461feae54ad141c64bfaace9127e1a29651" style="zoom:67%;" />
 
-观察上图不难发现，应该去除当前选择列表中，与上一个数重复的那个数，引出的分支，如 “2，2” 这个选择列表，第二个 “2” 是最后重复的，应该去除这个 “2” 引出的分支
+观察上图不难发现，应该去除当前选择列表中，与上一个数重复的那个数，引出的分支，如 “2，2” 这个选择列表，第二个 “2” 是最后重复的，应该去除这个 “2” 引出的分支(去除图中红色大框中的分支)编码呢，刚刚说到是 “去除当前选择列表中，与上一个数重复的那个数，引出的分支”，说明当前列表最少有两个数，当i>start时，做选择的之前，比较一下当前数，与上一个数 (i-1) 是不是相同，相同则 continue:
 
-(去除图中红色大框中的分支)
-
-编码呢，刚刚说到是 “去除当前选择列表中，与上一个数重复的那个数，引出的分支”，说明当前列表最少有两个数，当i>start时，做选择的之前，比较一下当前数，与上一个数 (i-1) 是不是相同，相同则 continue,
-
-C++
-
-```c++
-void backtrack(vector<int>& nums,vector<int>&path,int start)
+```java
+void backtrack(int[] nums , List<Integer> path , int start)
     {
-        res.push_back(path);
-        for(int i=start;i<nums.size();i++)
+        res.add(path);
+        for(int i=start;i<nums.length;i++)
         {
             if(i>start&&nums[i]==nums[i-1])//剪枝去重
                 continue;
@@ -5231,17 +5225,16 @@ void backtrack(vector<int>& nums,vector<int>&path,int start)
 ```
 
 ⑤做出选择
-C++
 
 ```java
-void backtrack(vector<int>& nums,vector<int>&path,int start)
+void backtrack(int[] nums , List<Integer> path , int start)
     {
-        res.push_back(path);
-        for(int i=start;i<nums.size();i++)
+        res.add(path);
+        for(int i=start;i<nums.length;i++)
         {
             if(i>start&&nums[i]==nums[i-1])//剪枝去重
                 continue;
-            temp.push_back(nums[i]);
+            path.add(nums[i]);
             backtrack(nums,path,i+1);
         }
     }
@@ -5250,27 +5243,52 @@ void backtrack(vector<int>& nums,vector<int>&path,int start)
 ⑥撤销选择
 整体的backtrack函数如下
 
-C++
-
-```c++
-sort(nums.begin(),nums.end());
-void backtrack(vector<int>& nums,vector<int>&path,int start)
+```java
+Arrays.sort(nums);
+void backtrack(int[] nums , List<Integer> path , int start)
     {
-        res.push_back(path);
-        for(int i=start;i<nums.size();i++)
+        res.add(path);
+        for(int i=start;i<nums.length;i++)
         {
             if(i>start&&nums[i]==nums[i-1])//剪枝去重
                 continue;
-            temp.push_back(nums[i]);
+            path.add(nums[i]);
             backtrack(nums,path,i+1);
-            temp.pop_back();
+            path.remove(path.size() - 1);
         }
     }
 ```
 
-**C、组合总和 - 问题描述**
-**给定一个无重复元素的数组 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。**
-**candidates 中的数字可以无限制重复被选取。**
+**完整AC代码：**
+
+```java
+class Solution {
+    public List<List<Integer>> subsetsWithDup(int[] nums){
+         Arrays.sort(nums);
+        List<List<Integer>> res = new ArrayList<>();
+        backTrack(nums,0,res,new ArrayList<>());
+        return res;
+    }
+
+    public void backTrack(int[] nums , int start , List<List<Integer>> res ,  List<Integer> path ){
+        res.add(new ArrayList<>(path));
+
+        for(int i = start ; i < nums.length ; ++i){
+            if(i>start && nums[i]==nums[i-1]) continue;//剪枝去重
+            path.add(nums[i]);
+            backTrack(nums,i+1,res,path);
+            path.remove(path.size()-1);
+        }
+
+    }
+}
+```
+
+
+
+### [组合总和](https://leetcode.cn/problems/combination-sum/)
+
+**给定一个无重复元素的数组 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。candidates 中的数字可以无限制重复被选取。**
 **输入: candidates = [1,2,3], target = 3,**
 **所求解集为:**
 **[**
@@ -5284,44 +5302,34 @@ void backtrack(vector<int>& nums,vector<int>&path,int start)
 
 <img src="Datastructureandalgorithm.assets\95513b4b31c8570d7c3b4b29cb09169e1ae981800602ec44ff3cfa20d662b72a.png" alt="95513b4b31c8570d7c3b4b29cb09169e1ae981800602ec44ff3cfa20d662b72a" style="zoom:67%;" />
 
-(绿色箭头上面的是路径，红色框[]则为结果，黄色框为选择列表)
-从上图看出，组合问题和子集问题一样，1,2 和 2,1 `是同一个组合，因此 需要引入start参数标识，每个状态中选择列表的起始位置。另外，每个状态还需要一个 sum 变量，来记录当前路径的和，函数签名如下
+(绿色箭头上面的是路径，红色框[]则为结果，黄色框为选择列表)从上图看出，组合问题和子集问题一样，1,2 和 2,1 是同一个组合，因此 需要引入start参数标识，每个状态中选择列表的起始位置。另外，每个状态还需要一个 sum 变量，来记录当前路径的和，函数名如下：
 
-C++
-
-```c++
-void backtrack(vector<int>& nums,vector<int>& path,int start,int sum,int target)
+```java
+void backtrack(int[] nums,List<List<Integer>>res,List<Integer>path,int start,int sum,int target,int len)
 ```
 
 ②找结束条件
 由题意可得，当路径总和等于 target 时候，就应该把路径加入结果集，并 return
 
-C++
-
-```c++
+```java
  if(target==sum)
         {
-            res.push_back(path);
+            res.add(new ArrayList<>(path));
             return;
         }
 ```
 
 ③找选择列表
-C++
 
- 
-
-```c++
-for(int i=start;i<nums.size();i++)
+```java
+for(int i=start;i<nums.length;i++)
 ```
 
 ④判断是否需要剪枝
 从①中的递归树中发现，当前状态的sum大于target的时候就应该剪枝，不用再递归下去了
 
-C++
-
-```c++
-for(int i=start;i<nums.size();i++)
+```java
+for(int i=start;i<nums.length;i++)
         {
             if(sum>target)//剪枝
                 continue;
@@ -5331,25 +5339,20 @@ for(int i=start;i<nums.size();i++)
 ⑤做出选择
 题中说数可以无限次被选择，那么 i 就不用 +1 。即下一层的选择列表，从自身开始。并且要更新当前状态的sum
 
-C++
-
-```c++
-for(int i=start;i<nums.size();i++)
+```java
+for(int i=start;i<nums.length;i++)
         {
             if(sum>target)
                 continue;
-            path.push_back(nums[i]);
-            backtrack(nums,path,i,sum+nums[i],target);//i不用+1(重复利用)，并更新当前状态的sum
+            path.add(nums[i]);
+            backtrack(nums,res,path,i,sum+nums[i],target,len);//i不用+1(重复利用)，并更新当前状态的sum
         }
 ```
 
 ⑤撤销选择
-整体的 backtrack 函数如下
-
-java
 
 ```java
-public void dfs(int[] nums,List<List<Integer>> res,List<Integer> path,int start,int sum,int target,int len){
+void backtrack(int[] nums,List<List<Integer>> res,List<Integer> path,int start,int sum,int target,int len){
         if(sum == target){
             res.add(new ArrayList(path));
             return;
@@ -5360,16 +5363,79 @@ public void dfs(int[] nums,List<List<Integer>> res,List<Integer> path,int start,
                 continue;
             }
             path.add(nums[i]);
-            dfs(nums,res,path,i,sum+nums[i],target,len);
+            backtrack(nums,res,path,i,sum+nums[i],target,len);
             path.remove(path.size()-1);
         }
     }
 ```
 
-总结：子集、组合类问题，关键是用一个 start 参数来控制选择列表！！最后回溯六步走：
-①画出递归树，找到状态变量(回溯函数的参数)，这一步非常重要※
+**完整AC代码：**
+
+```java
+class Solution {
+   public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        int len = candidates.length;
+        List<List<Integer>> res = new ArrayList<>();
+        if (len == 0) {
+            return res;
+        }
+        List<Integer> path = new ArrayList<>();
+        backtrack(candidates, res, path , 0 , 0 , target , len);
+        return res;
+    }
+    /**
+     * @param candidates 候选数组
+     * @param res        结果集列表
+     * @param path       从根结点到叶子结点的路径
+     * @param start      搜索起点
+     * @param sum        路径和
+     * @param target     目标值不变
+     * @param len		候选数组的长度
+     */
+    public void backtrack(int[] candidates,List<List<Integer>> res,List<Integer> path,int start,int sum,int target,int len){
+        if(sum == target){
+            res.add(new ArrayList(path));
+            return;
+        }
+        for(int i=start;i<len;i++){
+            //判断剪枝
+            if(sum+candidates[i]>target){
+                continue;
+            }
+            path.add(candidates[i]);
+            backtrack(candidates,res,path,i,sum+candidates[i],target,len);
+            path.remove(path.size()-1);
+        }
+    }
+    
+    
+}
+```
+
+### 总结1
+
+子集、组合类问题，关键是用一个 start 参数来控制选择列表！！最后回溯六步走：
+①画出递归树，找到状态变量(回溯函数的参数)，这一步非常重要
 ②根据题意，确立结束条件
 ③找准选择列表(与函数参数相关),与第一步紧密关联※
 ④判断是否需要剪枝
 ⑤作出选择，递归调用，进入下一层
 ⑥撤销选择
+
+
+
+### 全排列
+
+给定一个 没有重复 数字的序列，返回其所有可能的全排列。
+输入: [1,2,3]
+输出:
+[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+<font color=red>解题步骤</font>
+①递归树
+
+<img src="Datastructureandalgorithm.assets/60930c71aa60549ff5c78700a4fc211a7f4304d6548352b7738173eab8d6d7d8.png" alt="全排列递归树" style="zoom: 33%;" />
+
+最下面的叶子节点，红色【】中的就是要求的结果)
+然后我们来回想一下，整个问题的思考过程，这棵树是如何画出来的。首先，我们固定1，然后只有2、3可选：如果选2，那就只剩3可选，得出结果[1,2,3]；如果选3，那就只剩2可选，得出结果[1,3,2]。再来，如果固定2，那么只有1,3可选：如果选1，那就只剩3，得出结果[2,1,3].....
+有没有发现一个规律：如果我们固定了(选择了)某个数，那么他的下一层的选择列表就是——除去这个数以外的其他数！！\比如，第一次选择了2，那么他的下一层的选择列表只有1和3；如果选择了3，那么他的下一层的选择列表只有1和2,那么这个时候就要引入一个used数组来记录使用过的数字，算法签名如下：
+
