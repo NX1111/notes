@@ -5424,7 +5424,7 @@ class Solution {
 
 
 
-### 全排列
+### [全排列](https://leetcode.cn/problems/permutations/)
 
 给定一个 没有重复 数字的序列，返回其所有可能的全排列。
 输入: [1,2,3]
@@ -5437,5 +5437,73 @@ class Solution {
 
 最下面的叶子节点，红色【】中的就是要求的结果)
 然后我们来回想一下，整个问题的思考过程，这棵树是如何画出来的。首先，我们固定1，然后只有2、3可选：如果选2，那就只剩3可选，得出结果[1,2,3]；如果选3，那就只剩2可选，得出结果[1,3,2]。再来，如果固定2，那么只有1,3可选：如果选1，那就只剩3，得出结果[2,1,3].....
-有没有发现一个规律：如果我们固定了(选择了)某个数，那么他的下一层的选择列表就是——除去这个数以外的其他数！！\比如，第一次选择了2，那么他的下一层的选择列表只有1和3；如果选择了3，那么他的下一层的选择列表只有1和2,那么这个时候就要引入一个used数组来记录使用过的数字，算法签名如下：
+有没有发现一个规律：如果我们固定了(选择了)某个数，那么他的下一层的选择列表就是——除去这个数以外的其他数！！比如，第一次选择了2，那么他的下一层的选择列表只有1和3；如果选择了3，那么他的下一层的选择列表只有1和2,那么这个时候就要引入一个used数组来记录使用过的数字，算法函数如下：
+
+```java
+void backtrack(int[] nums , boolean[] used , List<List<Integer>> res ; List<Integer> path )//你也可以把used设置为全局变量
+```
+
+②找结束条件
+
+```java
+ if(path.size()==nums.length)
+        {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+```
+
+③找准选择列表
+
+```java
+for(int i=0;i<nums.length;i++)
+{
+    if(!used[i])//从给定的数中除去用过的，就是当前的选择列表
+    {
+    }
+}
+```
+
+④判断是否需要剪枝
+不需要剪枝，或者你可以认为，!used[i]已经是剪枝
+
+⑤做出选择
+
+```java
+for(int i=0;i<nums.length;i++)
+{
+    if(!used[i])//从给定的数中除去用过的，就是当前的选择列表
+    {
+        path.add(nums[i]);//做选择
+        used[i]=true;//设置当前数已用
+        backtrack(nums,used,res,path);//进入下一层
+    }
+}
+```
+
+⑥撤销选择
+整体代码如下:
+
+```java
+void backtrack(int[] nums , boolean[] used , List<List<Integer>> res ; List<Integer> path )//used初始化为false
+{
+    if(path.size()==nums.size())
+    {
+        res.push_back(path);
+        return;
+    }
+    for(int i=0;i<nums.size();i++)//从给定的数中除去，用过的数，就是当前的选择列表
+    {
+        if(!used[i])//如果没用过
+        {
+            path.push_back(nums[i]);//做选择
+            used[i]=true;//设置当前数已用
+            backtrack(nums,used,path);//进入下一层
+            used[i]=false;//撤销选择
+            path.pop_back();//撤销选择
+        }
+    }
+
+}
+```
 
