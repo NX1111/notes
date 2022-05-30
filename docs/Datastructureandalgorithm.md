@@ -5184,7 +5184,7 @@ class Solution {
 
 
 
-### [子集II](https://leetcode-cn.com/problems/subsets-ii/)
+### [子集II(剪枝思想)](https://leetcode-cn.com/problems/subsets-ii/)
 
 **B:子集 II(剪枝思想)--问题描述:给定一个可能包含重复元素的整数数组nums，返回该数组所有可能的子集（幂集**
 输入: [1,2,2]
@@ -5426,7 +5426,7 @@ class Solution {
 
 ### [全排列](https://leetcode.cn/problems/permutations/)
 
-给定一个 没有重复 数字的序列，返回其所有可能的全排列。
+给定一个 没有重复 数字的序列，返回其所有可能的全排列
 输入: [1,2,3]
 输出:
 [[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
@@ -5485,25 +5485,148 @@ for(int i=0;i<nums.length;i++)
 整体代码如下:
 
 ```java
-void backtrack(int[] nums , boolean[] used , List<List<Integer>> res ; List<Integer> path )//used初始化为false
-{
-    if(path.size()==nums.size())
+ public void backtrack(int[] nums , boolean[] used , List<List<Integer>> res , List<Integer> path )//used初始化为false
     {
-        res.push_back(path);
+        if(path.size()==nums.length)
+        {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+        for(int i=0;i<nums.length;i++)//从给定的数中除去，用过的数，就是当前的选择列表
+        {
+            if(!used[i])//如果没用过
+            {
+                path.add(nums[i]);//做选择
+                used[i]=true;//设置当前数已用
+                backtrack(nums,used,res,path);//进入下一层
+                used[i]=false;//撤销选择
+                path.remove(path.size() - 1);//撤销选择
+            }
+        }
+
+    }
+```
+
+完整代码：
+
+```java
+class Solution {
+    public List<List<Integer>> permute(int[] nums) {
+		
+        boolean[] used = new boolean[nums.length];
+        List<List<Integer>> res = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        backtrack(nums,used,res,path);
+        return res;
+        
+    }
+    
+      public void backtrack(int[] nums , boolean[] used , List<List<Integer>> res , List<Integer> path )//used初始化为false
+    {
+        if(path.size()==nums.length)
+        {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+        for(int i=0;i<nums.length;i++)//从给定的数中除去，用过的数，就是当前的选择列表
+        {
+            if(!used[i])//如果没用过
+            {
+                path.add(nums[i]);//做选择
+                used[i]=true;//设置当前数已用
+                backtrack(nums,used,res,path);//进入下一层
+                used[i]=false;//撤销选择
+                path.remove(path.size() - 1);//撤销选择
+            }
+        }
+
+    }
+    
+    
+    
+}
+```
+
+### [全排列 II](https://leetcode-cn.com/problems/permutations-ii/)(剪枝思想)
+
+给定一个可包含重复数字的序列，返回所有不重复的全排列。
+输入: [1,2,2]
+输出: [[1,2,2],[2,1,2],[2,2,1]]
+很明显又是一个“重复”问题，在[子集II](https://leetcode-cn.com/problems/subsets-ii/)中，当遇到有重复元素求子集时，先对nums数组的元素**排序**，再用if(i>start&&nums[i]==nums[i-1])来判断是否剪枝，那么在排列问题中又该怎么做呢？
+
+①递归树
+依旧要画递归树，判断在哪里剪枝。这个判断不是凭空想出来，而是看树上的重复部分，而归纳出来的
+
+<img src="Datastructureandalgorithm.assets/cc2e874824b271c5858d71d697497f6d7bab56fcf1600021d015e67c50ce4815.png" alt="在这里插入图片描述" style="zoom: 33%;" />
+
+可以看到，有两组是各自重复的，那么应该剪去哪条分支？首先要弄懂，重复结果是怎么来的，比如最后边的分支，选了第二个2后，,竟然还能选第一个2，从而导致最右边整条分支都是重复的
+
+<img src="Datastructureandalgorithm.assets/424c5bd8222eb40364adec57e5f9be5b5ab60642676d91d374b1fe004391b5cb.png" alt="在这里插入图片描述" style="zoom: 33%;" />
+
+②③不再赘述，直接看④
+④判断是否需要剪枝，如何编码
+有了前面“子集、组合”问题的判重经验，同样首先要对题目中给出的nums数组排序，让重复的元素并列排在一起，在if(i>start&&nums[i]==nums[i-1])，基础上修改为if(i>0&&nums[i]==nums[i-1]&&!used[i-1])，语义为：当i可以选第一个元素之后的元素时(因为如果i=0，即只有一个元素，哪来的重复？有重复即说明起码有两个元素或以上,i>0)，然后判断当前元素是否和上一个元素相同？如果相同，再判断上一个元素是否能用？如果三个条件都满足，那么该分支一定是重复的，应该剪去，给出最终代码:
+
+```java
+void backtrack(int[] nums , boolean[] used , List<List<Integer>> res , List<Integer> path)//used初始化全为false
+{
+    if(path.size()==nums.length())
+    {
+        res.add(new ArrayList<>(path));
         return;
     }
-    for(int i=0;i<nums.size();i++)//从给定的数中除去，用过的数，就是当前的选择列表
+    
+    for(int i=0 ; i<nums.length ; i++)//从给定的数中除去，用过的数，就是当前的选择列表
     {
-        if(!used[i])//如果没用过
+        if(!used[i])
         {
-            path.push_back(nums[i]);//做选择
+            if(i>0&&nums[i]==nums[i-1]&&!used[i-1])//剪枝，三个条件
+                continue;
+            path.add(nums[i]);//做选择
             used[i]=true;//设置当前数已用
-            backtrack(nums,used,path);//进入下一层
+            backtrack(nums,used,res,path);//进入下一层
             used[i]=false;//撤销选择
-            path.pop_back();//撤销选择
+            path.remove(path.size() - 1);//撤销选择
         }
     }
+}
+```
 
+完整代码：
+
+```java
+class Solution {
+    public List<List<Integer>> permuteUnique(int[] nums) {
+	    Arrays.sort(nums);
+        boolean[] used = new boolean[nums.length];
+        List<List<Integer>> res = new ArrayList<>();
+        List<Integer> path = new ArrayList<>();
+        backtrack(nums,used,res,path);
+        return res;
+    }
+    
+    public void backtrack(int[] nums , boolean[] used , List<List<Integer>> res , List<Integer> path)//used初始化全为false
+	{
+        if(path.size()==nums.length())
+        {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+        for(int i=0 ; i<nums.length ; i++)//从给定的数中除去，用过的数，就是当前的选择列表
+        {
+            if(!used[i])
+            {
+                if(i>0&&nums[i]==nums[i-1]&&!used[i-1])//剪枝，三个条件
+                    continue;
+                path.add(nums[i]);//做选择
+                used[i]=true;//设置当前数已用
+                backtrack(nums,used,res,path);//进入下一层
+                used[i]=false;//撤销选择
+                path.remove(path.size() - 1);//撤销选择
+            }
+        }
+	}  
+    
 }
 ```
 
