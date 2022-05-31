@@ -5163,6 +5163,7 @@ void backtrack(int[] nums,List<Integer> path, int start)
 **完整AC代码：**
 
 ```java
+import java.util.*;
 class Solution {
    public List<List<Integer>> subsets(int[] nums) {
         List<List<Integer>> res = new ArrayList<>();
@@ -5262,6 +5263,7 @@ void backtrack(int[] nums , List<Integer> path , int start)
 **完整AC代码：**
 
 ```java
+import java.util.*;
 class Solution {
     public List<List<Integer>> subsetsWithDup(int[] nums){
          Arrays.sort(nums);
@@ -5280,6 +5282,56 @@ class Solution {
             path.remove(path.size()-1);
         }
 
+    }
+}
+```
+
+### [组合](https://leetcode.cn/problems/combinations/solution/hui-su-suan-fa-jian-zhi-python-dai-ma-java-dai-ma-/)
+
+根据搜索起点画出二叉树
+既然是树形问题上的 深度优先遍历，因此首先画出树形结构。例如输入：n = 4, k = 2，我们可以发现如下递归结构：
+
+- 如果组合里有 1 ，那么需要在 [2, 3, 4] 里再找 11 个数；
+- 如果组合里有 2 ，那么需要在 [3, 4] 里再找 11数。注意：这里不能再考虑 11，因为包含 11 的组合，在第 1 种情况中已经包含。
+- 依次类推（后面部分省略），以上描述体现的 递归 结构是：在以 nn 结尾的候选数组里，选出若干个元素。画出递归结构如下图：
+
+<img src="Datastructureandalgorithm.assets/1599488203-TzmCXb-image.png" alt="image.png" style="zoom: 50%;" />
+
+说明：叶子结点的信息体现在从根结点到叶子结点的路径上，因此需要一个表示路径的变量 `path`，它是一个列表，特别地，`path` 是一个栈；
+每一个结点递归地在做同样的事情，区别在于搜索起点，因此需要一个变量 `start` ，表示在区间 `[start , n]` 里选出若干个数的组合；
+可能有一些分支没有必要执行，我们放在优化中介绍。==友情提示：对于这一类问题，画图帮助分析是非常重要的解题方法==。
+
+完整代码：
+
+```java
+import java.util.*;
+public class Solution {
+     public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> res = new ArrayList<>();
+        if (k <= 0 || n < k) {
+            return res;
+        }
+        // 从 1 开始是题目的设定
+        List<Integer> path = new ArrayList<>();
+        backTrack(n, k, 1, res , path);
+        return res;
+    }
+
+    private void backTrack(int n, int k, int start, List<List<Integer>> res ,List<Integer> path ) {
+        // 递归终止条件是：path 的长度等于 k
+        if (path.size() == k) {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+        // 遍历可能的搜索起点
+        for (int i = start; i <= n; i++) {
+            // 向路径变量里添加一个数
+            path.add(i);
+            // 下一轮搜索，设置的搜索起点要加 1，因为组合数理不允许出现重复的元素
+            backTrack(n, k, i + 1, res,path);
+            // 重点理解这里：深度优先遍历有回头的过程，因此递归之前做了什么，递归之后需要做相同操作的逆向操作
+            path.remove(path.size() - 1);
+        }
     }
 }
 ```
@@ -5411,6 +5463,98 @@ class Solution {
     
 }
 ```
+
+### [组合总和II](https://leetcode.cn/problems/combination-sum-ii/solution/hui-su-suan-fa-jian-zhi-python-dai-ma-java-dai-m-3/)
+
+与组合之和的区别在于：
+
+- 组合之和的数字可以被无限制重复选取
+- 本题中的数字，每一个组合中只能使用一次
+
+相同点是：相同数字列表的不同排列视为一个结果。
+
+这里我们使用和第 39 题和第 15 题（三数之和）类似的思路：不重复就需要按 顺序 搜索， 在搜索的过程中检测分支是否会出现重复结果 。注意：这里的顺序不仅仅指数组 candidates 有序，还指按照一定顺序搜索结果。
+
+<img src="Datastructureandalgorithm.assets/1599718525-iXEiiy-image.png" alt="image.png" style="zoom: 50%;" />
+
+<img src="Datastructureandalgorithm.assets/1599716342-gGiISM-image.png" alt="image.png" style="zoom: 40%;" />
+
+由第 39 题我们知道，数组 candidates 有序，也是 深度优先遍历 过程中实现「剪枝」的前提。
+将数组先排序的思路来自于这个问题：去掉一个数组中重复的元素。很容易想到的方案是：先对数组 升序 排序，重复的元素一定不是排好序以后相同的连续数组区域的第 11 个元素。也就是说，剪枝发生在：同一层数值相同的结点第 22、33 ... 个结点，因为数值相同的第 11 个结点已经搜索出了包含了这个数值的全部结果，同一层的其它结点，候选数的个数更少，搜索出的结果一定不会比第 11 个结点更多，并且是第 11 个结点的子集。（说明：这段文字很拗口，大家可以结合具体例子，在纸上写写画画进行理解。）
+说明：
+解决这个问题可能需要解决 第 15 题（[三数之和](https://leetcode-cn.com/problems/3sum/)）、 第 47 题（[全排列 II](https://leetcode-cn.com/problems/permutations-ii/solution/hui-su-suan-fa-python-dai-ma-java-dai-ma-by-liwe-2/)）、 第 39 题（[组合之和](https://leetcode-cn.com/problems/combination-sum/)）的经验；
+对于如何去重还不太清楚的朋友，可以参考当前题解的 高赞置顶评论 。
+
+完整代码：
+
+```java
+import java.util.*;
+
+public class Solution {
+
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        int len = candidates.length;
+        List<List<Integer>> res = new ArrayList<>();
+        if (len == 0) {
+            return res;
+        }
+
+        // 关键步骤
+        Arrays.sort(candidates);
+        
+        List<Integer> path = new ArrayList<>();
+        backtrack(candidates, target,len, 0, res, path);
+        return res;
+    }
+
+    /**
+     * @param candidates 候选数组
+     * @param len        冗余变量
+     * @param begin      从候选数组的 begin 位置开始搜索
+     * @param target     表示剩余，这个值一开始等于 target，基于题目中说明的"所有数字（包括目标数）都是正整数"这个条件
+     * @param path       从根结点到叶子结点的路径
+     * @param res
+     */
+    private void backtrack(int[] candidates, int target , int len, int begin, List<List<Integer>> res , List<Integer> path) {
+        if (target == 0) {
+            res.add(new ArrayList<>(path));
+            return;
+        }
+        for (int i = begin; i < len; i++) {
+            // 大剪枝：减去 candidates[i] 小于 0，减去后面的 candidates[i + 1]、candidates[i + 2] 肯定也小于 0，因此用 break
+            if (target - candidates[i] < 0) {
+                break;
+            }
+
+            // 小剪枝：同一层相同数值的结点，从第 2 个开始，候选数更少，结果一定发生重复，因此跳过，用 continue
+            if (i > begin && candidates[i] == candidates[i - 1]) {
+                continue;
+            }
+
+            path.add(candidates[i]);
+            // 调试语句 ①
+            // System.out.println("递归之前 => " + path + "，剩余 = " + (target - candidates[i]));
+
+            // 因为元素不可以重复使用，这里递归传递下去的是 i + 1 而不是 i
+            backtrack(candidates, target - candidates[i] , len , i + 1 , res , path );
+
+            path.remove(path.size() - 1);
+            // 调试语句 ②
+            // System.out.println("递归之后 => " + path + "，剩余 = " + (target - candidates[i]));
+        }
+    }
+
+    public static void main(String[] args) {
+        int[] candidates = new int[]{10, 1, 2, 7, 6, 1, 5};
+        int target = 8;
+        Solution solution = new Solution();
+        List<List<Integer>> res = solution.combinationSum2(candidates, target);
+        System.out.println("输出 => " + res);
+    }
+}
+```
+
+
 
 ### 总结1
 
@@ -5627,6 +5771,413 @@ class Solution {
         }
 	}  
     
+}
+```
+
+### [字符串的全排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)(剪枝思想)
+
+输入一个字符串，打印出该字符串中字符的所有排列。你可以以任意顺序返回这个字符串数组，但里面不能有重复元素。
+示例:
+		输入：s = "abc"
+		输出：["abc","acb","bac","bca","cab","cba"]
+解题步骤：
+其实这题跟例题B一模一样，换汤不换药，把nums数组换成了字符串，直接上最终代码，记得先用sort对字符串s进行排序，再传进来！
+
+```java
+class Solution {
+    public String[] permutation(String s)  {
+	    char[] nums = s.toCharArray();
+        Arrays.sort(nums);
+        boolean[] used = new boolean[nums.length];
+        List<String> res = new ArrayList<>();
+        List<Character> path = new ArrayList<>();
+        backtrack(nums,used,res,path);
+        return res.toArray(new String[res.size()]);
+    }
+    
+    public void backtrack(char[] nums , boolean[] used , List<String> res , List<Character> path)//used初始化全为false
+	{
+        if(path.size()==nums.length)
+        {
+            //字符集合转为字符串对象
+            StringBuilder str = new StringBuilder();
+        for (Character character : path) {// 对ArrayList进行遍历，将字符放入StringBuilder中
+            str.append(character);
+        }
+            res.add(str.toString());
+            return;
+        }
+        
+        for(int i=0 ; i < nums.length ; i++)//从给定的数中除去，用过的数，就是当前的选择列表
+        {
+            if(!used[i])
+            {
+                if(i>0&&nums[i]==nums[i-1]&&!used[i-1])//剪枝，三个条件
+                    continue;
+                path.add(nums[i]);//做选择
+                used[i]=true;//设置当前数已用
+                backtrack(nums,used,res,path);//进入下一层
+                used[i]=false;//撤销选择
+                path.remove(path.size() - 1);//撤销选择
+            }
+        }
+	}  
+    
+}
+```
+
+## 12.Java数据类型转换
+
+### 1. 简单数据类型之间的转换
+
+在Java中整型、实型、字符型被视为简单数据类型，这些类型由低级到高级分别为(byte，short，char)–int–long–float–double
+简单数据类型之间的转换又可以分为：
+●低级到高级的自动类型转换
+●高级到低级的强制类型转换
+●包装类过渡类型能够转换
+低级变量可以直接转换为高级变量，自动类型转换：
+
+```java
+byte b;
+int i=b;
+long l=b;
+float f=b;
+double d=b;
+char c='c';
+int i=c;
+System.out.println("output:" i);
+//输出：output:99;
+```
+对于byte,short,char三种类型而言，他们是平级的，因此不能相互自动转换，可以使用下述的[强制类型转换](https://so.csdn.net/so/search?q=强制类型转换&spm=1001.2101.3001.7020):
+
+```java
+short i=99;
+char c=(char)i;
+System.out.println("output:" c);
+//输出：output:c;
+```
+
+但根据笔者的经验，byte,short,int三种类型都是整型，因此如果操作整型数据时，最好统一使用int型。将高级变量转换为低级变量时，情况会复杂一些，你可以使用强制类型转换。即你必须采用下面这种语句格式：
+
+```java
+int i=99;
+byte b=(byte)i;
+char c=(char)i;
+float f=(float)i;
+```
+
+```java
+//1、float型转换为double型：
+float f1=100.00f;
+Float F1=new Float(f1);
+
+//F1.doubleValue()为Float类的返回double值型的方法
+double d1=F1.doubleValue();
+
+//2、double型转换为int型：
+double d1=100.00;
+Double D1=new Double(d1);
+int i1=D1.intValue();
+
+//3、int型转换为double型：
+int i1=200;
+double d1=i1;
+```
+
+### 2. 字符串与其它数据类型的转换
+#### 1. 其它类型向字符串的转换
+
+①调用类的串转换方法:`X.toString()`;
+       ②自动转换:`X+""`;
+       ③基本类型都可以使用String的方法:`String.volueOf(X)`;
+
+#### 2.字符串作为值,向其它基本类型的转换
+
+①先转换成相应的封装器实例,再调用对应的方法转换成其它类型
+		例如，字符中"32.1"转换double型的值的格式为**:`new Float(“32.1”).doubleValue()`**;
+        也可以用:`Double.valueOf(“32.1”).doubleValue()`;
+       ②静态parseXXX方法
+
+```java
+String s = "1";
+byte b = Byte.parseByte( s );
+short t = Short.parseShort( s );
+int i = Integer.parseInt( s );
+long l = Long.parseLong( s );
+Float f = Float.parseFloat( s );
+Double d = Double.parseDouble( s );
+```
+#### 3. 字符串转化为char[]数组
+
+```java
+String str = 'nx1111';
+char[] chArray = str.toCharArray();
+```
+
+### 3. 字符数组char[]转String
+
+`String.valueOf(char[] charArray)`
+
+```java
+char[] str = {'h','e', 'l', 'l', 'o', '  ', '1','2','3'};  //创建一个字符数组
+	String string1 = new String(str);
+	String string2 = String.valueOf(str);
+	System.out.println(string1);  //hello 123
+	System.out.println(string2);
+	System.out.println(string1 == string2);  //false
+	System.out.println(string1.equals(string2));  //true
+/*两者的结果不一样，因为在string1 == string2中，比较的是地址，由于string1 和 string2是两个不同的对象，string1是通过new方法创建的，string2是由valueOf()方法返回的对象，所以二者的地址不一样，等式的结果就是false。
+而String的equals()方法比较的是值
+*/
+
+```
+
+
+
+### 3. 日期格式设置
+
+```java
+Date date = new Date();
+SimpleDateFormat sy1=new SimpleDateFormat("yyyy-MM-dd");
+String dateFormat=sy1.format(date);
+```
+
+### 4. `List<String>`集合转数组`String[]`
+
+调用数组对象的toArray方法，参数传入String数组类型，内部做类型转换
+`strList.toArray(new String[strList.size()])`
+
+```java
+List<String> strList= new ArrayList<>();
+    strList.add("牛八少爷");
+    strList.add("欧阳无敌");
+    strList.add("西门吹雪");
+    String [] strArray = strList.toArray(new String[strList.size()]);
+    for (String string : strArray) {
+        System.out.println(string);
+    }
+```
+
+### 5. `String[]`数组转集合`List<String>`
+
+#### 1. 数组工具类的asList()
+
+但是这种方法却有其局限性，如果传入的参数是一个数组，那么这个数组一定要是引用类型才能将其转换为List集合，当传入基本数据类型数组时则会将这个数组对象当成一个引用类型对象存进List集合。
+
+<img src="Datastructureandalgorithm.assets/1401949-20190805132932520-555863570.png" alt="img" style="zoom:80%;" />
+
+<img src="Datastructureandalgorithm.assets/1660253-20190417223551607-1371188487.png" style="zoom: 80%;" >
+
+可以看到传入基本数据类型时，打印该列表是打印了传入的数组的地址值。你也可以直接将其传入asList()方法的参数中,就像这样
+
+```java
+//String不是基本数据类型，输出结果是1
+String[] strArray = {"1", "2" ,"3"};
+List list = Arrays.asList(strArray);
+System.out.println(list.get(0));
+```
+
+ArrayList可以存放不同类型的数据
+
+<img src="Datastructureandalgorithm.assets/1660253-20190417224546736-1897541673.png" alt="img" style="zoom:80%;" />
+
+这种方法显然不太好用，那怎么将一组基本数据类型的数组转换成集合呢，我们首先想到的是将该基本类型数组转换成其对应包装类类型的数组(遍历转换也可以)原文链接](https://zhidao.baidu.com/question/628312636366178684.html))。
+
+<img src="Datastructureandalgorithm.assets/1660253-20190417230403671-1142295552.png" alt="img" style="zoom:80%;" />
+
+#### 2. 使用Spring框架
+
+```java
+int[]  a = {1,2,3};
+List list = CollectionUtils.arrayToList(a);
+System.out.println(list);
+```
+
+#### 3. JDK8新特性
+
+![img](Datastructureandalgorithm.assets/1660253-20190417230431839-1358725408.png)
+
+#### 4.  Collections工具类
+
+```java
+//创建数组与集合
+String[] string=new String[5];
+ArrayList<String> list = new ArrayList<String>();
+//把数组转成集合，也就是把数组里面的数据存进集合；
+Collections.addAll(list, string);
+```
+
+
+
+### 6. 字符集合`List<Character> path`转字符串`String str`
+
+```java
+//字符集合转为字符串对象
+StringBuilder str = new StringBuilder();
+for (Character character : path) {// 对ArrayList进行遍历，将字符放入StringBuilder中
+	str.append(character);
+	}
+```
+
+
+
+## 13. 笔试输入输出框架
+
+### 1. 多行输入元素
+
+以三行输入为例，第一行输入两个数字m，n，分别表示数组num1和num2的长度，第二行和第三行输入num1和num2的元素，以空格分隔。
+
+```java
+// 输入如下
+3 4
+10 2 3 
+11 4 5 6
+```
+
+```java
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class myScanner {
+    Scanner sc = new Scanner(System.in);
+    public static void main(String[] args) {
+        System.out.println("输入：");
+        Scanner sc = new Scanner(System.in);
+        int m = sc.nextInt();
+        int n = sc.nextInt();
+        int[] num1 = new int[m];
+        int[] num2 = new int[n];
+        // 换成其他数据类型也一样，其他数值类型就修改int跟nextInt就可以了，
+        //String就把nextInt()换成next(),nextInt空格分隔读取
+        for(int i = 0; i < m; i ++) {
+            num1[i] = sc.nextInt();  // 一个一个读取
+        }
+        for(int i = 0; i < n; i ++) {
+            num2[i] = sc.nextInt();
+        }
+        System.out.println("输出：");
+        System.out.println(Arrays.toString(num1));
+        System.out.println(Arrays.toString(num2));
+    }
+}
+```
+
+### 2. 单行输入多个参数
+
+以空格（也可用其他的符号）为分割
+
+```java
+// 输入如下
+ABB CCC DDD  EEE 123 435
+```
+
+```java
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class myScanner {
+	Scanner sc = new Scanner(System.in);
+	public static void main(String[] args) {
+		System.out.println("输入：");
+		Scanner sc = new Scanner(System.in);
+		String str = sc.nextLine();  // 读取一行
+		System.out.println("输出：");
+		System.out.println(str);
+		String[] strIn = str.trim().split(" ");  // 以空格分割
+		System.out.println(Arrays.toString(strIn));
+	}
+}
+```
+
+### 3. 多行输入多个参数，每行参数个数不定
+
+假设第一行输入m，n，m表示后面有m行，n表示每行最多有n个(可用来截断某一行多输入的参数，不详细分析了)
+
+```java
+// 输入如下
+3 4
+AA bcd 123 54
+AA BB
+A B C
+
+```
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class myScanner {
+	Scanner sc = new Scanner(System.in);
+	public static void main(String[] args) {
+		System.out.println("输入：");
+		Scanner sc = new Scanner(System.in);
+		int m = sc.nextInt();
+		sc.nextLine();  // 很重要，跳到第二行
+		// 若直接确定行数，注释掉上面两行，加入下面一行
+		// int m = 3;
+		String[] strArr = new String[m];
+		// 从第二行开始读取
+		for(int i = 0; i < m; i++) {
+			strArr[i] = sc.nextLine();
+		}
+		System.out.println("输出：");
+		System.out.println(Arrays.toString(strArr));
+		ArrayList<String[]> strToOne = new ArrayList<String[]>();
+		for(int i = 0; i < m; i ++) {
+			String[] tmp = strArr[i].trim().split(" ");
+			strToOne.add(tmp);
+		}
+		System.out.println(strToOne);
+		// 形象点显示
+		System.out.print("[");
+		for(int i = 0; i < strToOne.size(); i++) {
+			System.out.print(Arrays.toString(strToOne.get(i)));
+			if(i != strToOne.size()-1)
+				System.out.print(", ");
+		}
+		System.out.print("]");
+	}
+}
+
+```
+
+### 4. 输入矩阵
+
+```java
+3 4 
+请输入数组元素
+1 2 3 4
+5 6 7 8
+9 10 11 12
+```
+
+```java
+public class Main {
+
+    public static void main(String arg[]) {
+        Scanner s = new Scanner(System.in);
+        System.out.println("请输入数组行数和列数");
+        int x = s.nextInt();//行数
+        int y = s.nextInt();//列数
+        int[][] awarry = new int[x][y];
+        System.out.println("请输入数组元素");
+
+        for (int i = 0; i < x; i++) {
+            for (int j = 0; j < y; j++) {
+                awarry[i][j] = s.nextInt();
+            }
+        }
+        System.out.println("你输入的数组为");
+
+        for (int i = 0; i < x; i++) {
+            for (int j = 0; j < y; j++) {
+                System.out.print(awarry[i][j] + "\t");
+            }
+            System.out.println();
+        }
+    }
+
 }
 ```
 
