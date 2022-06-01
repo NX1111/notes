@@ -1,5 +1,5 @@
 <p align="center">
-<img src="README.assets/tx.jpeg" width="200" height="200"/>
+<img src="./README.assets/tx.jpeg" width="200" height="200"/>
 </p>
 <h1 align="center">NX笔记</h1>
 

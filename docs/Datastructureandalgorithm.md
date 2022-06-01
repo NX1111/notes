@@ -357,7 +357,7 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
 
 - 公式推导
 
-<img src="Datastructureandalgorithm.assets\环形入口节点.png" alt="环形入口节点推导" style="zoom:80%;" />
+<img src="Datastructureandalgorithm.assets\环形入口节点.png" alt="环形入口节点推导"   />
 
 ```java
 public ListNode EntryNodeOfLoop(ListNode pHead) {
@@ -399,13 +399,13 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
 
   例如输入{1,2,3,4,5},2时，对应的链表结构如下图所示：
 
-  <img src="Datastructureandalgorithm.assets\5407F55227804F31F5C5D73558596F2C.png" alt="链表倒数K个节点" style="zoom:30%;" />
+  <img src="Datastructureandalgorithm.assets\5407F55227804F31F5C5D73558596F2C.png" alt="链表倒数K个节点"   />
 
   其中蓝色部分为该链表的最后2个结点，所以返回倒数第2个结点（也即结点值为4的结点）即可，系统会打印后面所有的节点来比较。
 
 - 快慢指针法
 
-  <img src="Datastructureandalgorithm.assets/B27699765EEF6CA0E75AF0D1A4B9BCAC.png" alt="img" style="zoom:67%;" />
+  <img src="Datastructureandalgorithm.assets/B27699765EEF6CA0E75AF0D1A4B9BCAC.png" alt="img"   />
 
 ```java
  public ListNode FindKthToTail (ListNode pHead, int k) {
@@ -428,7 +428,7 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
 - 先全部入栈
 - 出栈前面K个元素
 
-<img src="Datastructureandalgorithm.assets\C9E011A3DA1FB56916001C45812DEAA7.png" style="zoom:50%;" />
+<img src="Datastructureandalgorithm.assets\C9E011A3DA1FB56916001C45812DEAA7.png"   />
 
 ```java
  public ListNode FindKthToTail (ListNode pHead, int k) {
@@ -1958,7 +1958,7 @@ class EmpLinkedList {
 
   **小结**: 看输出父结点的顺序，就确定是前序，中序还是后序
 
-  <img src="Datastructureandalgorithm.assets/image-20210728221811659.png" alt="image-20210728221811659" style="zoom:50%;" />
+  <img src="Datastructureandalgorithm.assets/image-20210728221811659.png" alt="image-20210728221811659"   />
 
   前序遍历A-B-D-F-G-H-I-E-C
 
@@ -2550,7 +2550,7 @@ public class HeapSort {
   - 再次按照根结点权值从小到大进行排序，重复这两个步骤，直至List集合只剩下一个元素，就是赫夫曼树的根结点
   - 由数列 {13, 7, 8, 3, 29, 6, 1}构成的赫夫曼树
 
-  <img src="Datastructureandalgorithm.assets/image-20210729223216180.png" alt="image-20210729223216180" style="zoom:50%;" />
+  <img src="Datastructureandalgorithm.assets/image-20210729223216180.png" alt="image-20210729223216180"   />
 
 ```java
 public class HuffmanTree {
@@ -3410,7 +3410,7 @@ class Node {
 
   - 数列{1,2,3,4,5,6}，创建一颗二叉排序树(BST)，左子树全部为空，从形式上看，更像一个单链表，插入速度没有影响查询速度明显降低(因为需要依次比较)， 不能发挥BST的优势，因为每次还需要比较左子树，其查询速度比单链表还慢
 
-    <img src="Datastructureandalgorithm.assets/image-20210802193440057.png" alt="image-20210802193440057" style="zoom: 67%;" />
+    <img src="Datastructureandalgorithm.assets/image-20210802193440057.png" alt="image-20210802193440057"   />
 
   - 平衡二叉搜索树（Self-balancing binary search tree）又被称为AVL树，**是对二叉排序树功能的扩充**，可以**保证查询效率较高**。
 
@@ -3447,7 +3447,7 @@ public int height() {
 
 - AVL树左旋转：
 
-  <img src="Datastructureandalgorithm.assets/image-20210802194040450.png" alt="image-20210802194040450" style="zoom:67%;" />
+  <img src="Datastructureandalgorithm.assets/image-20210802194040450.png" alt="image-20210802194040450"   />
 
 ```java
 //Node类的方法
@@ -3471,7 +3471,7 @@ public void leftRotate() {
 
 - AVL树右旋转：
 
-<img src="Datastructureandalgorithm.assets/image-20210802194427681.png" alt="image-20210802194427681" style="zoom: 80%;" />
+<img src="Datastructureandalgorithm.assets/image-20210802194427681.png" alt="image-20210802194427681"   />
 
 ```java
 //Node类的方法
@@ -3565,7 +3565,7 @@ public void add(Node node) {
 - 多叉树：
   - 允许每个节点可以有更多的数据项和更多的子节点，就是多叉树（multiway tree）
   - 多叉树通过重新组织节点，减少树的高度，能对二叉树进行优化
-  - <img src="Datastructureandalgorithm.assets/image-20210802214332593.png" alt="image-20210802214332593" style="zoom:80%;" />
+  - <img src="Datastructureandalgorithm.assets/image-20210802214332593.png" alt="image-20210802214332593"   />
 
 #### b）2-3树
 
@@ -3585,7 +3585,7 @@ public void add(Node node) {
 
 - B树通过**重新组织节点，降低树的高度**，并且减少i/o读写次数来提升效率
 
-<img src="Datastructureandalgorithm.assets/image-20210802214917153.png" alt="image-20210802214917153" style="zoom:80%;" />
+<img src="Datastructureandalgorithm.assets/image-20210802214917153.png" alt="image-20210802214917153"   />
 
 - 文件系统及数据库系统的设计者利用了磁盘预读原理，将一个节点的大小设为等于一个页(页得大小通常为4k)，这样每个节点只需要一次I/O就可以完全载入
 
@@ -3660,7 +3660,7 @@ public void add(Node node) {
 
   邻接矩阵是表示图形中顶点之间相邻关系的矩阵，对于n个顶点的图而言，矩阵是的row和col表示的是1....n个点。0-未连通，1-连通（路径的权值）
 
-  <img src="Datastructureandalgorithm.assets/image-20210803165434134.png" alt="image-20210803165434134" style="zoom: 67%;" />
+  <img src="Datastructureandalgorithm.assets/image-20210803165434134.png" alt="image-20210803165434134"   />
 
 - 邻接表
 
@@ -4260,7 +4260,7 @@ public class KMP {
 
 - 应用-集合覆盖：存在如下表的需要付费的广播台，以及广播台信号可以覆盖的地区。 **如何选择最少的广播台**，让所有的地区都可以接收到信号
 
-  - <img src="Datastructureandalgorithm.assets/image-20210805193444352.png" alt="image-20210805193444352" style="zoom:80%;" />
+  - <img src="Datastructureandalgorithm.assets/image-20210805193444352.png" alt="image-20210805193444352"   />
 
   - 思路分析：
 
@@ -4504,7 +4504,7 @@ class MGraph {
 - 应用场景-修路问题：
 
   - 各个站点的距离用边线表示(权) ，如何修路保证各个村庄都能连通，并且总的修建公路总里程最短?
-  - <img src="Datastructureandalgorithm.assets/image-20210808203743814.png" alt="image-20210808203743814" style="zoom:50%;" />
+  - <img src="Datastructureandalgorithm.assets/image-20210808203743814.png" alt="image-20210808203743814"   />
 
 - 基本思想：按照权值从小到大的顺序选择n-1条边，并保证在选择边时不构成回路
 
@@ -5083,7 +5083,7 @@ public class HouseChessboard {
 
 **①递归树**
 
-<img src="Datastructureandalgorithm.assets\d8e07f0c876d9175df9f679fcb92505d20a81f09b1cb559afc59a20044cc3e8c-子集问题递归树.png" alt="d8e07f0c876d9175df9f679fcb92505d20a81f09b1cb559afc59a20044cc3e8c-子集问题递归树" style="zoom:60%;" />
+<img src="Datastructureandalgorithm.assets\d8e07f0c876d9175df9f679fcb92505d20a81f09b1cb559afc59a20044cc3e8c-子集问题递归树.png" alt="d8e07f0c876d9175df9f679fcb92505d20a81f09b1cb559afc59a20044cc3e8c-子集问题递归树"   />
 
 观察上图可得，选择列表里的数，都是选择路径(红色框)后面的数，比如[1]这条路径，他后面的选择列表只有"2、3"，[2]这条路径后面只有"3"这个选择，那么这个时候，就应该使用一个参数start，来标识当前的选择列表的起始位置。也就是标识每一层的状态，因此被形象的称为"状态变量",最终函数名如下：
 
@@ -5181,14 +5181,14 @@ class Solution {
 **解题步骤**
 ①递归树
 
-<img src="Datastructureandalgorithm.assets\1ccf07d0ab33b4b28c2bedb316e262f1d344dffefb4debde33fda98da1e8429e.png" alt="1ccf07d0ab33b4b28c2bedb316e262f1d344dffefb4debde33fda98da1e8429e" style="zoom:67%;" />
+<img src="Datastructureandalgorithm.assets\1ccf07d0ab33b4b28c2bedb316e262f1d344dffefb4debde33fda98da1e8429e.png" alt="1ccf07d0ab33b4b28c2bedb316e262f1d344dffefb4debde33fda98da1e8429e"   />
 
 可以发现，树中出现了大量重复的集合，②和③和第一个问题一样，不再赘述，我们直接看第四步
 
 ④判断是否需要剪枝，需要先对数组排序，使用排序函数 sort(nums.begin(),nums.end())
 显然我们需要去除重复的集合，即需要剪枝，把递归树上的某些分支剪掉。那么应去除哪些分支呢？又该如何编码呢？
 
-<img src="Datastructureandalgorithm.assets\7dd0461942d17bc38860b05a2b6a6461feae54ad141c64bfaace9127e1a29651.png" alt="7dd0461942d17bc38860b05a2b6a6461feae54ad141c64bfaace9127e1a29651" style="zoom:67%;" />
+<img src="Datastructureandalgorithm.assets\7dd0461942d17bc38860b05a2b6a6461feae54ad141c64bfaace9127e1a29651.png" alt="7dd0461942d17bc38860b05a2b6a6461feae54ad141c64bfaace9127e1a29651"   />
 
 观察上图不难发现，应该去除当前选择列表中，与上一个数重复的那个数，引出的分支，如 “2，2” 这个选择列表，第二个 “2” 是最后重复的，应该去除这个 “2” 引出的分支(去除图中红色大框中的分支)编码呢，刚刚说到是 “去除当前选择列表中，与上一个数重复的那个数，引出的分支”，说明当前列表最少有两个数，当i>start时，做选择的之前，比较一下当前数，与上一个数 (i-1) 是不是相同，相同则 continue:
 
@@ -5274,7 +5274,7 @@ class Solution {
 - 如果组合里有 2 ，那么需要在 [3, 4] 里再找 11数。注意：这里不能再考虑 11，因为包含 11 的组合，在第 1 种情况中已经包含。
 - 依次类推（后面部分省略），以上描述体现的 递归 结构是：在以 nn 结尾的候选数组里，选出若干个元素。画出递归结构如下图：
 
-<img src="Datastructureandalgorithm.assets/1599488203-TzmCXb-image.png" alt="image.png" style="zoom: 50%;" />
+<img src="Datastructureandalgorithm.assets/1599488203-TzmCXb-image.png" alt="image.png"   />
 
 说明：叶子结点的信息体现在从根结点到叶子结点的路径上，因此需要一个表示路径的变量 `path`，它是一个列表，特别地，`path` 是一个栈；
 每一个结点递归地在做同样的事情，区别在于搜索起点，因此需要一个变量 `start` ，表示在区间 `[start , n]` 里选出若干个数的组合；
@@ -5331,7 +5331,7 @@ public class Solution {
 **解题步骤**
 ①递归树
 
-<img src="Datastructureandalgorithm.assets\95513b4b31c8570d7c3b4b29cb09169e1ae981800602ec44ff3cfa20d662b72a.png" alt="95513b4b31c8570d7c3b4b29cb09169e1ae981800602ec44ff3cfa20d662b72a" style="zoom:67%;" />
+<img src="Datastructureandalgorithm.assets\95513b4b31c8570d7c3b4b29cb09169e1ae981800602ec44ff3cfa20d662b72a.png" alt="95513b4b31c8570d7c3b4b29cb09169e1ae981800602ec44ff3cfa20d662b72a"   />
 
 (绿色箭头上面的是路径，红色框[]则为结果，黄色框为选择列表)从上图看出，组合问题和子集问题一样，1,2 和 2,1 是同一个组合，因此 需要引入start参数标识，每个状态中选择列表的起始位置。另外，每个状态还需要一个 sum 变量，来记录当前路径的和，函数名如下：
 
@@ -5454,9 +5454,9 @@ class Solution {
 
 这里我们使用和第 39 题和第 15 题（三数之和）类似的思路：不重复就需要按 顺序 搜索， 在搜索的过程中检测分支是否会出现重复结果 。注意：这里的顺序不仅仅指数组 candidates 有序，还指按照一定顺序搜索结果。
 
-<img src="Datastructureandalgorithm.assets/1599718525-iXEiiy-image.png" alt="image.png" style="zoom: 50%;" />
+<img src="Datastructureandalgorithm.assets/1599718525-iXEiiy-image.png" alt="image.png"   />
 
-<img src="Datastructureandalgorithm.assets/1599716342-gGiISM-image.png" alt="image.png" style="zoom: 40%;" />
+<img src="Datastructureandalgorithm.assets/1599716342-gGiISM-image.png" alt="image.png"   />
 
 由第 39 题我们知道，数组 candidates 有序，也是 深度优先遍历 过程中实现「剪枝」的前提。
 将数组先排序的思路来自于这个问题：去掉一个数组中重复的元素。很容易想到的方案是：先对数组 升序 排序，重复的元素一定不是排好序以后相同的连续数组区域的第 11 个元素。也就是说，剪枝发生在：同一层数值相同的结点第 22、33 ... 个结点，因为数值相同的第 11 个结点已经搜索出了包含了这个数值的全部结果，同一层的其它结点，候选数的个数更少，搜索出的结果一定不会比第 11 个结点更多，并且是第 11 个结点的子集。（说明：这段文字很拗口，大家可以结合具体例子，在纸上写写画画进行理解。）
@@ -5556,7 +5556,7 @@ public class Solution {
 <font color=red>解题步骤</font>
 ①递归树
 
-<img src="Datastructureandalgorithm.assets/60930c71aa60549ff5c78700a4fc211a7f4304d6548352b7738173eab8d6d7d8.png" alt="全排列递归树" style="zoom: 33%;" />
+<img src="Datastructureandalgorithm.assets/60930c71aa60549ff5c78700a4fc211a7f4304d6548352b7738173eab8d6d7d8.png" alt="全排列递归树"   />
 
 最下面的叶子节点，红色【】中的就是要求的结果)
 然后我们来回想一下，整个问题的思考过程，这棵树是如何画出来的。首先，我们固定1，然后只有2、3可选：如果选2，那就只剩3可选，得出结果[1,2,3]；如果选3，那就只剩2可选，得出结果[1,3,2]。再来，如果固定2，那么只有1,3可选：如果选1，那就只剩3，得出结果[2,1,3].....
@@ -5680,11 +5680,11 @@ class Solution {
 ①递归树
 依旧要画递归树，判断在哪里剪枝。这个判断不是凭空想出来，而是看树上的重复部分，而归纳出来的
 
-<img src="Datastructureandalgorithm.assets/cc2e874824b271c5858d71d697497f6d7bab56fcf1600021d015e67c50ce4815.png" alt="在这里插入图片描述" style="zoom: 33%;" />
+<img src="Datastructureandalgorithm.assets/cc2e874824b271c5858d71d697497f6d7bab56fcf1600021d015e67c50ce4815.png" alt="在这里插入图片描述"   />
 
 可以看到，有两组是各自重复的，那么应该剪去哪条分支？首先要弄懂，重复结果是怎么来的，比如最后边的分支，选了第二个2后，,竟然还能选第一个2，从而导致最右边整条分支都是重复的
 
-<img src="Datastructureandalgorithm.assets/424c5bd8222eb40364adec57e5f9be5b5ab60642676d91d374b1fe004391b5cb.png" alt="在这里插入图片描述" style="zoom: 33%;" />
+<img src="Datastructureandalgorithm.assets/424c5bd8222eb40364adec57e5f9be5b5ab60642676d91d374b1fe004391b5cb.png" alt="在这里插入图片描述"   />
 
 ②③不再赘述，直接看④
 ④判断是否需要剪枝，如何编码
@@ -6011,9 +6011,9 @@ List<String> strList= new ArrayList<>();
 
 但是这种方法却有其局限性，如果传入的参数是一个数组，那么这个数组一定要是引用类型才能将其转换为List集合，当传入基本数据类型数组时则会将这个数组对象当成一个引用类型对象存进List集合。
 
-<img src="Datastructureandalgorithm.assets/1401949-20190805132932520-555863570.png" alt="img" style="zoom:80%;" />
+<img src="Datastructureandalgorithm.assets/1401949-20190805132932520-555863570.png" alt="img"   />
 
-<img src="Datastructureandalgorithm.assets/1660253-20190417223551607-1371188487.png" style="zoom: 80%;" >
+<img src="Datastructureandalgorithm.assets/1660253-20190417223551607-1371188487.png"   >
 
 可以看到传入基本数据类型时，打印该列表是打印了传入的数组的地址值。你也可以直接将其传入asList()方法的参数中,就像这样
 
@@ -6026,11 +6026,11 @@ System.out.println(list.get(0));
 
 ArrayList可以存放不同类型的数据
 
-<img src="Datastructureandalgorithm.assets/1660253-20190417224546736-1897541673.png" alt="img" style="zoom:80%;" />
+<img src="Datastructureandalgorithm.assets/1660253-20190417224546736-1897541673.png" alt="img"   />
 
 这种方法显然不太好用，那怎么将一组基本数据类型的数组转换成集合呢，我们首先想到的是将该基本类型数组转换成其对应包装类类型的数组(遍历转换也可以)原文链接](https://zhidao.baidu.com/question/628312636366178684.html))。
 
-<img src="Datastructureandalgorithm.assets/1660253-20190417230403671-1142295552.png" alt="img" style="zoom:80%;" />
+<img src="Datastructureandalgorithm.assets/1660253-20190417230403671-1142295552.png" alt="img"   />
 
 #### 2 使用Spring框架
 
