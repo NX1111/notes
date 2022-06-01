@@ -357,7 +357,7 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
 
 - 公式推导
 
-<img src="Datastructureandalgorithm.assets\环形入口节点.png" alt="环形入口节点推导"   />
+![环形入口节点](Datastructureandalgorithm.assets/环形入口节点.png)
 
 ```java
 public ListNode EntryNodeOfLoop(ListNode pHead) {
@@ -399,7 +399,7 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
 
   例如输入{1,2,3,4,5},2时，对应的链表结构如下图所示：
 
-  <img src="Datastructureandalgorithm.assets\5407F55227804F31F5C5D73558596F2C.png" alt="链表倒数K个节点"   />
+  <img src="Datastructureandalgorithm.assets\5407F55227804F31F5C5D73558596F2C.png"/>
 
   其中蓝色部分为该链表的最后2个结点，所以返回倒数第2个结点（也即结点值为4的结点）即可，系统会打印后面所有的节点来比较。
 
