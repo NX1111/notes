@@ -18,7 +18,7 @@ arr[i] [j] = k代表在矩阵的第i行第j列的元素值为k
 
 有序列表，可用数组与链表（linkedList中的removeFirst和addLast方法）实现，遵循先进先出，在尾部添加，在头部删除
 
-#### 1.2.1用环形数组实现队列
+#### 1 用环形数组实现队列
 
 ```java
 //使用数组模拟环形队列   留一个为空
@@ -96,7 +96,7 @@ class CircleArrayQueue {
 
 ![image-20210322165146288](Datastructureandalgorithm.assets/image-20210322165146288.png)
 
-### 单链表反转
+### 2.1 单链表反转
 
 - 链表是真实存在于内存中的，在栈中可以存在多个指向链表的指针，手动将其中的一个指针赋值为null，其他指针依然指向该链表。只有真实地修改了链表的结构，其他指向的链表的全指针才会部发生改变，
 
@@ -119,7 +119,7 @@ class CircleArrayQueue {
 
 ```
 
-### 链表指定区间反转
+### 2.2 链表指定区间反转
 
 - 将一个节点数为 size 链表 m 位置到 n 位置之间的区间反转，要求时间复杂度 O(n)*O*(*n*)，空间复杂度 O(1)*O*(1)。
   例如：
@@ -156,7 +156,7 @@ public class Solution {
 	
 ```
 
-### 链表中的节点每K个一组翻转
+### 2.3 链表中的节点每K个一组翻转
 
 - 将给出的链表中的节点每 k 个一组翻转，返回翻转后的链表
   如果链表中的节点数不是 k 的倍数，将最后剩下的节点保持原样
@@ -200,7 +200,7 @@ public class Solution {
 }
 ```
 
-### 合并两个有序链表
+### 2.4 合并两个有序链表
 
 - 输入两个递增的链表，单个链表的长度为n，合并这两个链表并使新链表中的节点仍然是递增排序的。
 
@@ -253,7 +253,7 @@ public class Solution {
     }
 ```
 
-### 合并K组有序链表（分而治之）
+### 2.5 合并K组有序链表（分而治之）
 
 - 合并 k 个升序的链表并将结果作为一个升序的链表返回其头节点。
 
@@ -293,7 +293,7 @@ public class Solution {
 
 ```
 
-### 快慢指针链表有环
+### 2.6 快慢指针链表有环
 
 - 自己的：
 
@@ -334,7 +334,7 @@ public class Solution {
 
 ```
 
-### 环形链表的入口节点
+### 2.7 环形链表的入口节点
 
 - Hash表法
 
@@ -385,7 +385,7 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
     }
 ```
 
-### 链表截取倒数第K个节点
+### 2.8 链表截取倒数第K个节点
 
 - 输入一个长度为 n 的链表，设链表中的元素的值为 ai ，返回该链表中倒数第k个节点。
 
@@ -452,7 +452,7 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
 
 
 
-### 逆序打印单链表
+### 2.9 逆序打印单链表
 
 - 创建一个栈，将各结点压入栈，先进后出
 - 遍历这个栈然后输出
@@ -475,27 +475,6 @@ public static void reversePrint(HeroNode head) {
     }
 }
 ```
-
-
-
-### 2.2双向链表
-
-每个结点除了next对象属性还有pre对象属性，指向前一个结点；
-
-双向链表可以向前或者向后查找，可以自我删除。
-
-
-
-### 2.3Josephu问题
-
-设编号为 1，2，… n 的 n 个人围坐一圈，约定编号k（1<=k<=n）的人从 1 开始报数，数到m 的那个人出列，它的下一位又从 1 开始报数，数到 m 的那个人又出列，依次类推，直到所有人出列为止，由此产生一个出队编号的序列。
-
-用不带头结点的单向循环链表解决。
-
-- 结点类：get/setnext
-- 管理结点的类：first指向第一个结点
-- 构建一个单向环形链表：先创建第一个结点，让first指向他形成环形，每加入一个保持环形。
-- 出圈：创建一个helper先遍历指向链表最后一个结点，当helper=first即到最后一个出圈的。
 
 
 
@@ -5087,7 +5066,7 @@ public class HouseChessboard {
 
 - **回到子集、组合类型问题上来**
 
-### [子集](https://leetcode-cn.com/problems/subsets/)
+### [11.1 子集](https://leetcode-cn.com/problems/subsets/)
 
    给你一个整数数组 `nums` ，数组中的元素**互不相同 **。返回该数组所有可能的**子集**（幂集）。
 
@@ -5185,7 +5164,7 @@ class Solution {
 
 
 
-### [子集II(剪枝思想)](https://leetcode-cn.com/problems/subsets-ii/)
+### [11.2 子集II(剪枝思想)](https://leetcode-cn.com/problems/subsets-ii/)
 
 **B:子集 II(剪枝思想)--问题描述:给定一个可能包含重复元素的整数数组nums，返回该数组所有可能的子集（幂集**
 输入: [1,2,2]
@@ -5286,7 +5265,7 @@ class Solution {
 }
 ```
 
-### [组合](https://leetcode.cn/problems/combinations/solution/hui-su-suan-fa-jian-zhi-python-dai-ma-java-dai-ma-/)
+### [11.3 组合](https://leetcode.cn/problems/combinations/solution/hui-su-suan-fa-jian-zhi-python-dai-ma-java-dai-ma-/)
 
 根据搜索起点画出二叉树
 既然是树形问题上的 深度优先遍历，因此首先画出树形结构。例如输入：n = 4, k = 2，我们可以发现如下递归结构：
@@ -5338,7 +5317,7 @@ public class Solution {
 
 
 
-### [组合总和](https://leetcode.cn/problems/combination-sum/)
+### [11.4 组合总和](https://leetcode.cn/problems/combination-sum/)
 
 **给定一个无重复元素的数组 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。candidates 中的数字可以无限制重复被选取。**
 **输入: candidates = [1,2,3], target = 3,**
@@ -5464,7 +5443,7 @@ class Solution {
 }
 ```
 
-### [组合总和II](https://leetcode.cn/problems/combination-sum-ii/solution/hui-su-suan-fa-jian-zhi-python-dai-ma-java-dai-m-3/)
+### [11.5 组合总和II](https://leetcode.cn/problems/combination-sum-ii/solution/hui-su-suan-fa-jian-zhi-python-dai-ma-java-dai-m-3/)
 
 与组合之和的区别在于：
 
@@ -5568,7 +5547,7 @@ public class Solution {
 
 
 
-### [全排列](https://leetcode.cn/problems/permutations/)
+###  [11.6 全排列](https://leetcode.cn/problems/permutations/)
 
 给定一个 没有重复 数字的序列，返回其所有可能的全排列
 输入: [1,2,3]
@@ -5691,7 +5670,7 @@ class Solution {
 }
 ```
 
-### [全排列 II](https://leetcode-cn.com/problems/permutations-ii/)(剪枝思想)
+### [11.7 全排列 II](https://leetcode-cn.com/problems/permutations-ii/)(剪枝思想)
 
 给定一个可包含重复数字的序列，返回所有不重复的全排列。
 输入: [1,2,2]
@@ -5774,7 +5753,7 @@ class Solution {
 }
 ```
 
-### [字符串的全排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)(剪枝思想)
+### [11.8 字符串的全排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)(剪枝思想)
 
 输入一个字符串，打印出该字符串中字符的所有排列。你可以以任意顺序返回这个字符串数组，但里面不能有重复元素。
 示例:
@@ -5826,9 +5805,74 @@ class Solution {
 }
 ```
 
+### [11.9 字母大小写全排列](https://leetcode-cn.com/problems/letter-case-permutation/)
+
+完整AC代码：
+
+**大小写字母的二进制ASCII码只有第6位有所不同**则我们可以利用异或位运算（XOR）来实现相互转换。则易证 ***一个字母 XOR （32 or（1 << 5））***即可以轻松地转换大小写。这边转换是异或了一个空格。因为空格的ASCII码即为32！！！！！！
+
+```java
+if(ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z') ch ^= ' ';
+if(ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z') ch ^= 32;
+```
+
+
+
+```java
+class Solution {
+    public List<String> letterCasePermutation(String s) {
+        List<String> res = new ArrayList<>();
+        char[] ch = s.toCharArray();
+        int n = ch.length;
+        backTracking(ch, 0, n ,res);
+        return res;
+    }
+
+    private void backTracking(char[] ch, int index, int n , List<String> res) {
+        res.add(new String(ch)); 
+        for (int i = index; i < n; i++) {
+            if (isDigit(ch[i])) {
+                continue;
+            }
+            ch[i] ^= ' ';
+            backTracking(ch, i + 1, n ,res);
+            ch[i] ^= ' ';
+        }
+    }
+
+    private boolean isDigit(char c) {
+        if (c >= '0' && c <= '9') {
+            return true;
+        }
+        return false;
+    }
+}
+```
+
+### 11.10 解数独
+
+![img](Datastructureandalgorithm.assets/250px-sudoku-by-l2g-20050714svg.png)
+
+```java
+输入：board = [["5","3",".",".","7",".",".",".","."],["6",".",".","1","9","5",".",".","."],[".","9","8",".",".",".",".","6","."],["8",".",".",".","6",".",".",".","3"],["4",".",".","8",".","3",".",".","1"],["7",".",".",".","2",".",".",".","6"],[".","6",".",".",".",".","2","8","."],[".",".",".","4","1","9",".",".","5"],[".",".",".",".","8",".",".","7","9"]]
+输出：[["5","3","4","6","7","8","9","1","2"],["6","7","2","1","9","5","3","4","8"],["1","9","8","3","4","2","5","6","7"],["8","5","9","7","6","1","4","2","3"],["4","2","6","8","5","3","7","9","1"],["7","1","3","9","2","4","8","5","6"],["9","6","1","5","3","7","2","8","4"],["2","8","7","4","1","9","6","3","5"],["3","4","5","2","8","6","1","7","9"]]
+```
+
+解数独思路：
+类似人的思考方式去尝试，行，列，还有 3*3 的方格内数字是 1~9 不能重复。我们尝试填充，如果发现重复了，那么擦除重新进行新一轮的尝试，直到把整个数组填充完成。
+
+算法步骤:
+
+- 数独首先行，列，还有 3*3 的方格内数字是 1~9 不能重复。*
+- 声明布尔数组，表明行列中某个数字是否被使用了， 被用过视为 true，没用过为 false。
+- 初始化布尔数组，表明哪些数字已经被使用过了。
+- 尝试去填充数组，只要行，列， 还有 3*3 的方格内 出现已经被使用过的数字，我们就不填充，否则尝试填充。
+- 如果填充失败，那么我们需要回溯。将原来尝试填充的地方改回来。
+- 递归直到数独被填充完成。
+
 ## 12.Java数据类型转换
 
-### 1. 简单数据类型之间的转换
+### 12.1 简单数据类型之间的转换
 
 在Java中整型、实型、字符型被视为简单数据类型，这些类型由低级到高级分别为(byte，short，char)–int–long–float–double
 简单数据类型之间的转换又可以分为：
@@ -5884,7 +5928,8 @@ int i1=200;
 double d1=i1;
 ```
 
-### 2. 字符串与其它数据类型的转换
+### 12.2 字符串与其它数据类型的转换
+
 #### 1. 其它类型向字符串的转换
 
 ①调用类的串转换方法:`X.toString()`;
@@ -5914,9 +5959,11 @@ String str = 'nx1111';
 char[] chArray = str.toCharArray();
 ```
 
-### 3. 字符数组char[]转String
+### 12.3 字符数组char[]转String
 
 `String.valueOf(char[] charArray)`
+
+`new String(char[] charArray)`
 
 ```java
 char[] str = {'h','e', 'l', 'l', 'o', '  ', '1','2','3'};  //创建一个字符数组
@@ -5934,7 +5981,7 @@ char[] str = {'h','e', 'l', 'l', 'o', '  ', '1','2','3'};  //创建一个字符�
 
 
 
-### 3. 日期格式设置
+### 12.4 日期格式设置
 
 ```java
 Date date = new Date();
@@ -5942,7 +5989,7 @@ SimpleDateFormat sy1=new SimpleDateFormat("yyyy-MM-dd");
 String dateFormat=sy1.format(date);
 ```
 
-### 4. `List<String>`集合转数组`String[]`
+### 12.5 `List<String>`集合转数组`String[]`
 
 调用数组对象的toArray方法，参数传入String数组类型，内部做类型转换
 `strList.toArray(new String[strList.size()])`
@@ -5958,9 +6005,9 @@ List<String> strList= new ArrayList<>();
     }
 ```
 
-### 5. `String[]`数组转集合`List<String>`
+### 12.6 `String[]`数组转集合`List<String>`
 
-#### 1. 数组工具类的asList()
+#### 1 数组工具类的asList()
 
 但是这种方法却有其局限性，如果传入的参数是一个数组，那么这个数组一定要是引用类型才能将其转换为List集合，当传入基本数据类型数组时则会将这个数组对象当成一个引用类型对象存进List集合。
 
@@ -5985,7 +6032,7 @@ ArrayList可以存放不同类型的数据
 
 <img src="Datastructureandalgorithm.assets/1660253-20190417230403671-1142295552.png" alt="img" style="zoom:80%;" />
 
-#### 2. 使用Spring框架
+#### 2 使用Spring框架
 
 ```java
 int[]  a = {1,2,3};
@@ -5993,11 +6040,11 @@ List list = CollectionUtils.arrayToList(a);
 System.out.println(list);
 ```
 
-#### 3. JDK8新特性
+#### 3 JDK8新特性
 
 ![img](Datastructureandalgorithm.assets/1660253-20190417230431839-1358725408.png)
 
-#### 4.  Collections工具类
+#### 4  Collections工具类
 
 ```java
 //创建数组与集合
@@ -6009,7 +6056,7 @@ Collections.addAll(list, string);
 
 
 
-### 6. 字符集合`List<Character> path`转字符串`String str`
+### 12.7 字符集合`List<Character> path`转字符串`String str`
 
 ```java
 //字符集合转为字符串对象
@@ -6023,7 +6070,7 @@ for (Character character : path) {// 对ArrayList进行遍历，将字符放入S
 
 ## 13. 笔试输入输出框架
 
-### 1. 多行输入元素
+### 13.1 多行输入元素
 
 以三行输入为例，第一行输入两个数字m，n，分别表示数组num1和num2的长度，第二行和第三行输入num1和num2的元素，以空格分隔。
 
@@ -6062,7 +6109,7 @@ public class myScanner {
 }
 ```
 
-### 2. 单行输入多个参数
+### 13.2 单行输入多个参数
 
 以空格（也可用其他的符号）为分割
 
@@ -6089,7 +6136,7 @@ public class myScanner {
 }
 ```
 
-### 3. 多行输入多个参数，每行参数个数不定
+### 13.3 多行输入多个参数，每行参数个数不定
 
 假设第一行输入m，n，m表示后面有m行，n表示每行最多有n个(可用来截断某一行多输入的参数，不详细分析了)
 
@@ -6142,7 +6189,7 @@ public class myScanner {
 
 ```
 
-### 4. 输入矩阵
+### 13.4 输入矩阵
 
 ```java
 3 4 
