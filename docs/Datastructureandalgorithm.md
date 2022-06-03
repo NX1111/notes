@@ -5037,7 +5037,7 @@ public class HouseChessboard {
 }
 ```
 
-## 11 回溯算法
+## 11. 回溯算法
 
 - **解题思路：**
 
@@ -5849,7 +5849,7 @@ class Solution {
 }
 ```
 
-### 11.10 解数独
+### 11.10 [解数独](https://leetcode.cn/problems/sudoku-solver/solution/hui-su-fa-jie-shu-du-by-i_use_python/)
 
 ![img](Datastructureandalgorithm.assets/250px-sudoku-by-l2g-20050714svg.png)
 
@@ -5870,7 +5870,452 @@ class Solution {
 - 如果填充失败，那么我们需要回溯。将原来尝试填充的地方改回来。
 - 递归直到数独被填充完成。
 
-## 12.Java数据类型转换
+完整代码:
+
+```java
+class Solution {
+    public void solveSudoku(char[][] board) {
+        // 三个布尔数组 表明 行, 列, 还有 3*3 的方格的数字是否被使用过
+        boolean[][] rowUsed = new boolean[9][10];
+        boolean[][] colUsed = new boolean[9][10];
+        boolean[][][] boxUsed = new boolean[3][3][10];
+        // 初始化
+        for(int row = 0; row < board.length; row++){
+            for(int col = 0; col < board[0].length; col++) {
+                int num = board[row][col] - '0';
+                if(1 <= num && num <= 9){
+                    rowUsed[row][num] = true;
+                    colUsed[col][num] = true;
+                    boxUsed[row/3][col/3][num] = true;
+                }
+            }
+        }
+        // 递归尝试填充数组 
+        recusiveSolveSudoku(board, rowUsed, colUsed, boxUsed, 0, 0);
+    }
+    
+    private boolean recusiveSolveSudoku(char[][]board, boolean[][]rowUsed, boolean[][]colUsed, boolean[][][]boxUsed, int row, int col){
+        // 边界校验, 如果已经填充完成, 返回true, 表示一切结束
+        if(col == board[0].length){
+            col = 0;
+            row++;
+            if(row == board.length){
+                return true;
+            }
+        }
+        // 是空则尝试填充, 否则跳过继续尝试填充下一个位置
+        if(board[row][col] == '.') {
+            // 尝试填充1~9
+            for(int num = 1; num <= 9; num++){
+                boolean canUsed = !(rowUsed[row][num] || colUsed[col][num] || boxUsed[row/3][col/3][num]);
+                if(canUsed){
+                    rowUsed[row][num] = true;
+                    colUsed[col][num] = true;
+                    boxUsed[row/3][col/3][num] = true;
+                    
+                    board[row][col] = (char)('0' + num);
+                    if(recusiveSolveSudoku(board, rowUsed, colUsed, boxUsed, row, col + 1)){
+                        return true;
+                    }
+                    board[row][col] = '.';
+                    
+                    rowUsed[row][num] = false;
+                    colUsed[col][num] = false;
+                    boxUsed[row/3][col/3][num] = false;
+                }
+            }
+        } else {
+            return recusiveSolveSudoku(board, rowUsed, colUsed, boxUsed, row, col + 1);
+        }
+        return false;
+    }
+}
+
+```
+
+### 11.11 [单词搜索](https://leetcode.cn/problems/word-search/comments/)
+
+给定一个 m x n 二维字符网格 board 和一个字符串单词 word 。如果 word 存在于网格中，返回 true ；否则，返回 false 。单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。
+
+![img](Datastructureandalgorithm.assets/word2.jpg)
+
+```java
+输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
+输出：true
+```
+
+![img](Datastructureandalgorithm.assets/word3.jpg)
+
+```java
+输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCB"
+输出：false
+```
+
+完整代码(可理解)：
+
+```java
+/**
+* 回溯法：相比于DFS，多了一步『撤销修改节点状态』
+*/
+class Solution {
+    private boolean find;  // 定义为成员变量，方便以下两个成员方法使用和修改
+
+    public boolean exist(char[][] board, String word) {
+        if (board == null) return false;
+        int m = board.length, n = board[0].length;
+        boolean[][] visited = new boolean[m][n];
+        find = false;
+
+        for (int i = 0; i < m; i++){
+            for (int j = 0; j < n; j++){
+                backtracking(i, j, board, word, visited, 0);  // 从左上角开始遍历棋盘每个格子
+            }
+        }
+        return find;
+    }
+
+    /**
+    * i,j,board：棋盘格及当前元素的坐标
+    * word: 要搜索的目标单词
+    * visited：记录当前格子是否已被访问过
+    * pos: 记录目标单词的字符索引，只有棋盘格字符和pos指向的字符一致时，才有机会继续搜索接下来的字符；如果pos已经过了目标单词的尾部了，那么便说明找到目标单词了
+    */
+    public void backtracking(int i, int j, char[][] board, String word, boolean[][] visited, int pos){
+        // 超出边界、已经访问过、已找到目标单词、棋盘格中当前字符已经和目标字符不一致了
+        if(i<0 || i>= board.length || j<0 || j >= board[0].length || visited[i][j] || find
+           || board[i][j]!=word.charAt(pos))  return;
+
+        if(pos == word.length()-1){
+            find = true;
+            return;
+        }
+
+        visited[i][j] = true;  // 修改当前节点状态
+        backtracking(i+1, j, board, word, visited, pos+1);  // 遍历子节点
+        backtracking(i-1, j, board, word, visited, pos+1);
+        backtracking(i, j+1, board, word, visited, pos+1);
+        backtracking(i, j-1, board, word, visited, pos+1);
+        visited[i][j] = false; // 撤销修改
+    }
+
+}
+```
+
+### [11.12 N皇后问题](https://leetcode.cn/problems/eight-queens-lcci/solution/ba-huang-hou-hui-su-suan-fa-jing-dian-ti-mu-xiang-/)
+
+n 皇后问题 研究的是如何将 n 个皇后放置在 n×n 的棋盘上，并且使皇后彼此之间不能相互攻击。给你一个整数 n ，返回所有不同的 n 皇后问题 的解决方案。每一种解法包含一个不同的 n 皇后问题 的棋子放置方案，该方案中 'Q' 和 '.' 分别代表了皇后和空位。
+
+![img](Datastructureandalgorithm.assets/20211020232201.png)
+
+- 输入：n = 4
+- 输出：[[".Q..","...Q","Q...","..Q."],["..Q.","Q...","...Q",".Q.."]]
+- 解释：如上图所示，4 皇后问题存在两个不同的解法。
+
+示例 2：
+
+- 输入：n = 1
+- 输出：[["Q"]]
+
+![51.N皇后](Datastructureandalgorithm.assets/20210130182532303.jpg)
+
+从图中，可以看出，二维矩阵中矩阵的高就是这棵树的高度，矩阵的宽就是树形结构中每一个节点的宽度。那么我们用皇后们的约束条件，来回溯搜索这棵树，**只要搜索到了树的叶子节点，说明就找到了皇后们的合理位置了**。
+
+ 回溯三部曲
+
+按照我总结的如下回溯模板，我们来依次分析：
+
+```text
+void backtracking(参数) {
+    if (终止条件) {
+        存放结果;
+        return;
+    }
+    for (选择：本层集合中元素（树中节点孩子的数量就是集合的大小）) {
+        处理节点;
+        backtracking(路径，选择列表); // 递归
+        回溯，撤销处理结果
+    }
+}
+```
+
+- 递归函数参数
+
+我依然是定义全局变量二维数组result来记录最终结果。
+
+参数n是棋盘的大小，然后用row来记录当前遍历到棋盘的第几层了。
+
+代码如下：
+
+```java
+List<List<string>> result;
+public void backTrack(int n, int row, char[][] chessboard)
+```
+
+- 递归终止条件
+
+在如下树形结构中： ![51.N皇后](Datastructureandalgorithm.assets/20210130182532303-16542559884329.jpg)
+
+可以看出，当递归到棋盘最底层（也就是叶子节点）的时候，就可以收集结果并返回了。
+
+代码如下：
+
+```java
+if (row == n) {
+    result.add(Array2List(chessboard));
+    return;
+}
+```
+
+- 单层搜索的逻辑
+
+递归深度就是row控制棋盘的行，每一层里for循环的col控制棋盘的列，一行一列，确定了放置皇后的位置。
+
+每次都是要从新的一行的起始位置开始搜，所以都是从0开始。
+
+代码如下：
+
+```cpp
+for (int col = 0; col < n; col++) {
+    if (isValid(row, col, chessboard, n)) { // 验证合法就可以放
+        chessboard[row][col] = 'Q'; // 放置皇后
+        backtracking(n, row + 1, chessboard);
+        chessboard[row][col] = '.'; // 回溯，撤销皇后
+    }
+}
+```
+
+- 验证棋盘是否合法
+
+按照如下标准去重：
+
+1. 不能同行
+2. 不能同列
+3. 不能同斜线 （45度和135度角）
+
+代码如下：
+
+```cpp
+public boolean isValid(int row, int col, int n, char[][] chessboard) {
+        // 检查列
+        for (int i=0; i<row; ++i) { // 相当于剪枝
+            if (chessboard[i][col] == 'Q') {
+                return false;
+            }
+        }
+        // 检查45度对角线
+        for (int i=row-1, j=col-1; i>=0 && j>=0; i--, j--) {
+            if (chessboard[i][j] == 'Q') {
+                return false;
+            }
+        }
+        // 检查135度对角线
+        for (int i=row-1, j=col+1; i>=0 && j<=n-1; i--, j++) {
+            if (chessboard[i][j] == 'Q') {
+                return false;
+            }
+        }
+        return true;
+    }
+```
+
+在这份代码中，细心的同学可以发现为什么没有在同行进行检查呢？因为在单层搜索的过程中，每一层递归，只会选for循环（也就是同一行）里的一个元素，所以不用去重了。
+
+完整代码：
+
+```java
+class Solution {
+    List<List<String>> res = new ArrayList<>();
+    public List<List<String>> solveNQueens(int n) {
+        char[][] chessboard = new char[n][n];
+        for (char[] c : chessboard) {
+            Arrays.fill(c, '.');
+        }
+        backTrack(n, 0, chessboard);
+        return res;
+    }
+
+
+    public void backTrack(int n, int row, char[][] chessboard) {
+        if (row == n) {
+            res.add(Array2List(chessboard));
+            return;
+        }
+
+        for (int col = 0;col < n; ++col) {
+            if (isValid (row, col, n, chessboard)) {
+                chessboard[row][col] = 'Q';
+                backTrack(n, row+1, chessboard);
+                chessboard[row][col] = '.';
+            }
+        }
+
+    }
+
+
+    public List Array2List(char[][] chessboard) {
+        List<String> list = new ArrayList<>();
+        for (char[] c : chessboard) {
+            list.add(String.copyValueOf(c));
+        }
+        return list;
+    }
+
+
+    public boolean isValid(int row, int col, int n, char[][] chessboard) {
+        // 检查列
+        for (int i=0; i<row; ++i) { // 相当于剪枝
+            if (chessboard[i][col] == 'Q') {
+                return false;
+            }
+        }
+        // 检查45度对角线
+        for (int i=row-1, j=col-1; i>=0 && j>=0; i--, j--) {
+            if (chessboard[i][j] == 'Q') {
+                return false;
+            }
+        }
+        // 检查135度对角线
+        for (int i=row-1, j=col+1; i>=0 && j<=n-1; i--, j++) {
+            if (chessboard[i][j] == 'Q') {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+### [11.13 分割回文串](https://leetcode.cn/problems/palindrome-partitioning/solution/131-fen-ge-hui-wen-chuan-hui-su-sou-suo-yp2jq/)
+
+本题这涉及到两个关键问题：
+
+- 切割问题，有不同的切割方式
+- 判断回文
+
+相信这里不同的切割方式可以搞懵很多同学了。这种题目，想用for循环暴力解法，可能都不那么容易写出来，所以要换一种暴力的方式，就是回溯。一些同学可能想不清楚 回溯究竟是如何切割字符串呢？我们来分析一下切割，其实切割问题类似组合问题。
+
+- 例如对于字符串abcdef：
+  - 组合问题：选取一个a之后，在bcdef中再去选取第二个，选取b之后在cdef中在选组第三个.....。
+  - 切割问题：切割一个a之后，在bcdef中再去切割第二段，切割b之后在cdef中在切割第三段.....。
+
+感受出来了不？所以切割问题，也可以抽象为一颗树形结构，如图：
+
+![image.png](Datastructureandalgorithm.assets/1631605968-vKKScH-image.png)
+
+递归用来纵向遍历，for循环用来横向遍历，切割线（就是图中的红线）切割到字符串的结尾位置，说明找到了一个切割方法。此时可以发现，切割问题的回溯搜索的过程和组合问题的回溯搜索的过程是差不多的。
+
+- 回溯三部曲
+
+递归函数参数
+全局变量数组path存放切割后回文的子串，二维数组result存放结果集。 （这两个参数可以放到函数参数里）本题递归函数参数还需要startIndex，因为切割过的地方，不能重复切割，和组合问题也是保持一致的。在回溯算法：[求组合总和（二）](https://leetcode.cn/link/?target=https%3A%2F%2Fprogrammercarl.com%2F0039.%E7%BB%84%E5%90%88%E6%80%BB%E5%92%8C.html)中我们深入探讨了组合问题什么时候需要startIndex，什么时候不需startIndex。
+
+代码如下：
+
+```java
+private void backTracking(String s, int startIndex)
+```
+
+- 递归函数终止条件
+
+  ![image.png](Datastructureandalgorithm.assets/1631606009-OMGnoi-image.png)
+
+  
+
+  从树形结构的图中可以看出：切割线切到了字符串最后面，说明找到了一种切割方法，此时就是本层递归的终止终止条件。那么在代码里什么是切割线呢？在处理组合问题的时候，递归参数需要传入startIndex，表示下一轮递归遍历的起始位置，这个startIndex就是切割线。
+
+  终止条件代码如下：
+
+  ```java
+  //如果起始位置大于s的大小，说明找到了一组分割方案
+          if (startIndex >= s.length()) {
+              lists.add(new ArrayList(deque));
+              return;
+          }
+  ```
+
+  - 单层搜索的逻辑
+
+  来看看在递归循环，中如何截取子串呢？在`for (int i = startIndex; i < s.size(); i++)`循环中，我们定义了起始位置`startIndex`，那么 `[startIndex, i]` 就是要截取的子串。首先判断这个子串是不是回文，如果是回文，就加入在`Deque<String> deque`中，deque用来记录切割过的回文子串
+
+  代码如下：
+
+  ```java
+  for (int i = startIndex; i < s.length(); i++) {
+              //如果是回文子串，则记录
+              if (isPalindrome(s, startIndex, i)) {
+                  String str = s.substring(startIndex, i + 1);
+                  deque.addLast(str);
+              } else {
+                  continue;
+              }
+              //起始位置后移，保证不重复
+              backTracking(s, i + 1);
+              deque.removeLast();
+          }
+  ```
+
+  - 判断回文子串
+
+  可以使用双指针法，一个指针从前向后，一个指针从后先前，如果前后指针所指向的元素是相等的，就是回文字符串了。
+
+  ```java
+  //判断是否是回文串
+      private boolean isPalindrome(String s, int startIndex, int end) {
+          for (int i = startIndex, j = end; i < j; i++, j--) {
+              if (s.charAt(i) != s.charAt(j)) {
+                  return false;
+              }
+          }
+          return true;
+      }
+  ```
+
+  - 完整代码
+
+  ```java
+  class Solution {
+      List<List<String>> lists = new ArrayList<>();
+      Deque<String> deque = new LinkedList<>();
+  
+      public List<List<String>> partition(String s) {
+          backTracking(s, 0);
+          return lists;
+      }
+  
+      private void backTracking(String s, int startIndex) {
+          //如果起始位置大于s的大小，说明找到了一组分割方案
+          if (startIndex >= s.length()) {
+              lists.add(new ArrayList(deque));
+              return;
+          }
+          for (int i = startIndex; i < s.length(); i++) {
+              //如果是回文子串，则记录
+              if (isPalindrome(s, startIndex, i)) {
+                  String str = s.substring(startIndex, i + 1);
+                  deque.addLast(str);
+              } else {
+                  continue;
+              }
+              //起始位置后移，保证不重复
+              backTracking(s, i + 1);
+              deque.removeLast();
+          }
+      }
+      //判断是否是回文串
+      private boolean isPalindrome(String s, int startIndex, int end) {
+          for (int i = startIndex, j = end; i < j; i++, j--) {
+              if (s.charAt(i) != s.charAt(j)) {
+                  return false;
+              }
+          }
+          return true;
+      }
+  }
+  ```
+
+
+
+## 12. JAVA数据类型转化技巧
 
 ### 12.1 简单数据类型之间的转换
 
@@ -6064,6 +6509,19 @@ StringBuilder str = new StringBuilder();
 for (Character character : path) {// 对ArrayList进行遍历，将字符放入StringBuilder中
 	str.append(character);
 	}
+```
+
+### 12.8 二维字符数组`char[][] charArray`转`List<String> list`
+
+```java
+public List Array2List(char[][] chessboard) {
+        List<String> list = new ArrayList<>();
+
+        for (char[] c : chessboard) {
+            list.add(String.copyValueOf(c));
+        }
+        return list;
+    }
 ```
 
 
