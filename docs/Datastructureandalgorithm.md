@@ -4178,7 +4178,7 @@ public class ViolenceMatch {
 
   - ![image-20210805150738117](Datastructureandalgorithm.assets/image-20210805150738117.png)
 
-    <img src="Datastructureandalgorithm.assets/image-20210805150752631.png" alt="image-20210805150752631"  />
+    ![image-20210805150752631](Datastructureandalgorithm.assets/image-20210805150752631.png)
 
 
 
@@ -6011,9 +6011,9 @@ List<String> strList= new ArrayList<>();
 
 但是这种方法却有其局限性，如果传入的参数是一个数组，那么这个数组一定要是引用类型才能将其转换为List集合，当传入基本数据类型数组时则会将这个数组对象当成一个引用类型对象存进List集合。
 
-<img src="Datastructureandalgorithm.assets/1401949-20190805132932520-555863570.png" alt="img"   />
+![1401949-20190805132932520-555863570](Datastructureandalgorithm.assets/1401949-20190805132932520-555863570.png)
 
-<img src="Datastructureandalgorithm.assets/1660253-20190417223551607-1371188487.png"   >
+![1660253-20190417223551607-1371188487](Datastructureandalgorithm.assets/1660253-20190417223551607-1371188487.png)
 
 可以看到传入基本数据类型时，打印该列表是打印了传入的数组的地址值。你也可以直接将其传入asList()方法的参数中,就像这样
 
@@ -6026,11 +6026,11 @@ System.out.println(list.get(0));
 
 ArrayList可以存放不同类型的数据
 
-<img src="Datastructureandalgorithm.assets/1660253-20190417224546736-1897541673.png" alt="img"   />
+![1660253-20190417224546736-1897541673](Datastructureandalgorithm.assets/1660253-20190417224546736-1897541673.png)
 
 这种方法显然不太好用，那怎么将一组基本数据类型的数组转换成集合呢，我们首先想到的是将该基本类型数组转换成其对应包装类类型的数组(遍历转换也可以)原文链接](https://zhidao.baidu.com/question/628312636366178684.html))。
 
-<img src="Datastructureandalgorithm.assets/1660253-20190417230403671-1142295552.png" alt="img"   />
+![1660253-20190417230403671-1142295552](Datastructureandalgorithm.assets/1660253-20190417230403671-1142295552.png)
 
 #### 2 使用Spring框架
 

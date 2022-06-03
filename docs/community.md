@@ -3819,7 +3819,7 @@ function publish() {
 
 
 
-<img src="community.assets\1}72MHJTLAKRRN4~SED`DNG.png" alt="1" style="zoom: 80%;" />
+![](community.assets\1}72MHJTLAKRRN4~SED`DNG.png)
 
 - 引入pom.xml
 
@@ -8333,11 +8333,13 @@ function publish() {
 - JDK和Spring线程池存在的问题：
 
   > 分布式部署环境下，定时任务Scheduler的配置存在于服务器的内存中，而服务器1和2的内存不共享，就会导致问题。
+  >
+  > 
 
-  ![image-20211009212506883](community.assets/image-20211009212506883.png) 
+  ![image-20211009212506883](community.assets/image-20211009212506883.png)
 
   > 使用分布式定时任务Spring Quartz时，配置(第一次初始化后)存在于数据库中，由多个服务器共享
-
+  
   ![image-20211009212920609](community.assets/image-20211009212920609.png)
 
 
