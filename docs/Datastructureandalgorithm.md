@@ -387,7 +387,7 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
     }
 ```
 
-### 2.8 链表截取倒数第K个节点
+### 2.8 链表中倒数最后K个节点
 
 - 输入一个长度为 n 的链表，设链表中的元素的值为 ai ，返回该链表中倒数第k个节点。
 
@@ -450,6 +450,222 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
         }
         return res;
  }
+```
+
+### 2.9 删除链表倒数第N个节点
+
+```java
+ public ListNode removeNthFromEnd (ListNode head, int n) {
+        ListNode temp = head;
+        if(head == null || n == 0) return head;
+        Stack<ListNode> stack = new Stack<>();
+        while(temp != null){
+            stack.push(temp);
+            temp = temp.next;
+        }
+        if(stack.size() < n) return head;
+        if(n==stack.size()) {
+            ListNode res = head.next;
+            head.next = null;
+            return res;
+        }
+        ListNode pre = null , cur = null;
+        for(int i = 0 ; i < n + 1 ; i++){
+            cur = pre;
+            pre = stack.pop();
+        }
+        pre.next = cur.next;
+        cur.next = null;
+        return head;
+    }
+```
+
+### 2.10 两个链表的第一个公共节点
+
+![img](Datastructureandalgorithm.assets/394BB7AFD5CEA3DC64D610F62E6647A6.png)
+
+```java
+示例1：
+输入：
+{1,2,3},{4,5},{6,7}
+复制
+返回值：
+{6,7}
+复制
+说明：
+第一个参数{1,2,3}代表是第一个链表非公共部分，第二个参数{4,5}代表是第二个链表非公共部分，最后的{6,7}表示的是2个链表的公共部分
+这3个参数最后在后台会组装成为2个两个无环的单链表，且是有公共节点的    
+如果没有公共节点，返回null
+```
+
+### 2.11 链表相加
+
+例如：链表 1 为 9->3->7，链表 2 为 6->3，最后生成新的结果链表为 1->0->0->0。
+
+![img](Datastructureandalgorithm.assets/C2DB572B01B0FDC03C097BE7ABA45114.png)
+
+完整代码：
+
+```java
+import java.util.*;
+public class Solution {
+    public ListNode addInList (ListNode head1, ListNode head2) {
+        // 进行判空处理
+        if(head1 == null)
+            return head2;
+        if(head2 == null){
+            return head1;
+        }
+        // 反转h1链表
+        head1 = reverse(head1);
+        // 反转h2链表
+        head2 = reverse(head2);
+        // 创建新的链表头节点
+        ListNode head = new ListNode(-1);
+        ListNode nHead = head;
+        // 记录进位的数值
+        int tmp = 0;
+        while(head1 != null || head2 != null){
+            // val用来累加此时的数值（加数+加数+上一位的进位=当前总的数值）
+            int val = tmp;
+            // 当节点不为空的时候，则需要加上当前节点的值
+            if (head1 != null) {
+                val += head1.val;
+                head1 = head1.next;
+            }
+            // 当节点不为空的时候，则需要加上当前节点的值
+            if (head2 != null) {
+                val += head2.val;
+                head2 = head2.next;
+            }
+            // 求出进位
+            tmp = val/10;
+            // 进位后剩下的数值即为当前节点的数值
+            nHead.next = new ListNode(val%10);
+            // 下一个节点
+            nHead = nHead.next;
+ 
+        }
+        // 最后当两条链表都加完的时候，进位不为0的时候，则需要再加上这个进位
+        if(tmp > 0){
+            nHead.next = new ListNode(tmp);
+        }
+        // 重新反转回来返回
+        return reverse(head.next);
+    }
+
+    // 反转链表
+    ListNode reverse(ListNode head){
+        if(head == null)
+            return head;
+        ListNode cur = head;
+        ListNode node = null;
+        while(cur != null){
+            ListNode tail = cur.next;
+            cur.next = node;
+            node = cur;
+            cur = tail;
+        }
+        return node;
+    }
+}
+```
+
+### 2.12 单链表的排序
+
+## 解题思路：
+
+主要通过递归实现链表归并排序，有以下两个环节：
+
+1、分割 cut 环节： 找到当前链表中点，并从中点将链表断开（以便在下次递归 cut 时，链表片段拥有正确边界）； 使用 fast,slow 快慢双指针法，奇数个节点找到中点，偶数个节点找到中心左边的节点。找到中点 slow 后，执行 `slow.next = null` 将链表切断。递归分割时，输入当前链表左端点 head 和中心节点 slow 的下一个节点 tmp(因为链表是从 slow 切断的)。  cut 递归终止条件： 当head.next == None时，说明只有一个节点了，直接返回此节点
+
+2、合并 merge 环节： 将两个排序链表合并，转化为一个排序链表。双指针法合并，建立辅助ListNode h 作为头部。设置两指针 left, right 分别指向两链表头部，比较两指针处节点值大小，由小到大加入合并链表头部，指针交替前进，直至添加完两个链表。返回辅助ListNode h 作为头部的下个节点 h.next。时间复杂度O(NlogN)：N表示链表结点数量，二分归并算法O(NlogN) ,空间复杂度O(1)：仅使用常数级变量空间		3、特殊情况，当题目输入的 head == null 时，直接返回null。
+
+**图解：**
+
+![img](Datastructureandalgorithm.assets/A42227C97389C374618E9F1DAFA2A2F2.png)
+
+```java
+import java.util.*;
+public class Solution {
+    public ListNode sortInList (ListNode head) {
+        // write code here
+        if (head == null || head.next == null)
+            return head;
+        // 使用快慢指针寻找链表的中点
+        ListNode fast = head.next, slow = head;
+        while (fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        ListNode tmp = slow.next;
+        slow.next = null;
+        // 递归左右两边进行排序
+        ListNode left = sortInList(head);
+        ListNode right = sortInList(tmp);
+        // 创建新的链表
+        ListNode h = new ListNode(0);
+        ListNode res = h;
+        // 合并 left right两个链表
+        while (left != null && right != null) {
+            // left  right链表循环对比
+            if (left.val < right.val) {
+                h.next = left;
+                left = left.next;
+            } else {
+                h.next = right;
+                right = right.next;
+            }
+            h = h.next;
+        }
+        // 最后添加未对比的链表部分判断左链表是否为空
+        h.next = left != null ? left : right;
+        return res.next;
+    }
+}
+```
+
+### 2.13 判断链表是否是回文结构
+
+```java
+输入：
+{1,2,2,1}
+返回值：
+true
+说明：
+1->2->2->1
+```
+
+思路：链表入栈，`while(stack.pop().val == head.val)`一直出栈，奇数个链表退出条件：`if(head == last ) return true;`,偶数个链表退出条件：`if(temp2 == head && temp1 == last ) return true;`
+
+完整AC代码:
+
+```java
+import java.util.*;
+public class Solution {
+    public boolean isPail (ListNode head) {
+      Stack<ListNode> stack = new Stack();
+        if(head == null) return false;
+        if(head.next == null) return true;
+        ListNode temp = head;
+        while(temp != null){
+            stack.push(temp);
+            temp = temp.next;
+        }
+        ListNode last = stack.pop();
+        ListNode temp1 = head , temp2 = last;
+        while(last.val == head.val){
+            temp1 = head;
+            temp2 = last;
+            head = head.next;
+            last = stack.pop();
+            if(head == last ) return true;
+            if(temp2 == head && temp1 == last ) return true;
+        }
+        return false;
+    }
+    
+}
 ```
 
 
@@ -6312,6 +6528,121 @@ private void backTracking(String s, int startIndex)
       }
   }
   ```
+
+### 11.14 二进制手表
+
+- 解题步骤：
+
+  1.读懂题意，把题目尽可能抽象成“子集、排列、组合”类型问题本题的题目总结而言就是：有十盏灯，我分别给他编号0-9，号码0-3代表小时，号码4-9代表分钟，然后每盏灯又代表着不同数字，如下图：
+
+  ![image.png](Datastructureandalgorithm.assets/b3f1697294a9d60841bc4a9f705d346fe2bc66ee0a14763774a3320cf2fb1d0d-image.png)
+
+(灯泡中的红色数字,其实就是二进制转换，题目中的图也有标)然后从10盏灯中挑选n盏打开，问你有多少种组合，返回这些组合代表的时间。这样一翻译，是不是有点“组合”类型问题的味道了？说白了就是：**==从n个数里面挑选k个，返回组合==**。如果你能形成这种抽象思想，那么你就成功一大半了
+
+2.回溯六步走
+
+①画出递归树，找到状态变量(回溯函数的参数)，这一步非常重要
+②根据题意，确立结束条件
+③找准选择列表(与函数参数相关),与第一步紧密关联
+④判断是否需要剪枝
+⑤作出选择，递归调用，进入下一层
+⑥撤销选择
+
+![1.png](Datastructureandalgorithm.assets/4cb75ced126e1d788ed9a0c0e91b61d9a9cb9303c576940a0b02323b9cc7f666-1.png)
+
+![2.png](Datastructureandalgorithm.assets/474f3d527c3e94d57e673bf4bd92cfb3eaea8d579e091c1bdfa6a7477270e020-2.png)
+
+我们接下来思考，回溯函数需要什么哪些参数，来表示当前状态。首先灯是越来越少的，所以需要一个参数num,表示剩余可亮的灯数，直到num等于0就应该结束；然后还需要参数start，来指示当前可选择的灯的开始位置，比如n=2我选了7号灯,然后剩下的一盏灯，只能选8号或9号，你不可能回去选0-6号，因为会导致重复，这个问题在“子集、组合”类型问题中说过，详细请看顶部的文章；最后还需要一个time参数，来表示当前状态的时间。算法签名如下：
+
+```java
+int[] hash = {1,2,4,8,16,32};//数组映射灯对应的数字
+private void backtrack(int num , int start , int[] time , List<String> res , int[] hash )
+```
+
+②根据题意，确立结束条件
+这个上面提到过了，当num=0就是没有灯可以点亮了，就应该return，加入结果集
+
+```java
+if(num == 0 ){
+    if(time[0] > 11 || time[1] > 59) return;
+    String tempHour = String.valueOf(time[0]);
+    String tempMinue = String.valueOf(time[1]);
+    if(tempMinue.length() == 1) tempMinue = "0" + tempMinue; //如果分钟数是个位数，需要补零
+    res.add(tempHour + ":" + tempMinue);
+    return;
+}
+```
+
+③找准选择列表
+从参数start标识的位置开始，到最后一盏灯，都是可选的
+
+```java
+for(int i=start;i<10;i++) {}
+```
+
+④判断是否需要剪枝
+当hour>11或minute>59的时候，无论还有没有灯可以点亮，都不用再继续递归下去，因为后面只会越增越多，应该剪枝
+
+```java
+if(time[0] > 11 || time[1] > 59) continue;
+```
+
+⑥撤销选择
+
+```java
+for(int i = start ; i < 10 ; i++ ){
+    if(time[0] > 11 || time[1] > 59) continue;
+    int[] store = Arrays.copyOf(time , 2);//数组拷贝，临时存放
+    if(i < 4){
+        time[0] += hash[i];
+    }else{
+        time[1] += hash[i-4];
+    }
+    backtrack(num - 1 , i + 1 , time , res , hash);
+    time = store;//撤销选择
+
+}
+```
+
+完整AC代码：
+
+```java
+class Solution {
+    public List<String> readBinaryWatch(int turnedOn) {
+        int[] hash = {1,2,4,8,16,32};
+        List<String> res = new ArrayList<>();
+        backtrack(turnedOn , 0 , new int[2] , res , hash);
+        return  res;
+    }
+
+    private void backtrack(int num , int start , int[] time , List<String> res , int[] hash ){
+        if(num == 0 ){
+            if(time[0] > 11 || time[1] > 59) return;
+            String tempHour = String.valueOf(time[0]);
+            String tempMinue = String.valueOf(time[1]);
+            if(tempMinue.length() == 1) tempMinue = "0" + tempMinue;
+            res.add(tempHour + ":" + tempMinue);
+            return;
+        }
+        
+        for(int i = start ; i < 10 ; i++ ){
+            if(time[0] > 11 || time[1] > 59) continue;
+            int[] store = Arrays.copyOf(time , 2);
+            if(i < 4){
+                time[0] += hash[i];
+            }else{
+                time[1] += hash[i-4];
+            }
+            backtrack(num - 1 , i + 1 , time , res , hash);
+            time = store;
+            
+        }
+        
+    }
+
+    
+}
+```
 
 
 
