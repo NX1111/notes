@@ -573,9 +573,7 @@ public class Solution {
 
 ### 2.12 单链表的排序
 
-## 解题思路：
-
-主要通过递归实现链表归并排序，有以下两个环节：
+解题思路：主要通过递归实现链表归并排序，有以下两个环节：
 
 1、分割 cut 环节： 找到当前链表中点，并从中点将链表断开（以便在下次递归 cut 时，链表片段拥有正确边界）； 使用 fast,slow 快慢双指针法，奇数个节点找到中点，偶数个节点找到中心左边的节点。找到中点 slow 后，执行 `slow.next = null` 将链表切断。递归分割时，输入当前链表左端点 head 和中心节点 slow 的下一个节点 tmp(因为链表是从 slow 切断的)。  cut 递归终止条件： 当head.next == None时，说明只有一个节点了，直接返回此节点
 
@@ -668,6 +666,322 @@ public class Solution {
 }
 ```
 
+### 2.14 链表的奇偶重排
+
+- 描述：给定一个单链表，请设定一个函数，将链表的奇数位节点和偶数位节点分别放在一起，重排后输出，注意是节点的编号而非节点的数值。
+
+```java
+输入：
+{1,4,6,3,7}
+返回值：
+{1,6,7,4,3}
+说明：
+1->4->6->3->7->NULL
+重排后为
+1->6->7->4->3->NULL
+奇数位节点有1,6,7，偶数位节点有4,3。重排后为1,6,7,4,3
+```
+
+
+
+- ==**思路**==：从头结点依次`head = head.next`扫描,设置标志位`flag`,将奇数和偶数分别存放在两条链表里，注意记录奇数链表的最后一个奇数位置，`temp1.next = temp22.next`合并奇数和偶数链表。
+
+```java
+import java.util.*;
+public class Solution {
+    public ListNode oddEvenList (ListNode head) {
+        ListNode temp1 = new ListNode(0),temp2 = new ListNode(0) , temp11 = temp1 , temp22 = temp2;
+        boolean flag = true;//奇数为true
+        while(head != null){
+            if(flag){
+                temp1.next = head;
+                head = head.next;
+                temp1.next.next = null;
+                temp1 = temp1.next;
+                flag = !flag;
+            }else{
+                temp2.next = head;
+                head = head.next;
+                temp2.next.next = null;
+                temp2 = temp2.next;
+                flag = !flag;  
+            }
+        }
+        temp1.next = temp22.next;//奇数尾部与偶数头部合并
+        return temp11.next;
+    }
+}
+```
+
+
+
+### 2.15 删除有序链表重复的元素I
+
+删除给出链表中的重复元素（链表中元素从小到大有序），使链表中的所有元素都只出现一次
+例如：
+给出的链表为1→1→2,返回1→2.
+给出的链表为1→1→2→3→3,返回1→2→3.
+
+==**操作原始链表**==
+
+```java
+import java.util.*;
+public class Solution {
+    public ListNode deleteDuplicates (ListNode head) {
+
+        if(head == null || head.next ==null) return head;
+        int lastNum = -1;
+         ListNode res = head ,cur = head;
+        while(head != null){
+            if(lastNum  != head.val){//如果不重复
+                lastNum =head.val;//更新重复值
+                cur = head;//cur移到head位置
+            }else{
+               cur.next=head.next;//依次往后遍历，如果与前一个节点值重复，当前节点下一个节点指向重复节点的下一个节点
+            }
+            head = head.next;//head后移
+        }
+        
+       return res;
+        
+    }
+}
+```
+
+- ==**栈思路**==：依次入栈，遇到重复元素跳过，反向输出连接栈输出的节点
+
+```java
+import java.util.*;
+public class Solution {
+    public ListNode deleteDuplicates (ListNode head) {
+
+        if(head == null || head.next ==null) return head;
+        int lastNum = -1;
+         Stack<ListNode> stack = new Stack();
+        while(head != null){
+            if(lastNum != head.val){
+                lastNum = head.val;
+                stack.push(head);
+                head = head.next; 
+            }else{
+                head = head.next;
+                continue;
+            }
+        }
+        ListNode res = null , cur = null;
+        while(stack.size() != 0){
+           cur = stack.pop();
+           cur.next = res;
+           res = cur;
+        }
+        return res;
+    }
+}
+```
+
+
+
+### 2.16 删除有序链表重复元素II
+
+给出一个升序排序的链表，删除链表中的所有重复出现的元素，只保留原链表中只出现一次的元素。
+例如：
+给出的链表为1→2→3→3→4→4→5, 返回1→2→5.
+给出的链表为1→1→1→2→3, 返回2→3.
+
+- ==**栈思路**==：维护一个数字`lastNum`，用来判别重复，如果当前`head.val != lastNum` , 那么将链表入栈并更新`lastNum数值`，如果`head.next.val == lastNum`，就	`stack.pop()`一个数，并且设置标志位为`false`，后面再有重复的数，就`continue`跳过，依次遍历到结尾。最后依次`stack.pop()`节点，反向连接即可。
+
+```java
+import java.util.*;
+public class Solution {
+    public ListNode deleteDuplicates (ListNode head) {
+        if(head == null || head.next ==null) return head;
+        int lastNum = -1 ; 
+        boolean flag = false;
+        Stack<ListNode> stack = new Stack();
+        while(head != null){
+            if(lastNum != head.val){
+                lastNum = head.val;
+                stack.push(head);
+                head = head.next;
+                flag = true;
+            }else{
+                if(flag){
+                     stack.pop();
+                     flag = false; 
+                    head = head.next;
+                }else{
+                    head = head.next;
+                    continue;
+                }
+               
+            }
+             
+        }
+        ListNode res = null , cur = null;
+        while(stack.size() != 0){
+           cur = stack.pop();
+           cur.next = res;
+           res = cur;
+        }
+        return res;
+    }
+         
+}
+```
+
+### 2.17 删除无序链表中值重复出现的节点
+
+给定一个无序链表，删除其中值重复出现的节点(保留当中顺序遍历第一个出现的节点)。
+
+- 输入描述:
+
+```
+第一行一个整数 n，表示单链表的节点数量。
+第二行 n 个整数表示单链表的节点的值。
+```
+
+- 输出描述:
+
+```
+顺序输出单链表每个节点的值。
+```
+
+- 输入
+
+```
+5
+1 3 2 3 1
+```
+
+- 输出
+
+```
+1 3 2
+```
+
+- 思路：不考虑空间复杂度的话还是比较容易实现O(n)时间复杂度的，直接重构一个链表就行： 遍历原始链表，并用一个集合记录已经出现过的节点值，如果当前值已经出现过，就直接跳过，否则创建一个新的节点追加在当前链表的后面。
+
+```java
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.IOException;
+import java.util.HashSet;
+
+class ListNode {
+    public int val;
+    public ListNode next;
+    public ListNode(int val) {
+        this.val = val;
+        this.next = null;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        int n = Integer.parseInt(br.readLine().trim());
+        String[] strList = br.readLine().trim().split(" ");
+        ListNode head = new ListNode(Integer.parseInt(strList[0]));
+        ListNode cur = head;
+        for(int i = 1; i < n; i++){
+            cur.next = new ListNode(Integer.parseInt(strList[i]));
+            cur = cur.next;
+        }
+        head = removeDuplicates(head, n);
+        while(head != null){
+            System.out.print(head.val + " ");
+            head = head.next;
+        }
+    }
+    
+    private static ListNode removeDuplicates(ListNode head, int len) {
+        ListNode cur = head;
+        HashSet<Integer> set = new HashSet<>();
+        ListNode newHead = new ListNode(head.val);
+        ListNode newCur = newHead;
+        while(cur != null){
+            if(!set.contains(cur.val)){//这里会直接加入链表头部，造成head重复
+                set.add(cur.val);
+                newCur.next = new ListNode(cur.val);
+                newCur = newCur.next;
+            }
+            cur = cur.next;
+        }
+        return newHead.next;     // 注意头结点重复了一次，直接跳过
+    }
+}
+```
+
+### 2.18 删除链表中指定值的节点
+
+给出一个链表和一个整数 num，输出删除链表中节点值等于 num 的节点之后的节点。
+
+```java
+第一行一个整数 n，n 表示单链表的节点数量。
+第二行 n 个整数表示单链表的各个节点的值。
+第三行一个整数 num。
+输入：
+4 
+1 2 3 4
+3
+输出：
+1 2 4
+```
+
+```java
+class ListNode{
+    int val;
+    ListNode next;
+    ListNode(int val){
+        this.val=val;
+    }
+}
+ 
+public class Main{
+ 
+    public static void main(String[] args){
+        Scanner sc=new Scanner(System.in);
+        int n=sc.nextInt();
+        int[] a=new int[n];
+        for(int i=0;i<n;i++){
+            a[i]=sc.nextInt();
+        }
+        ListNode head=new ListNode(a[0]);
+        ListNode cur=head;
+        for(int i=1;i<n;i++){
+            cur.next=new ListNode(a[i]);
+            cur=cur.next;
+        }
+        cur.next=null;
+        int val=sc.nextInt();
+        ListNode node=removeElements(head,val);
+        printList(node);
+    }
+    public static void printList(ListNode head){
+        while(head!=null){
+            System.out.print(head.val+" ");
+            head=head.next;
+        }
+    }
+    
+    //核心方法
+    public static ListNode removeElements(ListNode head,int val){
+        if(head == null ) return head;
+         ListNode res = head ,cur = head;
+        while(head != null){
+            if(val  != head.val){//如果不重复
+                cur = head;//cur移到head位置
+            }else{
+               cur.next=head.next;//依次往后遍历，如果与前一个节点值重复，当前节点下一个节点指向重复节点的下一个节点（删除操作）
+            }
+            head = head.next;//head后移
+        }
+        
+       return res;
+    }
+}
+```
+
 
 
 ### 2.9 逆序打印单链表
@@ -698,7 +1012,7 @@ public static void reversePrint(HeroNode head) {
 
 
 
-## 3.栈
+## 3.堆/栈/队列
 
 ### 3.1数组模拟栈
 
@@ -1134,6 +1448,39 @@ public class InvPolandNotation {
 1. 支持+-*/()
 2. 支持多位数、小数
 3. 过滤任何空白字符，包括换行符，制表符等等
+
+### 3.5 用两个栈实现队列
+
+思路：
+
+- 入队：将元素进栈A；
+- 出队：判断栈B是否为空，如果为空，则将栈A中所有元素pop，并push进栈B，栈B出栈；如果不为空，栈B直接出栈。
+- 不用管push，队列push的元素，最后才pop出去
+
+```java
+import java.util.Stack;
+
+public class Solution {
+    Stack<Integer> stack1 = new Stack<Integer>();
+    Stack<Integer> stack2 = new Stack<Integer>();
+    
+    public void push(int node) {
+        stack1.push(node);
+    }
+    
+    public int pop() {
+        if(stack2.size() <= 0){
+            while(stack1.size()!= 0){
+                stack2.push(stack1.pop());
+             }
+        }
+        
+        return stack2.pop();
+    }
+}
+```
+
+
 
 
 
@@ -6875,7 +7222,6 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class myScanner {
-    Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
         System.out.println("输入：");
         Scanner sc = new Scanner(System.in);
@@ -7015,5 +7361,62 @@ public class Main {
     }
 
 }
+```
+
+### 13.5 两行输入
+
+**遇到的问题：**在调用了nextInt()后，我们可以先调用一次nextLine(),将该行剩下的内容抛弃；
+
+```java
+int option = input.nextInt();
+input.nextLine();  // Consume newline left-over
+String str1 = input.nextLine();
+```
+
+全部都使用nextLine()读入，然后将其读入的数据转换为Integer。
+
+```java
+int option = 0;
+try {
+    option = Integer.parseInt(input.nextLine());
+} catch (NumberFormatException e) {
+    e.printStackTrace();
+}
+String str1 = input.nextLine();
+```
+
+```java
+ public static void main(String arg[]) {
+        System.out.println("输出：");
+        Scanner sc = new Scanner(System.in);
+        int m = Integer.parseInt(sc.nextLine().trim());
+        String s = sc.nextLine();
+        String[] s1 = s.trim().split(" ");
+        int[] num1 = new int[s1.length];
+
+        for(int i = 0; i < s1.length; i ++) {
+            num1[i] = Integer.parseInt(s1[i]);
+        }
+        System.out.println("输出：");
+        System.out.println(Arrays.toString(num1));
+    }
+```
+
+```java
+public static void main(String arg[]) {
+        System.out.println("输出：");
+        Scanner sc = new Scanner(System.in);
+        int m = sc.nextInt();
+        sc.nextLine();//丢弃读取Int的这一行
+        String s = sc.nextLine();
+        String[] s1 = s.trim().split(" ");
+        int[] num1 = new int[s1.length];
+
+        for(int i = 0; i < s1.length; i ++) {
+            num1[i] = Integer.parseInt(s1[i]);
+        }
+        System.out.println("输出：");
+        System.out.println(Arrays.toString(num1));
+    }
 ```
 
