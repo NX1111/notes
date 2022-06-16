@@ -1968,10 +1968,6 @@ public class Solution {
 
   
 
-
-
-
-
 ## 4.递归
 
 调用规则：1.当程序执行一个方法时，就会开辟一个独立的空间（在栈内）。
@@ -7601,7 +7597,593 @@ class Solution {
 }
 ```
 
+### 11.15 岛屿问题总结
 
+- DFS的基本结构
+
+  二叉树遍历:
+
+  ```java
+  void traverse(TreeNode root) {
+      // 判断 base case
+      if (root == null) {
+          return;
+      }
+      // 访问两个相邻结点：左子结点、右子结点
+      traverse(root.left);
+      traverse(root.right);
+  }
+  ```
+
+  可以看到，二叉树的 DFS 有两个要素：「访问相邻结点」和「判断 base case」。
+
+  第一个要素是访问相邻结点。二叉树的相邻结点非常简单，只有左子结点和右子结点两个。二叉树本身就是一个递归定义的结构：一棵二叉树，它的左子树和右子树也是一棵二叉树。那么我们的 DFS 遍历只需要递归调用左子树和右子树即可。
+
+  第二个要素是 判断 base case。一般来说，二叉树遍历的 base case 是 root == null。这样一个条件判断其实有两个含义：一方面，这表示 root 指向的子树为空，不需要再往下遍历了。另一方面，在 root == null 的时候及时返回，可以让后面的 root.left 和 root.right 操作不会出现空指针异常。
+
+  对于网格上的 DFS，我们完全可以参考二叉树的 DFS，写出网格 DFS 的两个要素。
+
+- 网格类问题的DFS遍历方法
+
+  岛屿问题是一类典型的网格问题。每个格子中的数字可能是 0 或者 1。我们把数字为 0 的格子看成海洋格子，数字为 1 的格子看成陆地格子，这样相邻的陆地格子就连接成一个岛屿。
+
+  ![岛屿问题示例](Datastructureandalgorithm.assets/c36f9ee4aa60007f02ff4298bc355fd6160aa2b0d628c3607c9281ce864b75a2.jpg)
+
+  网格结构中的格子有多少相邻结点？答案是上下左右四个。对于格子 (r, c) 来说（r 和 c 分别代表行坐标和列坐标），四个相邻的格子分别是 (r-1, c)、(r+1, c)、(r, c-1)、(r, c+1)。换句话说，网格结构是「四叉」的。
+
+  ![网格结构中四个相邻的格子](Datastructureandalgorithm.assets/63f5803e9452ccecf92fa64f54c887ed0e4e4c3434b9fb246bf2b410e4424555.jpg)
+
+  其次，网格 DFS 中的 base case 是什么？从二叉树的 base case 对应过来，应该是网格中不需要继续遍历、grid[r][c] 会出现数组下标越界异常的格子，也就是那些超出网格范围的格子。
+
+  ![网格 DFS 的 base case](Datastructureandalgorithm.assets/5a91ec351bcbe8e631e7e3e44e062794d6e53af95f6a5c778de369365b9d994e.jpg)
+
+  这一点稍微有些反直觉，坐标竟然可以临时超出网格的范围？这种方法我称为「**先污染后治理**」—— 甭管当前是在哪个格子，先往四个方向走一步再说，如果发现走出了网格范围再赶紧返回。这跟二叉树的遍历方法是一样的，先递归调用，发现 root == null 再返回。
+
+  这样，我们得到了网格 DFS 遍历的框架代码：
+
+  ```java
+  void dfs(int[][] grid, int r, int c) {
+      // 判断 base case
+      // 如果坐标 (r, c) 超出了网格范围，直接返回
+      if (!inArea(grid, r, c)) {
+          return;
+      }
+      // 访问上、下、左、右四个相邻结点
+      dfs(grid, r - 1, c);
+      dfs(grid, r + 1, c);
+      dfs(grid, r, c - 1);
+      dfs(grid, r, c + 1);
+  }
+  
+  // 判断坐标 (r, c) 是否在网格中
+  boolean inArea(int[][] grid, int r, int c) {
+      return 0 <= r && r < grid.length 
+          	&& 0 <= c && c < grid[0].length;
+  }
+  ```
+
+- 如何避免重复遍历
+
+  网格结构的 DFS 与二叉树的 DFS 最大的不同之处在于，遍历中可能遇到遍历过的结点。这是因为，网格结构本质上是一个「图」，我们可以把每个格子看成图中的结点，每个结点有向上下左右的四条边。在图中遍历时，自然可能遇到重复遍历结点。这时候，DFS 可能会不停地「兜圈子」，永远停不下来，如下图所示：
+
+  ![DFS 遍历可能会兜圈子（动图）](Datastructureandalgorithm.assets/7fec64afe8ab72c5df17d6a41a9cc9ba3879f58beec54a8791cbf108b9fd0685.gif)
+
+  如何避免这样的重复遍历呢？答案是标记已经遍历过的格子。以岛屿问题为例，我们需要在所有值为 1 的陆地格子上做 DFS 遍历。每走过一个陆地格子，就把格子的值改为 2，这样当我们遇到 2 的时候，就知道这是遍历过的格子了。也就是说，每个格子可能取三个值：
+
+  - 0 —— 海洋格子
+  - 1 —— 陆地格子（未遍历过）
+  - 2 —— 陆地格子（已遍历过）
+
+  我们在框架代码中加入避免重复遍历的语句：
+
+  ```java
+  void dfs(int[][] grid, int r, int c) {
+      // 判断 base case
+      if (!inArea(grid, r, c)) {
+          return;
+      }
+      // 如果这个格子不是岛屿，直接返回
+      if (grid[r][c] != 1) {
+          return;
+      }
+      grid[r][c] = 2; // 将格子标记为「已遍历过」
+      // 访问上、下、左、右四个相邻结点
+      dfs(grid, r - 1, c);
+      dfs(grid, r + 1, c);
+      dfs(grid, r, c - 1);
+      dfs(grid, r, c + 1);
+  }
+  // 判断坐标 (r, c) 是否在网格中
+  boolean inArea(int[][] grid, int r, int c) {
+      return 0 <= r && r < grid.length 
+          	&& 0 <= c && c < grid[0].length;
+  }
+  ```
+
+  ![标记已遍历的格子](Datastructureandalgorithm.assets/20fe202fb5e5fc5048e140c29310c1bcbb17661860d2441e8a3feb1236a2e44d.gif)
+
+  这样，我们就得到了一个岛屿问题、乃至各种网格问题的通用 DFS 遍历方法。以下所讲的几个例题，其实都只需要在 DFS 遍历框架上稍加修改而已。
+
+  小贴士：在一些题解中，可能会把「已遍历过的陆地格子」标记为和海洋格子一样的 0，美其名曰「陆地沉没方法」，即遍历完一个陆地格子就让陆地「沉没」为海洋。这种方法看似很巧妙，但实际上有很大隐患，因为这样我们就无法区分「海洋格子」和「已遍历过的陆地格子」了。如果题目更复杂一点，这很容易出 bug。
+
+### 11.16 岛屿数量
+
+- 问题描述
+
+  给一个01矩阵，1代表是陆地，0代表海洋， 如果两个1相邻，那么这两个1属于同一个岛。我们只考虑上下左右为相邻。
+  岛屿: 相邻陆地可以组成一个岛屿（相邻:上下左右） 判断岛屿个数。
+  例如：
+  输入
+  [[1,1,0,0,0],
+  [0,1,0,1,1],
+  [0,0,0,1,1],
+  [0,0,0,0,0],
+  [0,0,1,1,1]]
+  对应的输出为3
+
+```java
+输入：
+[[1,1,0,0,0],[0,1,0,1,1],[0,0,0,1,1],[0,0,0,0,0],[0,0,1,1,1]]
+返回值：3
+```
+
+- 完整代码
+
+```java
+class Solution {
+    private int res;
+    public int numIslands(char[][] grid) {
+        res = 0;
+        //从网格的每一个格子为入口遍历
+        for (int i = 0; i < grid.length; i ++) {
+            for (int j = 0; j < grid[0].length; j ++) {
+               	//如果遇到'1'的岛屿，一定有一个岛屿res+1  
+                if (grid[i][j] == '1') {
+                    dfsGrid(grid, i, j);
+                    res ++;
+                }
+            }
+        }
+        return res;
+    }
+
+    private void dfsGrid(char[][] grid, int row, int col) {
+        if (row >= grid.length || col >= grid[0].length || row < 0 || col < 0) {
+            return;
+        }
+        //如果发现不是'1' ， 直接return返回
+        if (grid[row][col] != '1') {
+            return;
+        }
+        grid[row][col] = '2';//将搜索完的岛屿标记为2，下次如果深度递归到这个格子，直接return返回
+        //依次上下左右递归寻找'1'，并标记为'2',
+        dfsGrid(grid, row - 1, col);
+        dfsGrid(grid, row + 1, col);
+        dfsGrid(grid, row, col - 1);
+        dfsGrid(grid, row, col + 1);
+    }
+}
+```
+
+### 11.17 岛屿的最大面积
+
+- 问题描述
+
+  给你一个大小为 m x n 的二进制矩阵 grid 。
+
+  岛屿 是由一些相邻的 1 (代表土地) 构成的组合，这里的「相邻」要求两个 1 必须在 水平或者竖直的四个方向上 相邻。你可以假设 grid 的四个边缘都被 0（代表水）包围着。岛屿的面积是岛上值为 1 的单元格的数目。计算并返回 grid 中最大的岛屿面积。如果没有岛屿，则返回面积为 0 。
+
+  ![img](Datastructureandalgorithm.assets/maxarea1-grid.jpg)
+
+```java
+输入：grid = [[0,0,1,0,0,0,0,1,0,0,0,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,1,1,0,1,0,0,0,0,0,0,0,0],[0,1,0,0,1,1,0,0,1,0,1,0,0],[0,1,0,0,1,1,0,0,1,1,1,0,0],[0,0,0,0,0,0,0,0,0,0,1,0,0],[0,0,0,0,0,0,0,1,1,1,0,0,0],[0,0,0,0,0,0,0,1,1,0,0,0,0]]
+输出：6
+解释：答案不应该是 11 ，因为岛屿只能包含水平或垂直这四个方向上的 1 。
+```
+
+- 代码
+
+  ```java
+  public class Solution {
+  
+      private int res = 0;//成员变量存储每一个节点对应的岛屿数量，在计算下一个节点的时候，记得归零
+      public int maxAreaOfIsland(int[][] grid) {
+          int result = 0 ;//存储最大的岛屿数量
+          for (int i = 0; i < grid.length; i ++) {
+              for (int j = 0; j < grid[0].length; j ++) {
+                      res = 0;//计算每一个节点之前，需要归0
+                  if (grid[i][j] == 1) {
+                      dfsGrid(grid, i, j );
+                      result = Math.max(result,res);
+                  }
+              }
+          }
+          return result;
+      }
+  
+      private void dfsGrid(int[][] grid, int row, int col ) {
+          if (row >= grid.length || col >= grid[0].length || row < 0 || col < 0) {
+              return;
+          }
+  
+          if (grid[row][col] != 1) {
+              return;
+          }
+          res++;//如果发现grid[row][col] == 1 ， 表示当前为岛屿，岛屿数量加1
+          grid[row][col] = 2;
+          dfsGrid(grid, row - 1, col );
+          dfsGrid(grid, row + 1, col );
+          dfsGrid(grid, row, col - 1 );
+          dfsGrid(grid, row, col + 1);
+  
+      }
+      
+  }
+  ```
+
+### 11.18 岛屿的周长
+
+- 描述
+  给定一个 `row x col` 的二维网格地图 grid ，其中：`grid[i][j] = 1` 表示陆地， `grid[i][j] = 0` 表示水域。网格中的格子 水平和垂直 方向相连（对角线方向不相连）。整个网格被水完全包围，但其中恰好有一个岛屿（或者说，一个或多个表示陆地的格子相连组成的岛屿）。
+  岛屿中没有“湖”（“湖” 指水域在岛屿内部且不和岛屿周围的水相连）。格子是边长为 1 的正方形。网格为长方形，且宽度和高度均不超过 100 。计算这个岛屿的周长。
+
+![img](Datastructureandalgorithm.assets/island.png)
+
+- 思路
+
+  那么这些和我们岛屿的周长有什么关系呢？实际上，岛屿的周长是计算岛屿全部的「边缘」，而这些边缘就是我们在 DFS 遍历中，dfs 函数返回的位置。观察题目示例，我们可以将岛屿的周长中的边分为两类，如下图所示。黄色的边是与网格边界相邻的周长，而蓝色的边是与海洋格子相邻的周长。
+
+  ![将岛屿周长中的边分为两类](Datastructureandalgorithm.assets/66d817362c1037ebe7705aacfbc6546e321c2b6a2e4fec96791f47604f546638.jpg)
+
+  当我们的 dfs 函数因为「坐标 (r, c) 超出网格范围」返回的时候，实际上就经过了一条黄色的边；而当函数因为「当前格子是海洋格子」返回的时候，实际上就经过了一条蓝色的边。这样，我们就把岛屿的周长跟 DFS 遍历联系起来了，我们的题解代码也呼之欲出。
+
+- 代码
+
+  ```java
+  class Solution {
+     
+      private int res = 0;
+      public int islandPerimeter(int[][] grid) {
+          res = 0;
+          //这个for循环只需要找到其中一个岛，因为题目限制矩阵中只有一个岛屿
+          for (int i = 0; i < grid.length; i ++) {
+              for (int j = 0; j < grid[0].length; j ++) {
+                  //如果要求岛屿的最大周长，就需要res=0,并且result = Math.max(result,res)存储岛屿周长的最大值
+                  if (grid[i][j] == 1) {
+                      dfsGrid(grid, i, j );
+                     return res;//如果矩阵中有多个岛屿，就去掉这一行，去遍历整个矩阵
+                      
+                  }
+              }
+          }
+          return res;
+  
+      }
+  
+       private void dfsGrid(int[][] grid, int row, int col ) {
+          if (row >= grid.length || col >= grid[0].length || row < 0 || col < 0) {
+              res++;//遇到边界，边长加一
+              return;
+          }
+  
+          if (grid[row][col] != 1) {
+              if(grid[row][col] != 2) res++;//遇到水域，边长加一
+              return;
+          }
+         
+          grid[row][col] = 2;//已经遍历过的置为2
+          dfsGrid(grid, row - 1, col );
+          dfsGrid(grid, row + 1, col );
+          dfsGrid(grid, row, col - 1 );
+          dfsGrid(grid, row, col + 1);
+  
+      }
+  
+  }
+  ```
+
+### 11.19 最大人工岛
+
+- 问题描述
+
+  在二维地图上， 0 代表海洋，1代表陆地，我们最多只能将一格 0 （海洋）变成 1 （陆地）。进行填海之后，地图上最大的岛屿面积是多少？
+
+- 思路
+
+  大致的思路我们不难想到，我们先计算出所有岛屿的面积，在所有的格子上标记出岛屿的面积。然后搜索哪个海洋格子相邻的两个岛屿面积最大。例如下图中红色方框内的海洋格子，上边、左边都与岛屿相邻，我们可以计算出它变成陆地之后可以连接成的岛屿面积为 7+1+2=10
+
+  ![一个海洋格子连接起两个岛屿](Datastructureandalgorithm.assets/3a993272977112d82a37676380bf723f3f6b919a20da322e9a5c5afda07fa397.jpg)
+
+  然而，这种做法可能遇到一个问题。如下图中红色方框内的海洋格子，它的上边、左边都与岛屿相邻，这时候连接成的岛屿面积难道是 7+1+7？显然不是。这两个 7 来自同一个岛屿，所以填海造陆之后得到的岛屿面积应该只有 7+1 = 8。
+
+![一个海洋格子与同一个岛屿有两个边相邻](Datastructureandalgorithm.assets/f519da076eb48fc993c7c71a0fa091b53bc6a1661163549eab60010606ee0e1c.jpg)
+
+可以看到，要让算法正确，我们得能区分一个海洋格子相邻的两个 7 是不是来自同一个岛屿。那么，我们不能在方格中标记岛屿的面积，而应该标记岛屿的索引（下标），另外用一个数组记录每个岛屿的面积，如下图所示。这样我们就可以发现红色方框内的海洋格子，它的「两个」相邻的岛屿实际上是同一个。
+
+![标记每个岛屿的索引（下标）](Datastructureandalgorithm.assets/56ec808215d4ff3014476ef22297522b3731602266f9a069a82daf41001f904c.jpg)
+
+可以看到，这道题实际上是对网格做了两遍 DFS：第一遍 DFS 遍历陆地格子，计算每个岛屿的面积并标记岛屿；第二遍 DFS 遍历海洋格子，观察每个海洋格子相邻的陆地格子。
+
+- 代码
+
+```java
+import java.util.HashMap;
+import java.util.HashSet;
+
+class Solution {
+    public int largestIsland(int[][] grid) {
+        if (grid==null || grid.length == 0){
+            return 1;
+        }
+
+        int res = 0;
+        int index = 2;//index表示岛屿的编号，0是海洋1是陆地，从2开始遍历
+        HashMap<Integer,Integer> indexAndAreas = new HashMap<>();//岛屿编号：岛屿面积
+
+        /**
+         * 计算每个岛屿的面积，并标记是第几个岛屿
+         */
+        for (int r=0;r<grid.length;r++){
+            for (int c=0;c<grid[0].length;c++){
+                if (grid[r][c] == 1){//遍历没有访问过的岛屿格子
+                    int area = area(grid,r,c,index);//返回每个岛屿的面积，dfs
+                    indexAndAreas.put(index,area);//存入岛屿编号、岛屿面积
+                    index++;//岛屿编号增加
+                    res = Math.max(res,area);//记录最大的岛屿面积
+                }
+            }
+        }
+
+        if (res == 0) return 1;//res=0表示没有陆地，那么造一块，则返回1即可
+
+        /**
+         * 遍历海洋格子，假设这个格子填充，那么就把上下左右是陆地的格子所在的岛屿连接起来
+         */
+        for (int r=0;r<grid.length;r++){
+            for (int c=0;c<grid[0].length;c++){
+                if (grid[r][c] == 0){ //遍历海洋格子
+                    HashSet<Integer> hashSet = findNeighbour(grid,r,c);//把上下左右邻居放入set去重
+                    if (hashSet.size() < 1)continue;//如果海洋格子周围没有格子不必计算
+                    int twoIsland = 1;//填充这个格子，初始为1，这个变量记录合并岛屿后的面积
+                    for (Integer i: hashSet){
+                        twoIsland += indexAndAreas.get(i);//该格子填充，则上下左右的陆地的都连接了，通过序号获得面积，加上面积
+                    }
+                    res = Math.max(res,twoIsland);//比较得到最大的面积
+                }
+            }
+        }
+        return res;
+    }
+
+
+    /**
+     * 对于海洋格子，找到上下左右
+     * 每个方向，都要确保有效inArea以及是陆地格子，则表示是该海洋格子的陆地邻居
+     * @param grid
+     * @param r
+     * @param c
+     * @return
+     */
+    private HashSet<Integer> findNeighbour(int[][] grid,int r,int c){
+        HashSet<Integer> hashSet = new HashSet<>();
+        if (inArea(grid,r-1,c)&&grid[r-1][c] != 0){
+            hashSet.add(grid[r-1][c]);
+        }
+        if (inArea(grid,r+1,c) && grid[r+1][c] != 0){
+            hashSet.add(grid[r+1][c]);
+        }
+        if (inArea(grid,r,c-1) && grid[r][c-1] != 0){
+            hashSet.add(grid[r][c-1]);
+        }
+        if (inArea(grid,r,c+1) && grid[r][c+1] != 0){
+            hashSet.add(grid[r][c+1]);
+        }
+        return hashSet;
+    }
+
+    /**
+     * dfs方法，将格子填充为index，即表示这个格子属于哪个岛的
+     * 计算岛屿面积，上下左右，当然这个可以优化的，因为不需要计算上面的，会有重复
+     * @param grid
+     * @param r
+     * @param c
+     * @param index
+     * @return
+     */
+    private int area(int[][] grid, int r, int c,int index){
+        if (!inArea(grid,r,c)){
+            return 0;
+        }
+        //不为1，表示为海洋格子或者已经遍历过了
+        if (grid[r][c] != 1){
+            return 0;
+        }
+        grid[r][c] = index;//设置当前格子为某个岛屿编号
+        return 1 + area(grid,r-1,c,index) + area(grid,r+1,c,index) + area(grid,r,c-1,index) + area(grid,r,c+1,index);
+    }
+
+    /**
+     * 判断grid[r][c]是否大小合适
+     * @param grid
+     * @param r
+     * @param c
+     * @return
+     */
+    private boolean inArea(int[][] grid,int r,int c){
+        return r>=0 && r<grid.length&&c>=0 && c<grid[0].length;
+    }
+}
+```
+
+### 11.20 括号生成
+
+- 描述
+
+  数字 `n` 代表生成括号的对数，请你设计一个函数，用于能够生成所有可能的并且 **有效的** 括号组合。
+
+  ```java
+  输入：n = 3
+  输出：["((()))","(()())","(())()","()(())","()()()"]
+  ```
+
+- 思路
+
+  我们以 `n = 2` 为例，画树形结构图。方法是 「做减法」
+
+  ![LeetCode 第 22 题：“括号生出”题解配图.png](Datastructureandalgorithm.assets/7ec04f84e936e95782aba26c4663c5fe7aaf94a2a80986a97d81574467b0c513-LeetCode 第 22 题：“括号生出”题解配图.png)
+
+  画图以后，可以分析出的结论：
+
+  - 当前左右括号都有大于 00 个可以使用的时候，才产生分支；
+  - 产生左分支的时候，只看当前是否还有左括号可以使用；
+  - 产生右分支的时候，还受到左分支的限制，右边剩余可以使用的括号数量一定得在严格大于左边剩余的数量的时候，才可以产生分支；
+  - 在左边和右边剩余的括号数都等于 00 的时候结算。
+
+- 代码
+
+  ```java
+  import java.util.ArrayList;
+  import java.util.List;
+  
+  public class Solution {
+  
+      // 做减法
+  
+      public List<String> generateParenthesis(int n) {
+          List<String> res = new ArrayList<>();
+          // 特判
+          if (n == 0) {
+              return res;
+          }
+  
+          // 执行深度优先遍历，搜索可能的结果
+          dfs("", n, n, res);
+          return res;
+      }
+  
+      /**
+       * @param curStr 当前递归得到的结果
+       * @param left   左括号还有几个可以使用
+       * @param right  右括号还有几个可以使用
+       * @param res    结果集
+       */
+      private void dfs(String curStr, int left, int right, List<String> res) {
+          // 因为每一次尝试，都使用新的字符串变量，所以无需回溯
+          // 在递归终止的时候，直接把它添加到结果集即可，注意与「力扣」第 46 题、第 39 题区分
+          if (left == 0 && right == 0) {
+              res.add(curStr);
+              return;
+          }
+          // 剪枝（如图，左括号可以使用的个数严格大于右括号可以使用的个数，才剪枝，注意这个细节）
+          if (left > right) {
+              return;
+          }
+  
+          if (left > 0) {
+              dfs(curStr + "(", left - 1, right, res);
+          }
+  
+          if (right > 0) {
+              dfs(curStr + ")", left, right - 1, res);
+          }
+      }
+  }
+  ```
+
+  ### 11.21 矩阵中的最长递增路径
+
+  - 描述
+
+    给定一个 m x n 整数矩阵 matrix ，找出其中 最长递增路径 的长度。对于每个单元格，你可以往上，下，左，右四个方向移动。 你 不能 在 对角线 方向上移动或移动到 边界外（即不允许环绕）。
+
+    ![img](Datastructureandalgorithm.assets/grid1.jpg)
+
+    ```java
+    输入：matrix = [[9,9,4],[6,6,8],[2,1,1]]
+    输出：4 
+    解释：最长递增路径为 [1, 2, 6, 9]。
+    ```
+
+    ![img](Datastructureandalgorithm.assets/tmp-grid.jpg)
+
+    ```java
+    输入：matrix = [[3,4,5],[3,2,6],[2,2,1]]
+    输出：4 
+    解释：最长递增路径是 [3, 4, 5, 6]。注意不允许在对角线方向上移动。
+    ```
+
+    
+
+  - 思路（记忆化思路）
+
+    记忆化的思想明确了，回到本题上来看看怎么应用这个思想。首先明确我们记忆化矩阵每一点存的值意味着什么。从深搜的角度入手，我们从i，j这个点出发，返回值为int意味着我们得到从该点出发能够经过的最长递增路径的值。举个一维数组的例子，现在是[1, 2, 3, 4]，我们从3这个点出发，找递增路径，然后求得从3出发的最大递增路径长度为2，现在从2出发，我们会深搜进3，再从3出发，到4，最后回到最开始的层，我们计算出的结果是3。这里就可以利用记忆化去减少时间，当我们从2出发时，到位置3，既然第一遍我们已经算过从3出发的路径长度，那么我们可以直接返回从3出发的路径长度，这样相当于直接是 1 + 从3出发的路径长度 = 3，现在将从2出发的路径长度记录下来存入memo[2]中，我们再从1出发，当1碰到2时，我们看看memo，发现从2出发的长度我们已经计算过了，那么我们不必要再去从2深搜，直接返回memo[2]的值即可。这便是记忆化的应用。
+
+    回到这个题上来，我们是不是也可以类比上面一维数组的例子来进行记忆化呢？
+    我们建立一个memo[][]二维数组，其中`memo[i][j]`意味着，从(i, j)这个点出发最长的递增路径长度。因为`memo[i][j]`最小为1，意味着此时这个点上下左右都没法走，它是上下左右最大的，那么最长也就是1了，这就是为什么代码中我每进入一层首先要给我的`memo[i][j]++`(我初始化将其全部为0了)。现在又有这样一个问题，每当你达到(i, j)这个位置的时候，你都要计算上下左右四个方向，你需要选四个方向中最长的路径长度将其记录进`memo[i][j]`，因此我在每个if里都进行了`max(memo[i][j], dfs(...) + 1)`进行比较，比如我先计算了上方存入memo，再计算左边，发现左边小于上面的memo，因此此时还保留上方的memo的值。当你读到这里时，你应该对记忆化有了一个基本的认知，并且明白这道题该怎么利用记忆化去做了。
+
+  - 代码
+
+    ```java
+    class Solution {
+        int m, n;
+        int[][] matrix, memo;   
+        public int longestIncreasingPath(int[][] _matrix) {
+            /*
+            方法2:记忆化搜索
+            利用dfs将深度优先搜索过程中得到matrix[i][j]的最长路径长度存储到memo[i][j]中
+            然后如果memo[i][j]没有计算才需要dfs,否则说明已经计算过了就不用进一步计算
+            */
+            matrix = _matrix;
+            m = matrix.length;
+            n = matrix[0].length;
+            // 存储matrix的最长递增路经
+            int res = 1;
+            // 记忆载体
+            memo = new int[m][n];        
+            // 遍历每个节点
+            for(int i = 0; i < m; i++) {
+                for(int j = 0; j < n; j++) {
+                    // 若没有搜索过才需要进行搜索
+                    if(memo[i][j] == 0) {
+                        res = Math.max(res, dfs(i, j));   
+                    }
+                    // 这里为什么没有比较memo[i][j]!=0的情况?
+                    // 因为后面matrix[nextI][nextJ]为起点的路径总比matrix[i][j]为起点的短
+                    // 满足matrix[nextI][nextJ]>matrix[i][j]才会进行dfs的
+                }
+            }
+            return res;
+        }
+        /*
+        返回以matrix[i][j]为起点的最长递增路径
+        */
+        private int dfs(int i, int j) {
+            // 若之前搜索过了直接返回之前存储的最大长度
+            if(memo[i][j] != 0) {
+                return memo[i][j];
+            }
+            int[][] dirs = new int[][]{{-1, 0}, {1, 0}, {0, 1}, {0, -1}};
+            // 以matrix[i][j]为起点的最长递增路径
+            int maxLen = 1;
+            for(int[] dir : dirs) {
+                int nextI = i + dir[0];
+                int nextJ = j + dir[1];
+                if(nextI >= 0 && nextI < m && nextJ >= 0 && nextJ < n 
+                && matrix[nextI][nextJ] > matrix[i][j]) {
+                    // 选择4个方向的最大路径的最大值作为maxLen
+                    maxLen = Math.max(maxLen, dfs(nextI, nextJ) + 1);
+                }
+            }
+            // 将以matrix[i][j]为起点的最长递增路径存储在memo[i][j]中
+            // 注意:在递归过程中将matrix[nextI,nextJ]为起点的最长路径都存储在memo了
+            memo[i][j] = maxLen;
+            // 返回该最长路径长度
+            return maxLen;
+        }
+    }
+    ```
+
+    
 
 ## 12. JAVA数据类型转化技巧
 
