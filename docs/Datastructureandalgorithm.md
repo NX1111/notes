@@ -8202,8 +8202,8 @@ int i=b;
 long l=b;
 float f=b;
 double d=b;
-char c='c';
-int i=c;
+char c='8';
+int i=c - '0';
 System.out.println("output:" i);
 //输出：output:99;
 ```
@@ -8394,7 +8394,22 @@ public List Array2List(char[][] chessboard) {
     }
 ```
 
+### 12.9 字符串截取函数substring()方法
 
+- 语法
+
+  ```java
+  public String substring(int beginIndex)
+  或
+  public String substring(int beginIndex, int endIndex)
+  ```
+
+- 参数
+
+  - **beginIndex** -- 起始索引（包括）, 索引从 0 开始。
+  - **endIndex** -- 结束索引（不包括）。
+
+  ![img](Datastructureandalgorithm.assets/java-substring-20201208.png)
 
 ## 13. 笔试输入输出框架
 
