@@ -1,3 +1,449 @@
+## 一. JAVA数据类型转化技巧
+
+### 1 简单数据类型之间的转换
+
+在Java中整型、实型、字符型被视为简单数据类型，这些类型由低级到高级分别为(byte，short，char)–int–long–float–double
+简单数据类型之间的转换又可以分为：
+●低级到高级的自动类型转换
+●高级到低级的强制类型转换
+●包装类过渡类型能够转换
+低级变量可以直接转换为高级变量，自动类型转换：
+
+```java
+byte b;
+int i=b;
+long l=b;
+float f=b;
+double d=b;
+char c='8';
+int i=c - '0';
+System.out.println("output:" i);
+//输出：output:99;
+```
+
+对于byte,short,char三种类型而言，他们是平级的，因此不能相互自动转换，可以使用下述的[强制类型转换](https://so.csdn.net/so/search?q=强制类型转换&spm=1001.2101.3001.7020):
+
+```java
+short i=99;
+char c=(char)i;
+System.out.println("output:" c);
+//输出：output:c;
+```
+
+但根据笔者的经验，byte,short,int三种类型都是整型，因此如果操作整型数据时，最好统一使用int型。将高级变量转换为低级变量时，情况会复杂一些，你可以使用强制类型转换。即你必须采用下面这种语句格式：
+
+```java
+int i=99;
+byte b=(byte)i;
+char c=(char)i;
+float f=(float)i;
+```
+
+```java
+//1、float型转换为double型：
+float f1=100.00f;
+Float F1=new Float(f1);
+
+//F1.doubleValue()为Float类的返回double值型的方法
+double d1=F1.doubleValue();
+
+//2、double型转换为int型：
+double d1=100.00;
+Double D1=new Double(d1);
+int i1=D1.intValue();
+
+//3、int型转换为double型：
+int i1=200;
+double d1=i1;
+```
+
+### 2 字符串与其它数据类型的转换
+
+#### 1. 其它类型向字符串的转换
+
+①调用类的串转换方法:`X.toString()`;
+       ②自动转换:`X+""`;
+       ③基本类型都可以使用String的方法:`String.volueOf(X)`;
+
+#### 2.字符串作为值,向其它基本类型的转换
+
+①先转换成相应的封装器实例,再调用对应的方法转换成其它类型
+		例如，字符中"32.1"转换double型的值的格式为**:`new Float(“32.1”).doubleValue()`**;
+        也可以用:`Double.valueOf(“32.1”).doubleValue()`;
+       ②静态parseXXX方法
+
+```java
+String s = "1";
+byte b = Byte.parseByte( s );
+short t = Short.parseShort( s );
+int i = Integer.parseInt( s );
+long l = Long.parseLong( s );
+Float f = Float.parseFloat( s );
+Double d = Double.parseDouble( s );
+```
+
+#### 3. 字符串转化为char[]数组
+
+```java
+String str = 'nx1111';
+char[] chArray = str.toCharArray();
+```
+
+### 3 字符数组char[]转String
+
+`String.valueOf(char[] charArray)`
+
+`new String(char[] charArray)`
+
+```java
+char[] str = {'h','e', 'l', 'l', 'o', '  ', '1','2','3'};  //创建一个字符数组
+	String string1 = new String(str);
+	String string2 = String.valueOf(str);
+	System.out.println(string1);  //hello 123
+	System.out.println(string2);
+	System.out.println(string1 == string2);  //false
+	System.out.println(string1.equals(string2));  //true
+/*两者的结果不一样，因为在string1 == string2中，比较的是地址，由于string1 和 string2是两个不同的对象，string1是通过new方法创建的，string2是由valueOf()方法返回的对象，所以二者的地址不一样，等式的结果就是false。
+而String的equals()方法比较的是值
+*/
+
+```
+
+
+
+### 4 日期格式设置
+
+```java
+Date date = new Date();
+SimpleDateFormat sy1=new SimpleDateFormat("yyyy-MM-dd");
+String dateFormat=sy1.format(date);
+```
+
+### 5 `List<String>`集合转数组`String[]`
+
+调用数组对象的toArray方法，参数传入String数组类型，内部做类型转换
+`strList.toArray(new String[strList.size()])`
+
+```java
+List<String> strList= new ArrayList<>();
+    strList.add("牛八少爷");
+    strList.add("欧阳无敌");
+    strList.add("西门吹雪");
+    String [] strArray = strList.toArray(new String[strList.size()]);
+    for (String string : strArray) {
+        System.out.println(string);
+    }
+```
+
+### 6 `String[]`数组转集合`List<String>`
+
+#### 1 数组工具类的asList()
+
+但是这种方法却有其局限性，如果传入的参数是一个数组，那么这个数组一定要是引用类型才能将其转换为List集合，当传入基本数据类型数组时则会将这个数组对象当成一个引用类型对象存进List集合。
+
+![1401949-20190805132932520-555863570](Datastructureandalgorithm.assets/1401949-20190805132932520-555863570.png)
+
+![1660253-20190417223551607-1371188487](Datastructureandalgorithm.assets/1660253-20190417223551607-1371188487.png)
+
+可以看到传入基本数据类型时，打印该列表是打印了传入的数组的地址值。你也可以直接将其传入asList()方法的参数中,就像这样
+
+```java
+//String不是基本数据类型，输出结果是1
+String[] strArray = {"1", "2" ,"3"};
+List list = Arrays.asList(strArray);
+System.out.println(list.get(0));
+```
+
+ArrayList可以存放不同类型的数据
+
+![1660253-20190417224546736-1897541673](Datastructureandalgorithm.assets/1660253-20190417224546736-1897541673.png)
+
+这种方法显然不太好用，那怎么将一组基本数据类型的数组转换成集合呢，我们首先想到的是将该基本类型数组转换成其对应包装类类型的数组(遍历转换也可以)原文链接](https://zhidao.baidu.com/question/628312636366178684.html))。
+
+![1660253-20190417230403671-1142295552](Datastructureandalgorithm.assets/1660253-20190417230403671-1142295552.png)
+
+#### 2 使用Spring框架
+
+```java
+int[]  a = {1,2,3};
+List list = CollectionUtils.arrayToList(a);
+System.out.println(list);
+```
+
+#### 3 JDK8新特性
+
+![img](Datastructureandalgorithm.assets/1660253-20190417230431839-1358725408.png)
+
+#### 4  Collections工具类
+
+```java
+//创建数组与集合
+String[] string=new String[5];
+ArrayList<String> list = new ArrayList<String>();
+//把数组转成集合，也就是把数组里面的数据存进集合；
+Collections.addAll(list, string);
+```
+
+
+
+### 7 字符集合`List<Character> path`转字符串`String str`
+
+```java
+//字符集合转为字符串对象
+StringBuilder str = new StringBuilder();
+for (Character character : path) {// 对ArrayList进行遍历，将字符放入StringBuilder中
+	str.append(character);
+	}
+```
+
+### 8 二维字符数组`char[][] charArray`转`List<String> list`
+
+```java
+public List Array2List(char[][] chessboard) {
+        List<String> list = new ArrayList<>();
+
+        for (char[] c : chessboard) {
+            list.add(String.copyValueOf(c));
+        }
+        return list;
+    }
+```
+
+### 9 字符串截取函数substring()方法
+
+- 语法
+
+  ```java
+  public String substring(int beginIndex)
+  或
+  public String substring(int beginIndex, int endIndex)
+  ```
+
+- 参数
+
+  - **beginIndex** -- 起始索引（包括）, 索引从 0 开始。
+  - **endIndex** -- 结束索引（不包括）。
+
+  ![img](Datastructureandalgorithm.assets/java-substring-20201208.png)
+
+## 二. 笔试输入输出框架
+
+### 1 多行输入元素
+
+以三行输入为例，第一行输入两个数字m，n，分别表示数组num1和num2的长度，第二行和第三行输入num1和num2的元素，以空格分隔。
+
+```java
+// 输入如下
+3 4
+10 2 3 
+11 4 5 6
+```
+
+```java
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class myScanner {
+    public static void main(String[] args) {
+        System.out.println("输入：");
+        Scanner sc = new Scanner(System.in);
+        int m = sc.nextInt();
+        int n = sc.nextInt();
+        int[] num1 = new int[m];
+        int[] num2 = new int[n];
+        // 换成其他数据类型也一样，其他数值类型就修改int跟nextInt就可以了，
+        //String就把nextInt()换成next(),nextInt空格分隔读取
+        for(int i = 0; i < m; i ++) {
+            num1[i] = sc.nextInt();  // 一个一个读取
+        }
+        for(int i = 0; i < n; i ++) {
+            num2[i] = sc.nextInt();
+        }
+        System.out.println("输出：");
+        System.out.println(Arrays.toString(num1));
+        System.out.println(Arrays.toString(num2));
+    }
+}
+```
+
+### 2 单行输入多个参数
+
+以空格（也可用其他的符号）为分割
+
+```java
+// 输入如下
+ABB CCC DDD  EEE 123 435
+```
+
+```java
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class myScanner {
+	Scanner sc = new Scanner(System.in);
+	public static void main(String[] args) {
+		System.out.println("输入：");
+		Scanner sc = new Scanner(System.in);
+		String str = sc.nextLine();  // 读取一行
+		System.out.println("输出：");
+		System.out.println(str);
+		String[] strIn = str.trim().split(" ");  // 以空格分割
+		System.out.println(Arrays.toString(strIn));
+	}
+}
+```
+
+### 3 多行输入多个参数，每行参数个数不定
+
+假设第一行输入m，n，m表示后面有m行，n表示每行最多有n个(可用来截断某一行多输入的参数，不详细分析了)
+
+```java
+// 输入如下
+3 4
+AA bcd 123 54
+AA BB
+A B C
+
+```
+
+```java
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+
+public class myScanner {
+	Scanner sc = new Scanner(System.in);
+	public static void main(String[] args) {
+		System.out.println("输入：");
+		Scanner sc = new Scanner(System.in);
+		int m = sc.nextInt();
+		sc.nextLine();  // 很重要，跳到第二行
+		// 若直接确定行数，注释掉上面两行，加入下面一行
+		// int m = 3;
+		String[] strArr = new String[m];
+		// 从第二行开始读取
+		for(int i = 0; i < m; i++) {
+			strArr[i] = sc.nextLine();
+		}
+		System.out.println("输出：");
+		System.out.println(Arrays.toString(strArr));
+		ArrayList<String[]> strToOne = new ArrayList<String[]>();
+		for(int i = 0; i < m; i ++) {
+			String[] tmp = strArr[i].trim().split(" ");
+			strToOne.add(tmp);
+		}
+		System.out.println(strToOne);
+		// 形象点显示
+		System.out.print("[");
+		for(int i = 0; i < strToOne.size(); i++) {
+			System.out.print(Arrays.toString(strToOne.get(i)));
+			if(i != strToOne.size()-1)
+				System.out.print(", ");
+		}
+		System.out.print("]");
+	}
+}
+
+```
+
+### 4 输入矩阵
+
+```java
+3 4 
+请输入数组元素
+1 2 3 4
+5 6 7 8
+9 10 11 12
+```
+
+```java
+public class Main {
+
+    public static void main(String arg[]) {
+        Scanner s = new Scanner(System.in);
+        System.out.println("请输入数组行数和列数");
+        int x = s.nextInt();//行数
+        int y = s.nextInt();//列数
+        int[][] awarry = new int[x][y];
+        System.out.println("请输入数组元素");
+
+        for (int i = 0; i < x; i++) {
+            for (int j = 0; j < y; j++) {
+                awarry[i][j] = s.nextInt();
+            }
+        }
+        System.out.println("你输入的数组为");
+
+        for (int i = 0; i < x; i++) {
+            for (int j = 0; j < y; j++) {
+                System.out.print(awarry[i][j] + "\t");
+            }
+            System.out.println();
+        }
+    }
+
+}
+```
+
+### 5 两行输入
+
+**遇到的问题：**在调用了nextInt()后，我们可以先调用一次nextLine(),将该行剩下的内容抛弃；
+
+```java
+int option = input.nextInt();
+input.nextLine();  // Consume newline left-over
+String str1 = input.nextLine();
+```
+
+全部都使用nextLine()读入，然后将其读入的数据转换为Integer。
+
+```java
+int option = 0;
+try {
+    option = Integer.parseInt(input.nextLine());
+} catch (NumberFormatException e) {
+    e.printStackTrace();
+}
+String str1 = input.nextLine();
+```
+
+```java
+ public static void main(String arg[]) {
+        System.out.println("输出：");
+        Scanner sc = new Scanner(System.in);
+        int m = Integer.parseInt(sc.nextLine().trim());
+        String s = sc.nextLine();
+        String[] s1 = s.trim().split(" ");
+        int[] num1 = new int[s1.length];
+
+        for(int i = 0; i < s1.length; i ++) {
+            num1[i] = Integer.parseInt(s1[i]);
+        }
+        System.out.println("输出：");
+        System.out.println(Arrays.toString(num1));
+    }
+```
+
+```java
+public static void main(String arg[]) {
+        System.out.println("输出：");
+        Scanner sc = new Scanner(System.in);
+        int m = sc.nextInt();
+        sc.nextLine();//丢弃读取Int的这一行
+        String s = sc.nextLine();
+        String[] s1 = s.trim().split(" ");
+        int[] num1 = new int[s1.length];
+
+        for(int i = 0; i < s1.length; i ++) {
+            num1[i] = Integer.parseInt(s1[i]);
+        }
+        System.out.println("输出：");
+        System.out.println(Arrays.toString(num1));
+    }
+```
+
+
+
 ## 1.稀疏数组与队列
 
 ### 1.1稀疏数组（Sparse  Array）
@@ -1961,141 +2407,1265 @@ public class Solution {
               if(map.containsKey(c)) stack.addLast(c);//如果有左括号，就加入栈中
               else if(map.get(stack.removeLast()) != c) return false;//左右括号成一对
           }
-          return stack.size() == 1;
+          return stack.size() = 1;
+      }
+  }
+  ```
+
+
+## 4.动态规划
+
+### 4.1最小花费爬楼梯
+
+- 描述
+
+  给定一个整数数组 cost ，其中 cost[i]  是从楼梯第i 个台阶向上爬需要支付的费用，下标从0开始。一旦你支付此费用，即可选择向上爬一个或者两个台阶。你可以选择从下标为 0 或下标为 1 的台阶开始爬楼梯。请你计算并返回达到楼梯顶部的最低花费。
+
+  ![alt](Datastructureandalgorithm.assets/CD2B95CDF3D0BEA28A46D1C0172B9F61.gif)
+
+- 代码
+
+  ```java
+  import java.util.*;
+  public class Solution {
+      public int minCostClimbingStairs (int[] cost) {
+          //dp[i]表示爬到第i阶楼梯需要的最小花费
+          int[] dp = new int[cost.length + 1]; 
+          for(int i = 2; i <= cost.length; i++)
+              //每次选取最小的方案
+              dp[i] = Math.min(dp[i - 1] + cost[i - 1], dp[i - 2] + cost[i - 2]); 
+          return dp[cost.length];
+      }
+  }
+  
+  ```
+
+### 4.2最长公共子序列(返回序列字符个数)
+
+- 描述
+
+  给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果不存在 公共子序列 ，返回 0 。
+
+  一个字符串的 子序列 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符（也可以不删除任何字符）后组成的新字符串。例如，"ace" 是 "abcde" 的子序列，但 "aec" 不是 "abcde" 的子序列。
+  两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列。
+
+  ```java
+  输入：text1 = "abcde", text2 = "ace" 
+  输出：3  
+  解释：最长公共子序列是 "ace" ，它的长度为 3 。
+  ```
+
+- 思路
+
+  求两个数组或者字符串的最长公共子序列问题，肯定是要用动态规划的。下面的题解并不难，你肯定能看懂。
+
+  首先，区分两个概念：子序列可以是不连续的；子数组（子字符串）需要是连续的；
+  另外，动态规划也是有套路的：单个数组或者字符串要用动态规划时，可以把动态规划 dp[i] 定义为 `nums[0:i]` 中想要求的结果；当两个数组或者字符串要用动态规划时，可以把动态规划定义成两维的 `dp[i][j]` ，其含义是在 `A[0:i] 与 B[0:j]` 之间匹配得到的想要的结果。
+
+  - 状态定义
+
+    定义`dp[i][j]`表示`text1[0:i-1]和text2[0:j-1]`的最长公共子序列（注：`text1[0:i-1]` 表示的是 `text1` 的 第 0 个元素到第 i - 1 个元素，两端都包含）之所以 `dp[i][j] 的定义不是 text1[0:i] 和 text2[0:j]` ，是为了方便当 i = 0 或者 j = 0 的时候，`dp[i][j]`表示的为空字符串和另外一个字符串的匹配，这样 `dp[i][j]` 可以初始化为 0.
+
+  - 状态转移方程
+
+    当 text1[i - 1] == text2[j - 1] 时，说明两个子字符串的最后一位相等，所以最长公共子序列又增加了 1，所以 `dp[i][j] = dp[i - 1][j - 1] + 1`；举个例子，比如对于 ac 和 bc 而言，他们的最长公共子序列的长度等于 a 和 b 的最长公共子序列长度 0 + 1 = 1。
+    当 text1[i - 1] != text2[j - 1] 时，说明两个子字符串的最后一位不相等，那么此时的状态 `dp[i][j]` 应该是 `dp[i - 1][j] 和 dp[i][j - 1]` 的最大值。举个例子，比如对于 ace 和 bc 而言，他们的最长公共子序列的长度等于 ① ace 和 b 的最长公共子序列长度0 与 ② ac 和 bc 的最长公共子序列长度1 的最大值，即 1。
+
+    ```java
+    dp[i][j]=dp[i−1][j−1]+1, 当 text1[i - 1] == text2[j - 1];
+    dp[i][j]=max(dp[i−1][j],dp[i][j−1]), 当 text1[i - 1] != text2[j - 1]
+    ```
+
+  - 状态初始化
+
+    初始化就是要看当 i = 0 与 j = 0 时， `dp[i][j]` 应该取值为多少。
+
+    当 i = 0 时，`dp[0][j]` 表示的是 text1 中取空字符串 跟 text2 的最长公共子序列，结果肯定为 0.
+    当 j = 0 时，`dp[i][0]` 表示的是 text2 中取空字符串 跟 text1 的最长公共子序列，结果肯定为 0.
+    综上，当 i = 0 或者 j = 0 时，`dp[i][j]` 初始化为 0.
+
+  - 最终返回结果
+
+    由于`dp[i][j]`的含义是`text1[0:i-1]和text2[0:j-1]`的最长公共子序列，所以需要返回的是`dp[text1.length][text2.length]`
+
+- 代码
+
+  ```java
+  class Solution {
+      public int longestCommonSubsequence(String text1, String text2) {
+          int M = text1.length();
+          int N = text2.length();
+          int[][] dp = new int[M + 1][N + 1];
+          for (int i = 1; i <= M; ++i) {
+              for (int j = 1; j <= N; ++j) {
+                  if (text1.charAt(i - 1) == text2.charAt(j - 1)) {
+                      dp[i][j] = dp[i - 1][j - 1] + 1;
+                  } else {
+                      dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+                  }
+              }
+          }
+          return dp[M][N];
+      }
+  }
+  ```
+
+- 复杂度分析
+
+  - 时间复杂度：$O(M*N)$
+  - 空间复杂度：$O(M*N)$
+
+### 4.3最长公共子序列（返回最长序列String）
+
+- 描述
+
+  给定两个字符串str1和str2，输出两个字符串的最长公共子序列。如果最长公共子序列为空，则返回"-1"，目前给出的数据，仅仅会存在一个最长的公共子序列，数据范围：$0<=|str1|,|str2|<=2000$，要求：$空间复杂度O(n^2),时间复杂度O(n^2)$
+
+  **子序列定义**：一个字符串的子序列是由原字符串在不改变字符相对顺序的情况下删除某些字符（也可以不删任何字符）后组成的新字符串。
+
+  - 例如，`"ace"` 是 `"abcde"` 的子序列，但 `"aec"` 不是 `"abcde"` 的子序列。
+
+  ```java
+  输入："1A2C3D4B56","B1D23A456A"
+  返回值："123456"
+  ```
+
+- 思路
+
+  `c[8][9]` = 5，且`S1[8] != S2[9]`，所以倒推回去，`c[8][9]`的值来源于`c[8][8]`的值(因为`c[8][8] > c[7][9]`)。
+
+  `c[8][8] = 5,  且S1[8] = S2[8],` 所以倒推回去，`c[8][8]`的值来源于 `c[7][7]`。
+
+  以此类推，如果遇到`S1[i] != S2[j] ，且c[i-1][j] = c[i][j-1]` 这种存在分支的情况，这里请都选择一个方向（之后遇到这样的情况，也选择相同的方向）。第一种结果为：
+
+  ![img](Datastructureandalgorithm.assets/Center.jpeg)
+
+  这就是倒推回去的路径，棕色方格为相等元素，即 最长子序列为 {3,4,6,7,8}，这是其中一个结果。如果如果遇到`S1[i] != S2[j] ，且c[i-1][j] = c[i][j-1]` 这种存在分支的情况，选择另一个方向，会得到另一个结果{3,5,7,7,8}。
+
+  ![img](Datastructureandalgorithm.assets/Center-165536858224015.jpeg)
+
+- 代码
+
+  ```java
+  import java.util.*;
+  
+  
+  public class Solution {
+      /**
+       * longest common subsequence
+       * @param s1 string字符串 the string
+       * @param s2 string字符串 the string
+       * @return string字符串
+       */
+       public String LCS (String s1, String s2) {
+          int len1 = s1.length();
+          int len2 = s2.length();
+          if(len1 == 0 || len2 == 0)
+              return "-1";
+          int[][] dp = new int[len1+1][len2+1];
+          for(int i = 0; i < len1+1; i++){
+              for(int j = 0; j < len2+1; j++){
+                  //初始化行列第一个元素
+                  if(i == 0 || j == 0){
+                      dp[i][j] = 0;
+                      continue;
+                  }
+                  if(s1.charAt(i-1) == s2.charAt(j-1)){
+                      dp[i][j] = dp[i-1][j-1]+1;
+                  }else{
+                      dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+                  }
+              }
+          }
+          //找出一个最长的公共子序列
+          StringBuilder sb = new StringBuilder();
+          int s1L = len1, s2L = len2;
+          while(s1L != 0 && s2L != 0){
+              if (s1.charAt(s1L-1) == s2.charAt(s2L-1)){
+                  sb.append(s1.charAt(s1L - 1));
+                  s1L--;
+                  s2L--;
+              }else{
+                  if (dp[s1L-1][s2L] > dp[s1L][s2L-1]){
+                      s1L--;
+                  }else{
+                      s2L--;
+                  }
+              }
+          }
+          if(sb.length() == 0)
+              return "-1";
+          return sb.reverse().toString();
+      }
+  }
+  ```
+
+### 4.4最长公共子串
+
+- 描述
+
+  给定两个字符串str1和str2,输出两个字符串的最长公共子串，题目保证str1和str2的最长公共子串存在且唯一。
+
+  输入：
+
+  ```java
+  输入："1AB2345CD","12345EF"
+  输出："2345"
+  ```
+
+  数据范围：$ 1\le|str1|,|str2|\le5000 $
+  要求： 空间复杂度 $O(n^2)$,时间复杂度  $O(n^2)$
+
+- 思路
+
+  ![图片说明](Datastructureandalgorithm.assets/E0DAECB00AA87023651AACD533597F0C.png)
+
+  一看到两个字符串的“最值”问题，一般想到二维dp。很自然地想到把str1前i个字符和str2前j个字符最长公共子串的长度作为`dp[i][j]`，但由于子串定义必须是原字符串连续的序列，这样定义无法找到递推关系，因此需要加限定条件——以`str1[i-1]`和`str2[j-1]`结尾的最长公共子串长度。
+
+  也就是str1的第i个字符和str2的第j个字符为最后一个元素所构成的最长公共子串，我们首先需要判断这两个字符是否相等。
+
+  - 如果不相等，那么他们就不能构成公共子串，也就是
+    `dp[i][j]=0`
+  - 如果相等，我们还需要计算前面相等字符的个数，其实就是dp[i-1][j-1]，所以
+    `dp[i][j]=dp[i-1][j-1]+1`
+
+  ```java
+  public String LCS(String str1, String str2) {
+      int maxLenth = 0;//记录最长公共子串的长度
+      //记录最长公共子串最后一个元素在字符串str1中的位置
+      int maxLastIndex = 0;
+      int[][] dp = new int[str1.length() + 1][str2.length() + 1];
+      for (int i = 0; i < str1.length(); i++) {
+          for (int j = 0; j < str2.length(); j++) {
+              //递推公式，两个字符相等的情况
+              if (str1.charAt(i) == str2.charAt(j)) {
+                  dp[i + 1][j + 1] = dp[i][j] + 1;
+                  //如果遇到了更长的子串，要更新，记录最长子串的长度，
+                  //以及最长子串最后一个元素的位置
+                  if (dp[i + 1][j + 1] > maxLenth) {
+                      maxLenth = dp[i + 1][j+1];
+                      maxLastIndex = i;
+                  }
+              } else {
+                  //递推公式，两个字符不相等的情况
+                  dp[i + 1][j+1] = 0;
+              }
+          }
+      }
+      //最字符串进行截取，substring(a,b)中a和b分别表示截取的开始和结束位置
+      return str1.substring(maxLastIndex - maxLenth + 1, maxLastIndex + 1);
+  }
+  ```
+
+  
+
+### 4.5不同路径的数目
+
+- 描述
+
+  一个机器人位于一个 m x n 网格的左上角 （起始点在下图中标记为 “Start” ）。机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。问总共有多少条不同的路径？
+
+  
+
+![img](Datastructureandalgorithm.assets/robot_maze.png)
+
+```java
+输入：m = 3, n = 7
+输出：28
+```
+
+- 思路
+
+  - 排列组合：因为机器到底右下角，向下几步，向右几步都是固定的，比如，m=3, n=2，我们只要向下 1 步，向右 2 步就一定能到达终点。$C^{m-1}_{m+n-2}$
+
+  - 动态规划：我们令`dp[i][j]`是到达`i,j`的最多路径
+    - 动态方程：`dp[i][j] = dp[i-1][j] + dp[i][j-1]`,从左边来的路径和加上从右边来的路径和就是当前位置的路径数
+    - 动态方程初始化：对于第一行 `dp[0][j]`，或者第一列 `dp[i][0]`，由于都是在边界，所以只能为 1
+    - 时间复杂度：O(m*n)O(m∗n)
+    - 空间复杂度：O(m * n)O(m∗n)
+    - 优化：因为我们每次只需要 `dp[i-1][j],dp[i][j-1]`
+
+  
+
+- 代码
+
+  ```java
+  class Solution {
+      public int uniquePaths(int m, int n) {
+          int[][] dp = new int[m][n];
+         //对于第一行 dp[0][j]，或者第一列 dp[i][0]，由于都是在边界，所以只能为 1
+          for (int i = 0; i < n; i++) dp[0][i] = 1;
+          for (int i = 0; i < m; i++) dp[i][0] = 1;
+          for (int i = 1; i < m; i++) {
+              for (int j = 1; j < n; j++) {
+                  dp[i][j] = dp[i - 1][j] + dp[i][j - 1];
+              }
+          }
+          return dp[m - 1][n - 1];  
+      }
+  }
+  ```
+
+### 4.6矩阵的最小路径和
+
+- 描述
+
+  给定一个包含非负整数的 `m x n` 网格 `grid` ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
+
+  **说明：**每次只能向下或者向右移动一步。
+
+  ![img](Datastructureandalgorithm.assets/minpath.jpg)
+
+  ```java
+  输入：grid = [[1,3,1],[1,5,1],[4,2,1]]
+  输出：7
+  解释：因为路径 1→3→1→1→1 的总和最小。
+  ```
+
+- 思路（动态规划）
+
+  - 状态定义：设`dp`为大小为`m x n`的矩阵，其中`dp[i][j]`的值表示走到（i , j）的最小路径和
+
+  - 转移方程：
+
+    - 题目要求，只能向右或向下走，换句话说，当前单元格 `(i,j)` 只能从左方单元格 `(i−1,j)` 或上方单元格`(i,j−1)` 走到，因此只需要考虑矩阵左边界和上边界。
+
+      走到当前单元格 `(i,j)(i,j)` 的最小路径和 = 从左方单元格 `(i−1,j)` 与 从上方单元格 `(i,j−1)` 走来的 两个最小路径和中较小的 + 当前单元格值 `grid[i][j]` 。具体分为以下 4 种情况：
+
+      - 当左边和上边都不是矩阵边界时：即`i != 0 , j != 0`,`dp[i][j] = Math.min(dp[i-1][j] , dp[i][j-a] ) + grid[i][j] `
+      - 当只有左边是矩阵边界时：即`i = 0 , j != 0` ,`dp[i][j] = dp[i][j-1] + grid[i][j]`
+      - 当只有上边是矩阵边界时：即`i != 0 , j = 0` , `dp[i][j] = dp[i-1][j] + grid[i][j]`
+
+      - 当左边和右边都是矩阵边界时：即`i = 0 , j = 0` , `dp[i][j] = grid[i][j]`
+
+  - 初始状态：dp初始化即可，不需要修改初始0值
+
+  - 返回值：返回dp矩阵右下角值，即走到终点的最小路径和
+
+    其实我们完全不需要建立 dp矩阵浪费额外空间，直接遍历 `grid[i][j]` 修改即可。这是因为：`grid[i][j] = min(grid[i - 1][j], grid[i][j - 1]) + grid[i][j]` ；原 grid 矩阵元素中被覆盖为 dp 元素后（都处于当前遍历点的左上方），不会再被使用到。
+
+  - 复杂度分析
+
+    - 时间复杂度 `O(M×N)` ： 遍历整个 grid 矩阵元素。
+    - 空间复杂度 `O(1)` ： 直接修改原矩阵，不使用额外空间。
+
+  - 代码
+
+    ```java
+    class Solution {
+        public int minPathSum(int[][] grid) {
+            for(int i = 0; i < grid.length; i++) {
+                for(int j = 0; j < grid[0].length; j++) {
+                    if(i == 0 && j == 0) continue;
+                    else if(i == 0)  grid[i][j] = grid[i][j - 1] + grid[i][j];
+                    else if(j == 0)  grid[i][j] = grid[i - 1][j] + grid[i][j];
+                    else grid[i][j] = Math.min(grid[i - 1][j], grid[i][j - 1]) + grid[i][j];
+                }
+            }
+            return grid[grid.length - 1][grid[0].length - 1];
+        }
+    }
+    ```
+
+###4.7 把数字翻译成字符串(一)
+
+- 描述
+
+  有一种将字母编码成数字的方式：'a'->1, 'b->2', ... , 'z->26'。我们把一个字符串编码成一串数字，再考虑逆向编译成字符串。由于没有分隔符，数字编码成字母可能有多种编译结果，例如 11 既可以看做是两个 'a' 也可以看做是一个 'k' 。但 10 只可能是 'j' ，因为 0 不能编译成任何结果。现在给一串数字，返回有多少种可能的译码结果
+
+  数据范围：字符串长度满足 $0 < n \le90$
+
+  进阶：空间复杂度 $O(n)$，时间复杂度 $O(n)$
+
+   其实按照题目要求，一定是可以把数字串转为字符串的，应为这个数字串是从字符串转过来的，但是测试用例有几个是不能转过去的
+
+- 思路（动态规划）
+
+  - 状态定义：`dp[i]`表示`num[0:i]`的可能编码个数
+  - 转移方程：
+    - 如果`num[i]==0` 则`num[i]`需要牵连上一个字符`num[i-1]`，所以`dp[i] = dp[i-2]`
+    - 如果`num[i-1]==0 || num[i-1]*10 + num[i] > 26` 则`num[i]`与前面的字符串不产生关联，所以`dp[i] = dp[i-1]`
+    - 如果` num[i-1]*10 + num[i] <= 26` 则`dp[i] = dp[i-1] + dp[i-2]`
+  - 状态初始化：`dp[0] == 1`
+  - 结果返回：`dp[num.length - 1]`
+
+- 代码
+
+  ```java
+  import java.util.*;
+  public class Solution {
+      public int solve (String nums) {
+          char[] c = nums.toCharArray();
+          int[] num = new int [c.length];
+          for(int j =0 ; j < c.length ;j++){
+              num[j] = c[j] - '0';
+          }
+          int[] dp = new int[c.length];
+          dp[0] = 1;
+          if(c.length==1) return dp[0];
+          if(num[1] == 0 || num[0]*10 + num[1] > 26) {
+              dp[1] = 1;
+          }else if (num[0]*10 + num[1] <= 26){
+              dp[1] = 2;
+          }
+          for(int i = 2 ; i < c.length ; i++){
+              if(num[i] == 0 ){
+                  if(num[i-1] > 2) return 0;
+                  dp[i] = dp[i-2];
+              }else if(num[i-1] == 0 || num[i-1]*10 + num[i] > 26){
+                  dp[i] = dp[i-1];
+              }else if(num[i-1]*10 + num[i] <= 26){
+                  dp[i] = dp[i-1] + dp[i-2];
+              }
+          }
+          return dp[c.length - 1];
+      }
+  }
+  ```
+
+### 4.8把数字翻译成字符串（二）
+
+- 描述
+
+  给定一个数字，我们按照如下规则把它翻译为字符串：0 翻译成 “a” ，1 翻译成 “b”，……，11 翻译成 “l”，……，25 翻译成 “z”。一个数字可能有多个翻译。请编程实现一个函数，用来计算一个数字有多少种不同的翻译方法。
+
+  ```java
+  输入: 12258
+  输出: 5
+  解释: 12258有5种不同的翻译，分别是"bccfi", "bwfi", "bczi", "mcfi"和"mzi"
+  ```
+
+- 思路
+
+  ![Picture1.png](Datastructureandalgorithm.assets/e231fde16304948251633cfc65d04396f117239ea2d13896b1d2678de9067b42-Picture1.png)
+
+  - 状态定义：设动态规划表dp，dp[i]代表以xi结尾的翻译方案数量
+
+  - 转移方程：
+
+    - 如果xi和xi-1组成的两位数字可以被翻译，则`dp[i] = dp[i -1] + dp[i - 2]`
+
+    - 否则 dp[i] = dp[i-1]
+
+      可被翻译的两位数区间：$当 x_{i-1} = 0$时，组成的两位数是无法被翻译的（例如 00, 01, 02, ⋯ ），因此区间为 [10, 25] 。
+      $dp[i] = \begin{cases} dp[i - 1] + dp[i - 2] & {, 10 x_{i-1} + x_i \in [10,25]} \\ dp[i - 1] & {, 10 x_{i-1} + x_i \in [0, 10) \cup (25, 99]} \end{cases}$
+
+  - 初始状态： `dp[0] = dp[1] = 1 ，即 “无数字” 和 “第 11 位数字” 的翻译方法数量均为 1 ；
+  - 返回值： `dp[n]` ，即此数字的翻译方案数量。
+
+- 代码
+
+  ```java
+  class Solution {
+      public int translateNum(int num) {
+          String s = String.valueOf(num);
+          int a = 1, b = 1;
+          for(int i = 2; i <= s.length(); i++) {
+              String tmp = s.substring(i - 2, i);
+              int c = tmp.compareTo("10") >= 0 && tmp.compareTo("25") <= 0 ? a + b : a;
+              b = a;
+              a = c;
+          }
+          return a;
+      }
+  }
+  ```
+
+### 4.9兑换零钱
+
+- 描述
+
+  给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总金额，返回 -1 。你可以认为每种硬币的数量是无限的。
+
+  ```java
+  输入：coins = [1, 2, 5], amount = 11
+  输出：3 
+  解释：11 = 5 + 5 + 1
+  ```
+
+- 思路
+
+  为什么说它符合最优子结构呢？比如你想求 `amount = 11` 时的最少数（原问题），如果你知道凑出 `amount = 10` 的最少数（子问题）
+
+  - 状态定义：dp(n)表示目标金额为n的最少零钱组合数量
+
+  - 初始状态：dp[0] = 0,显然目标金额为0时所需的组合数量为0
+
+  - 状态转移：
+
+    尝试dp[i - coin]的组合数，去凑coin，两者就少了零钱数组中的一个元素的值
+
+    ```java
+    for(int coin : coins){
+        if( i - coin < 0)  continue;
+        //状态转移方程
+        dp[i] = Math.min(dp[i], 1 + dp[i - coin]);
+    }
+    ```
+
+  - 结果
+
+    如果都不符合，dp[amount]没修改，直接返回-1，如果dp[amount]修改后，就返回dp[amount]的值
+
+- 代码
+
+  ```java
+  import java.util.Arrays;
+  public class Solution {
+      public int coinChange(int[] coins, int amount) {
+          int[] dp = new int[amount+1];
+          Arrays.fill(dp,amount+1);
+          dp[0] = 0;
+          //外层遍历所有状态的所有取值
+          for(int i = 0 ; i < dp.length ;i++){
+              //内层循环求所有选择的最小值
+              for(int coin : coins){
+                  if( i - coin < 0)  continue;
+                  //状态转移方程
+                  dp[i] = Math.min(dp[i], 1 + dp[i - coin]);
+              }
+          }
+          return (dp[amount] == amount + 1) ? -1 : dp[amount];
       }
   }
   ```
 
   
 
-## 4.递归
+### 4.10兑换零钱（二）
 
-调用规则：1.当程序执行一个方法时，就会开辟一个独立的空间（在栈内）。
+- 描述
 
-2.每个空间的数据（局部变量）是独立的，如果方法中使用的是引用数据类型，则共享该数据。
+  给你一个整数数组coins表示不同面额的硬币，另给一个整数amount表示总金额，请你计算并返回可以凑成总金额的硬币组合数，如果任何硬币组合都无法凑出金额，返回0。假设每一种硬币有无数个。
 
-3.当一个方法执行完毕，或者遇到return，就会返回，遵守谁调用，就将结果返回给谁。
+  ```java
+  输入：amount = 5, coins = [1, 2, 5]
+  输出：4
+  解释：有四种方式可以凑成总金额：
+  5=5
+  5=2+2+1
+  5=2+1+1+1
+  5=1+1+1+1+1
+  ```
 
-### 4.1迷宫问题
+- 思路
 
+  - 回溯算法（超时）
 
+    - 代码
 
-```java
-public class MiGong {
-    public static void main(String[] args) {
-        //二维数组模拟迷宫
-        int[][] map = new int[8][7];
-        //1-墙、挡板
-        for (int i = 0; i < 7; i++) {
-            map[0][i] = 1;
-            map[7][i] = 1;
+      ```java
+      class Solution {
+          private int res = 0;
+          public int change(int amount, int[] coins) {
+              int len = coins.length;
+              if(len == 0) return res;
+              List<Integer> path = new ArrayList<>();
+              backtrack(coins,path,0,0,amount,len);
+              return res;
+      
+          }
+      
+          public void backtrack(int[] coins ,  List<Integer> path , int start ,int sum ,int target ,int len){
+              if(sum == target){
+                  res++;
+                  return;
+              }
+              for(int i = start ; i < len ; i++){
+                  if(sum + coins[i] > target){
+                      continue;
+                  }
+                  path.add(coins[i]);
+                  backtrack(coins,path,i,sum+coins[i],target,len);
+                  path.remove(path.size() - 1);
+              }
+          }
+      }
+      ```
+
+  - 动态规划
+
+    - 状态定义：dp[j]:凑成总金额j的货币组合数为dp[j]
+
+    - 状态转移方程：dp[j] （考虑coins[i]的组合总和） 就是所有的dp[j - coins[i]]相加`dp[j] += dp[j - coins[i]]`
+
+    - 状态初始化：首先dp[0]一定要为1，dp[0] = 1是 递归公式的基础。从dp[i]的含义上来讲就是，凑成总金额0的货币组合数为1。下标非0的dp[j]初始化为0，这样累计加dp[j - coins[i]]的时候才不会影响真正的dp[j]
+
+    - 代码如下：
+
+      ```CPP
+      for (int i = 0; i < coins.size(); i++) { // 遍历物品
+          for (int j = coins[i]; j <= amount; j++) { // 遍历背包容量
+              dp[j] += dp[j - coins[i]];
+          }
+      }
+      ```
+
+      假设：coins[0] = 1，coins[1] = 5。
+
+      那么就是先把1加入计算，然后再把5加入计算，得到的方法数量只有{1, 5}这种情况。而不会出现{5, 1}的情况。
+
+      **所以这种遍历顺序中dp[j]里计算的是组合数！**
+
+      如果把两个for交换顺序，代码如下：
+
+      ```cpp
+      for (int j = 0; j <= amount; j++) { // 遍历背包容量
+          for (int i = 0; i < coins.size(); i++) { // 遍历物品
+              if (j - coins[i] >= 0) dp[j] += dp[j - coins[i]];
+          }
+      }
+      ```
+
+      背包容量的每一个值，都是经过 1 和 5 的计算，包含了{1, 5} 和 {5, 1}两种情况。
+
+      **此时dp[j]里算出来的就是排列数！**
+
+- 代码
+
+  ```java
+  class Solution {
+      public int change(int amount, int[] coins) {
+          //递推表达式
+          int[] dp = new int[amount + 1];
+          //初始化dp数组，表示金额为0时只有一种情况，也就是什么都不装
+          dp[0] = 1;
+          for (int i = 0; i < coins.length; i++) {
+              for (int j = coins[i]; j <= amount; j++) {
+                  dp[j] += dp[j - coins[i]];
+              }
+          }
+          return dp[amount];
+      }
+  }
+  ```
+
+### 4.11最长上升子序列（一）
+
+- 描述
+
+  给定一个长度为 n 的数组 arr，求它的最长严格上升子序列的长度。
+  所谓子序列，指一个数组删掉一些数（也可以不删）之后，形成的新数组。例如 [1,5,3,7,3] 数组，其子序列有：[1,3,3]、[7] 等。但 [1,6]、[1,3,5] 则不是它的子序列。当且仅当该序列不存在两个下标i和j满足$i<j且arr_i \ge arr_j$.
+
+  数据范围：$0 \le n \le1000$
+
+  要求：时间复杂度$O(n^2)$,空间复杂度$O(n)$
+
+  ```java
+  输入：
+  [6,3,1,5,2,3,7]
+  返回值：4
+  说明：该数组最长上升子序列为 [1,2,3,7] ，长度为4
+  ```
+
+- 思路（动态规划）
+
+  - 状态定义：dp[i]表示以nums[i]结尾的上升子序列的长度，num[i]必须被选取且必须是这个子序列的最后一个元素
+
+  - 状态转移方程：如果一个更大的数接在小的数后面，就会形成一个长度加一的子序列，只要num[i]严格大于在它位置之前的某个数，那么num[i]就可以接在这个数后面形成一个更长的上升子序列。
+
+    $$dp[i] = max_{0\le j <i , nums[j] < nums[i]}(dp[j] + 1)$$
+
+  - 状态初始化：dp[i] = 1,一个字符显然长度是1的上升子序列
+
+  - 返回值：
+
+  - 不能返回最后一个状态值，最后一个状态值只表示以 nums[len - 1] 结尾的「上升子序列」的长度，状态数组 dp 的最大值才是题目要求的结果。
+
+    $\max_{1 \le i \le N} dp[i]$
+    
+    
+
+    
+
+- 代码
+
+  ```java
+  import java.util.Arrays;
+  
+  public class Solution {
+  
+      public int lengthOfLIS(int[] nums) {
+          int len = nums.length;
+          if (len < 2) {
+              return len;
+          }
+          //dp数组长度保持和数组nums一致
+          int[] dp = new int[len];
+          Arrays.fill(dp, 1);
+          //填充每一个dp[i]值
+          for (int i = 1; i < len; i++) {
+  //状态转移：如果一个更大的数接在小的数后面，就会形成一个长度加一的子序列，只要num[i]严格大于在它位置之前的某个数，那么num[i]就可以接在这个数后面形成一个更长的上升子序列。
+              for (int j = 0; j < i; j++) {
+                  if (nums[j] < nums[i]) {
+                      dp[i] = Math.max(dp[i], dp[j] + 1);
+                  }
+              }
+          }
+          int res = 0;
+          for (int i = 0; i < len; i++) {
+              res = Math.max(res, dp[i]);
+          }
+          return res;
+      }
+  }
+  ```
+
+### 4.12连续子数组的最大和
+
+- 描述
+
+  输入一个长度为n的整型数组array，数组中的一个或连续多个整数，组成一个子数组，子数组最小长度为1，求所有子数组的和的最大值。
+
+  数据范围：$0\le n\le 2*10^5,-100\le a[i]\le100$
+
+  复杂度要求：时间$O(n)$,空间$O(n)$
+
+  ```java
+  输入：
+  [1,-2,3,10,-4,7,2,-5]
+  返回值：18
+  说明：经分析可知，输入数组的子数组[3,10,-4,7,2]可以求得最大和为18         
+  ```
+
+- 动态规划
+
+  - 状态定义：dp[i]表示以当前元素nums[i]结尾的`nums[0:i]`的数组的最大值
+
+  - 状态转移方程：
+    - 如果dp[i-1]<0,表示加上前面的序列的数值反而减少，则以当前数为最大值，dp[i] = nums[i]
+    - 否则，dp[i] = dp[i-1] + nums[i]
+
+  - 状态初始化：dp[i] = nums[i]
+  - 返回结果：遍历dp[]数组，取最大值，$\max_{1 \le i \le N} dp[i]$
+
+- 代码
+
+  ```java
+  public class Solution {
+      public int FindGreatestSumOfSubArray(int[] array) {
+          int[] dp = new int[array.length];
+          dp[0] = array[0];
+         for(int i  = 1 ; i < array.length ;i++){
+             //状态转移方程
+             if(dp[i-1]<0){
+                 dp[i]=array[i];
+             }else{
+                 dp[i] = dp[i-1] + array[i];
+             }
+         }
+          //设置一个全局最小量
+          int res = -200;
+          for(int c : dp){
+              res = Math.max(res,c);
+          }
+          return res;
+      }
+  }
+  ```
+
+### 4.13最长回文子串
+
+- 描述
+
+  对于长度为n的一个字符串A（仅包含数字，大小写英文字母），请设计一个高效算法，计算其中最长回文子串的长度
+
+  数据范围：$1\le n \le1000$
+
+  复杂度：$空间复杂度O(1),时间复杂度O(n^2)$
+
+  进阶：$空间复杂度O(n),时间复杂度O(n)$
+
+  ```java
+  输入："ababc"
+  返回值：3
+  说明：最长的回文子串为"aba"与"bab"，长度都为3  
+  ```
+
+- 动态规划
+
+  - 状态定义：定义二维数组`dp[length][length]`，如果`dp[left][right]`为true，则表示字符串从left到right是回文子串，如果`dp[left][right]`为false，则表示字符串从`left`到`right`不是回文子串。
+
+  - 状态转移方程：如果`dp[left+1][right-1]`为true，我们判断`s.charAt(left)`和`s.charAt(right)`是否相等，如果相等，那么`dp[left][right]`肯定也是回文子串，否则`dp[left][right]`一定不是回文子串。
+
+    **如果s.charAt(left)！=s.charAt(right)**，那么字符串从left到right是不可能构成子串的，直接跳过即可。
+
+    **如果s.charAt(left)==s.charAt(right)**，字符串从left到right能不能构成回文子串还需要进一步判断
+
+    - 如果`left==right`，也就是说只有一个字符，我们认为他是回文子串。即`dp[left][right]=true（left==right）`
+    - 如果`right-left<=2`，类似于`"aa"`，或者`"aba"`，我们认为他是回文子串。即`dp[left][right]=true（right-left<=2）`
+    - 如果`right-left>2`，我们只需要判断`dp[left+1][right-1]`是否是回文子串，才能确定`dp[left][right]`是否为true还是false。即`dp[left][right]=dp[left+1][right-1]`
+
+- 代码
+
+  ```java
+  import java.util.*;
+  public class Solution {
+      /**
+       * 代码中的类名、方法名、参数名已经指定，请勿修改，直接返回方法规定的值即可
+       * @param A string字符串 
+       * @return int整型
+       */
+          public int getLongestPalindrome(String A) {
+          //边界条件判断
+              int n = A.length();
+          if (n < 2)
+              return A.length();
+          //start表示最长回文串开始的位置，
+          //maxLen表示最长回文串的长度
+          int maxLen = 1;
+          boolean[][] dp = new boolean[n][n];
+          for (int right = 1; right < n; right++) {
+              for (int left = 0; left <= right; left++) {
+                  //如果两种字符不相同，肯定不能构成回文子串
+                  if (A.charAt(left) != A.charAt(right))
+                      continue;
+  
+                  //下面是s.charAt(left)和s.charAt(right)两个
+                  //字符相同情况下的判断
+                  //如果只有一个字符，肯定是回文子串
+                  if (right == left) {
+                      dp[left][right] = true;
+                  } else if (right - left <= 2) {
+                      //类似于"aa"和"aba"，也是回文子串
+                      dp[left][right] = true;
+                  } else {
+                      //类似于"a******a"，要判断他是否是回文子串，只需要
+                      //判断"******"是否是回文子串即可
+                      dp[left][right] = dp[left + 1][right - 1];
+                  }
+                  //如果字符串从left到right是回文子串，只需要保存最长的即可
+                  if (dp[left][right] && right - left + 1 > maxLen) {
+                      maxLen = right - left + 1;
+                  }
+              }
+          }
+          //最长的回文子串
+          return maxLen;
+      }
+  }
+  ```
+
+### 4.14数字字符串转化为IP地址
+
+- 描述
+
+  现在有一个只包含数字的字符串，将该字符串转化为ip地址的形式，返回所有可能的情况。
+
+  例如：
+
+  给出的字符串为"25525522135"
+
+  返回：["255,255,22,135","255,255,221,35"] (顺序没有关系)
+
+  数据范围：字符串长度`0<=n<12`
+
+  要求：时间O（n!）,空间O（n!）
+
+  注意：注意：ip地址是由四段数字组成的数字序列，格式如 "x.x.x.x"，其中 x 的范围应当是 [0,255]。
+
+- 思路
+
+  - 回溯框架法
+
+    ```java
+    //深搜
+    import java.util.ArrayList;
+    
+    public class Solution {
+        public ArrayList<String> restoreIpAddresses(String s) {
+            ArrayList<String> res = new ArrayList<>();
+            ArrayList<String> ip = new ArrayList<>();  //存放中间结果
+            dfs(s, res, ip, 0);
+            return res;
         }
-        for (int i = 0; i < 7; i++) {
-            map[i][0] = 1;
-            map[i][6] = 1;
-        }
-        map[3][1] = 1;
-        map[3][2] = 1;
-
-        setWay(map, 1, 1);
-
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 7; j++) {
-                System.out.print(map[i][j]+" ");
+        
+        private void dfs(String s, ArrayList<String> res, ArrayList<String> ip, int start){
+            if(ip.size() == 4 && start == s.length()){  //找到一个合法解
+                res.add(ip.get(0) + '.' + ip.get(1) + '.' + ip.get(2) + '.' + ip.get(3));
+                return;
             }
-            System.out.println();
+            if(s.length() - start > 3 * (4 - ip.size()))  //剪枝
+                return;
+            if(s.length() - start < (4 - ip.size()))  //剪枝
+                return;
+            int num = 0;
+            for(int i = start; i < start + 3 && i < s.length(); i++){
+                num = num * 10 + (s.charAt(i) - '0');
+                if(num < 0 || num > 255)  //剪枝
+                    continue;
+                ip.add(s.substring(start, i + 1));
+                dfs(s, res, ip, i + 1);
+                ip.remove(ip.size() - 1);
+                
+                if(num == 0)  //不允许前缀0
+                    break;
+            }
         }
     }
+    ```
 
-    /**
-    * @Description: map[6][5]表示通路找到，当map[i][j]为0则未走过，
-     * 为2则通路走过，为3表示走过但是走不通
-     * 策略：下-右-上-左，走不通再回溯
-    * @Param: [int[][] 表示地图, int 位置, int]
-    * @return: boolean
-    */
-    public static boolean setWay(int[][] map, int i, int j) {
-        if (map[6][5] == 2) {   //通路已经找到
-            return true;
-        } else {
-            if (map[i][j] == 0) {   //如果当前这个点还没有走过
-                map[i][j] = 2;
-                if (setWay(map, i + 1, j)) {        //向下走
-                    return true;
-                } else if (setWay(map, i, j + 1)) { //向右走
-                    return true;
-                } else if (setWay(map, i - 1, j)) { //向上走
-                    return true;
-                } else if (setWay(map, i, j - 1)) { //向左走
-                    return true;
-                } else {    //说明该点走不通
-                    map[i][j] = 3;
-                    return false;
+### 4.15打家劫舍（一）
+
+- 描述
+
+  你是一个经验丰富的小偷，准备偷沿街的一排房子，每一个房子都存在一定的现金，为了防止被发现，你不能偷相邻的两家。
+
+  给定一个整数数组nums，数组中的元素表示每个房间存有的现金数额，请你计算在不被发现的前提下最多偷窃的金额。
+
+  数据范围：数组长度满足 $1 \le n \le 2\times 10^5$ ，数组中每个值满足 $1 \le num[i] \le 5000$  
+
+- 思路（动态规划）
+  - 状态定义：`dp[i]`表示以nums[0:i]数组可以偷窃的最大金额，而且必须是以nums[i]结尾
+  - 状态转移方程：
+    - 除去与当前nums[i]相邻的数，遍历dp[i-3:i-2]，取最大值和nums[i]相加，`dp[i] = dp[i-3:i-2].max + nums[i]`
+  - 状态初始化：dp[0] = nums[0],dp[1] = nums[1],dp[2] = nums[0] + nums[2]
+  - 返回结果：dp[]数组中的最大值
+
+- 代码
+
+  ```java
+  import java.util.*;
+  public class Solution {
+      public int rob (int[] nums) {
+          int[] dp = new int[nums.length];
+          //状态初始化dp[0],dp[1],dp[2]
+          if(nums.length < 2) return nums[0];
+          dp[0] = nums[0];
+          dp[1] = nums[1];
+          if(nums.length >= 3) {
+              dp[2] = nums[0]+nums[2];
+          }
+          for(int i = 3 ; i < nums.length ;i++){
+             	 //因为要隔家抢，但是肯定间隔不会超过2家以上。(如果全部遍历，将超出时间限制)
+  			//比如说[1,2,1,1,2,1,1]，和[1,2,1,1,1,2,1]，前者是2+2+1，后者是2+1+2。
+  			//所以DP时只需要比较（dp[i-1],dp[i-2]+nums[i],dp[i-3]+nums[i]）
+              for(int j = i-3 ; j < i - 1 ; j++){
+                  dp[i] = Math.max(dp[i] , dp[j]);
+              }
+              dp[i] = dp[i] + nums[i];
+          }
+          int res =0;
+          for(int dpt : dp){
+              res = Math.max(res,dpt);
+          }
+          return res;
+      }
+  }
+  ```
+
+### 4.16打家劫舍（二）
+
+- 描述
+
+  你是一个经验丰富的小偷，准备偷沿湖的一排房间，每个房间都存在一定的现金，为了防止被发现，你不能偷相邻的两家。沿湖的房间组成一个闭合的圆形，即第一个房间和最后一个房间视为相邻。
+
+  给定一个长度为n的整数数组nums，数组中的每一个房间都表示房间里存有的现金金额，请你计算在不被发现的前提下最多的偷窃金额。
+
+  数据范围：数组长度满足 $1 \le n \le 2\times 10^5$ ，数组中每个值满足 $1 \le num[i] \le 5000$  
+
+  ```java
+  输入：[1,2,3,4]
+  返回值：6
+  说明：最优方案是偷第 2 4 个房间  
+   
+  输入：[1,3,6]
+  返回值：6
+  说明：由于 1 和 3 是相邻的，因此最优方案是偷第 3 个房间  
+  ```
+
+- 思路(动态规划)
+
+  环状排列意味着第一个房子和最后一个房子中只能选择一个偷窃，因此可以把此环状排列房间问题约化为两个单排排列房间子问题：
+
+  在不偷窃第一个房子的情况下（即 nums[1:]），最大金额是 p1；
+  在不偷窃最后一个房子的情况下（即 nums[:n-1]，最大金额是 p2；
+
+  取两者最大值
+
+  思路同打家劫舍（一）
+
+- 代码
+
+  ```java
+  import java.util.*;
+  public class Solution {
+     
+     public int rob(int[] nums){
+          if(nums.length < 2) return nums[0];
+         return Math.max(robOne((int[])Arrays.copyOfRange(nums,0,nums.length-1)),robOne((int[])Arrays.copyOfRange(nums,1,nums.length)));
+     }
+     
+  
+      public int robOne (int[] nums) {
+          int[] dp = new int[nums.length];
+          //状态初始化dp[0],dp[1],dp[2]
+          if(nums.length < 2) return nums[0];
+          dp[0] = nums[0];
+          dp[1] = nums[1];
+          if(nums.length >= 3) {
+              dp[2] = nums[0]+nums[2];
+          }
+          for(int i = 3 ; i < nums.length ;i++){
+             	 //因为要隔家抢，但是肯定间隔不会超过2家以上。(如果全部遍历，将超出时间限制)
+  			//比如说[1,2,1,1,2,1,1]，和[1,2,1,1,1,2,1]，前者是2+2+1，后者是2+1+2。
+  			//所以DP时只需要比较（dp[i-1],dp[i-2]+nums[i],dp[i-3]+nums[i]）
+              for(int j = i-3 ; j < i - 1 ; j++){
+                  dp[i] = Math.max(dp[i] , dp[j]);
+              }
+              dp[i] = dp[i] + nums[i];
+          }
+          int res =0;
+          for(int dpt : dp){
+              res = Math.max(res,dpt);
+          }
+          return res;
+      }
+  }
+  ```
+
+###   4.17买卖股票的最好时机(一)
+
+- 描述
+
+  假设你有一个数组prices，长度为n，其中prices[i]是股票在第i天的价格，请根据这个价格数组，返回买卖股票能获得的最大收益。
+
+  - 你可以买入一次股票和卖出一次股票，并非每天都可以买入或卖出一次，总共只能买入和卖出一次，且买入必须在卖出的前面的某一天
+  - 如果不能获取到任何利润，请返回0
+  - 假设买入卖出均没有手续费
+
+  - 数据范围： $0 \le n \le 10^5 , 0 \le val \le 10^4$
+
+    要求：空间复杂度 O*(1)，时间复杂度 O*(*n*)
+
+  ```java
+  输入：[8,9,2,5,4,7,1]
+  返回值：5
+  说明：在第3天(股票价格 = 2)的时候买入，在第6天(股票价格 = 7)的时候卖出，最大利润 = 7-2 = 5 ，不能选择在第2天买入，第3天卖出，这样就亏损7了；同时，你也不能在买入前卖出股票。         
+  ```
+
+- 思路(动态规划)
+
+  - 状态定义：dp[i]表示截止到i，价格的最低点是多少
+  - 状态转移方程：
+    - 如果dp[i - 1] < prices[i],dp[i]=dp[i-1];
+    - 否则dp[i] = prices[i]
+  - 状态初始化：dp[0] = prices[0];
+  - 返回值：用一个数字，记录当前点卖出的最大利润，并返回`res = Math.max(res,prices[i]-dp[i]);`
+
+- 代码
+
+  - 空间复杂度O（n）
+
+    ```java
+    import java.util.*;
+    public class Solution {
+     
+        public int maxProfit (int[] prices) {
+            if(prices.length < 2) return 0;
+            int[] dp = new int[prices.length];
+            int res = 0;
+            dp[0] = prices[0];
+            for(int i = 1 ; i< prices.length ;i++){
+                dp[i] = (dp[i-1] < prices[i]) ? dp[i-1]:prices[i];
+                res = Math.max(res,prices[i]-dp[i]);
+            }
+            return res;
+        }
+    }
+    ```
+
+  - 空间复杂度O（1）
+
+    ```java
+    public class Solution {
+        public int maxProfit(int prices[]) {
+            int minprice = Integer.MAX_VALUE;
+            int maxprofit = 0;
+            for (int i = 0; i < prices.length; i++) {
+                if (prices[i] < minprice) {
+                    minprice = prices[i];
+                } else if (prices[i] - minprice > maxprofit) {
+                    maxprofit = prices[i] - minprice;
                 }
-            } else {    //map[i][j] != 0
-                return false;
             }
+            return maxprofit;
         }
     }
-}
-```
+    ```
 
-### 4.2八皇后问题
+### 4.18买卖股票的最好时机（二）
 
-8x8棋盘上，任意两个皇后都不能处于同一行、同一列或者同一斜线上（暴力遍历回溯）。
+- 描述
 
-```java
-public class Queue8 {
+  假设你有一个prices数组，长度为n，其中prices[i]是某只股票在第i天的价格，请根据这个价格数组，返回买卖股票能获得的最大收益
 
-    int max = 8;
-    int[] arr = new int[max];
-    int methodNum = 0;
+  - 你可以**多次**买卖该只股票，但是在此购买前必须卖出之前的股票
+  - 如果不能获取收益，请返回0
+  - 假设买入卖出均没手续费
 
-    public static void main(String[] args) {
-        Queue8 queue8 = new Queue8();
-        queue8.place(0);
-        System.out.println(queue8.methodNum);
-    }
+  数据范围： $1 \le n \le 1 \times 10^5， 1 \le prices[i] \le 10^4$
 
-    //放置第n个皇后
-    private void place(int n) {
-        if (n == max) {
-            print();
-            methodNum += 1;
-            return;
-        }
-        //依次放入皇后
-        //i表示放到哪一列
-        for (int i = 0; i < max; i++) {
-            //先把当前的皇后，放到该行第一列
-            arr[n] = i;
-            if (judge(n)) { //不冲突
-                place(n + 1);
-            }//冲突，继续执行arr[n]=i;
-        }
-    }
+  要求：空间复杂度 O(n)，时间复杂度 O(n)
 
-    //输出皇后摆放位置
-    private void print() {
-        for (int i = 0; i < arr.length; i++) {
-            System.out.print(arr[i]+" ");
-        }
-        System.out.println();
-        System.out.println();
-    }
+  进阶：空间复杂度 O(1)，时间复杂度 O(n)
 
-    //判断是否冲突（同一行，同一列，同一斜线）
-    //n-第n个皇后
-    private boolean judge(int n) {
-        for (int i = 0; i < n; i++) {
-            if (arr[i] == arr[n] || Math.abs(n - i) == Math.abs(arr[n] - arr[i])) {
-                return false;
-            }
-        }
-        return true;
-    }
-}
-```
+  ```java
+  输入：[8,9,2,5,4,7,1]
+  返回值：7
+  说明：
+  在第1天(股票价格=8)买入，第2天(股票价格=9)卖出，获利9-8=1
+  在第3天(股票价格=2)买入，第4天(股票价格=5)卖出，获利5-2=3
+  在第5天(股票价格=4)买入，第6天(股票价格=7)卖出，获利7-4=3
+  总获利1+3+3=7，返回7  
+  ```
+
+- 思路（动态规划，比较难想，贪心算法非常好用）
+
+  - 状态定义：`dp[i][j]`表示到下标i的这一天，持股状态为j时，我们手上拥有的最大现金数。
+
+    **注意**：限定持股状态为j是为了方便推导状态转移方程，这样的做法满足无后效性
+
+    其中：
+
+    - 第一维i表示下标为i的那一天
+    - **第二维j表示下标为i的那一天是持有股票，还是持有现金，0表示持有现金可以买入股票，1表示持有股票可以卖出股票**
+
+  - 状态转移方程：
+
+    ```java
+    dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] + prices[i]);
+    dp[i][1] = Math.max(dp[i - 1][1], dp[i - 1][0] - prices[i]);
+    ```
+
+  - 状态初始值：
+
+    - 如果什么都不做，`dp[0][0] = 0`；
+    - 如果持有股票，当前拥有的现金数是当天股价的相反数，即 `dp[0][1] = -prices[i]`；
+
+  - 返回值：终止的时候，上面也分析了，输出 `dp[len - 1][0]`，因为一定有 `dp[len - 1][0] > dp[len - 1][1]`。
+
+- 代码
+
+  ```java
+  public class Solution {
+  
+      public int maxProfit(int[] prices) {
+          int len = prices.length;
+          if (len < 2) {
+              return 0;
+          }
+  
+          // 0：持有现金
+          // 1：持有股票
+          // 状态转移：0 → 1 → 0 → 1 → 0 → 1 → 0
+          int[][] dp = new int[len][2];
+  
+          dp[0][0] = 0;
+          dp[0][1] = -prices[0];
+  
+          for (int i = 1; i < len; i++) {
+              // 这两行调换顺序也是可以的
+              dp[i][0] = Math.max(dp[i - 1][0], dp[i - 1][1] + prices[i]);
+              dp[i][1] = Math.max(dp[i - 1][1], dp[i - 1][0] - prices[i]);
+          }
+          return dp[len - 1][0];
+      }
+  }
+  ```
+
+- 贪心算法思路
+
+  仔细观察上面的式子，按照贪心算法，在下标为 1、2、3 的这三天，我们做的操作应该是买进昨天的，卖出今天的，虽然这种操作题目并不允许，但是它等价于：在下标为 0 的那一天买入，在下标为 3 的那一天卖出。
+
+  
+
+  - 这道题 「贪心」 的地方在于，对于 「今天的股价 - 昨天的股价」，得到的结果有 3 种可能：① 正数，② 00，③负数。贪心算法的决策是： **只加正数** 。
+
+- 代码
+
+  ```java
+  public class Solution {
+  
+      public int maxProfit(int[] prices) {
+          int len = prices.length;
+          if (len < 2) {
+              return 0;
+          }
+  
+          int res = 0;
+          for (int i = 1; i < len; i++) {
+              //只加正数
+              res += Math.max(prices[i] - prices[i - 1], 0);
+          }
+          return res;
+      }
+  }
+  ```
+
+### 4.19买卖股票的最好时机（三）
+
+- 描述
+
+  给定一个数组，他的i个元素是一支给定的股票在第i天的价格
+
+  设计一个算法来计算你所能获取的最大利润，最多可以完成两笔交易
+
+  注意：你不能同时参与多笔交易（你必须在再次购买前出售之前的股票）
+
+  ```java
+  输入：prices = [3,3,5,0,0,3,1,4]
+  输出：6
+  解释：在第 4 天（股票价格 = 0）的时候买入，在第 6 天（股票价格 = 3）的时候卖出，这笔交易所能获得利润 = 3-0 = 3 。
+       随后，在第 7 天（股票价格 = 1）的时候买入，在第 8 天 （股票价格 = 4）的时候卖出，这笔交易所能获得利润 = 4-1 = 3 。
+  ```
+
+- 思路
+
+  一天结束时，可能有持股、可能未持股、可能卖出过1次、可能卖出过2次、也可能未卖出过
+
+  所以定义状态转移数组dp[天数] [当前是否持股] [卖出的次数]
+
+  具体一天结束时的6种状态：
+
+  1. 未持股，未卖出过股票：说明从未进行过买卖，利润为0
+  2. `dp[i][0][0]=0`
+  3. 未持股，卖出过1次股票：可能是今天卖出，也可能是之前卖的（昨天也未持股且卖出过）
+  4. `dp[i][0][1]=max(dp[i-1][1][0]+prices[i],dp[i-1][0][1])`
+  5. 未持股，卖出过2次股票:可能是今天卖出，也可能是之前卖的（昨天也未持股且卖出过）
+  6. `dp[i][0][2]=max(dp[i-1][1][1]+prices[i],dp[i-1][0][2])`
+  7. 持股，未卖出过股票：可能是今天买的，也可能是之前买的（昨天也持股）
+  8. `dp[i][1][0]=max(dp[i-1][0][0]-prices[i],dp[i-1][1][0])`
+  9. 持股，卖出过1次股票：可能是今天买的，也可能是之前买的（昨天也持股）
+  10. `dp[i][1][1]=max(dp[i-1][0][1]-prices[i],dp[i-1][1][1])`
+  11. 持股，卖出过2次股票：最多交易2次，这种情况不存在
+  12. `dp[i][1][2]=float('-inf')`
+
+- 代码（动态规划（困难）
+
+  ```java
+  public int maxProfitDP(int[] prices) {
+          if (prices == null || prices.length <= 1) return 0;
+          int[][][] dp = new int[prices.length][2][3];
+          int MIN_VALUE = Integer.MIN_VALUE / 2;//因为最小值再减去1就是最大值Integer.MIN_VALUE-1=Integer.MAX_VALUE
+          //初始化
+          dp[0][0][0] = 0;//第一天休息
+          dp[0][0][1] = dp[0][1][1] = MIN_VALUE;//不可能
+          dp[0][0][2] = dp[0][1][2] = MIN_VALUE;//不可能
+          dp[0][1][0] = -prices[0];//买股票
+          for (int i = 1; i < prices.length; i++) {
+              dp[i][0][0] = 0;
+              dp[i][0][1] = Math.max(dp[i - 1][1][0] + prices[i], dp[i - 1][0][1]);
+              dp[i][0][2] = Math.max(dp[i - 1][1][1] + prices[i], dp[i - 1][0][2]);
+              dp[i][1][0] = Math.max(dp[i - 1][0][0] - prices[i], dp[i - 1][1][0]);
+              dp[i][1][1] = Math.max(dp[i - 1][0][1] - prices[i], dp[i - 1][1][1]);
+              dp[i][1][2] = MIN_VALUE;
+          }
+          return Math.max(0, Math.max(dp[prices.length - 1][0][1], dp[prices.length - 1][0][2]));
+      }
+  ```
+
+  
 
 
 
@@ -3808,7 +5378,7 @@ public class HuffmanTree {
 
 ### 8.7 赫夫曼编码
 
-#### a）通信领域中信息的处理方式：
+a）通信领域中信息的处理方式：
 
 - 定长编码：每个字符对应的AscII码对应的8位的二进制
 - 变长编码：各个字符出现的次数进行编码（0= , 1=a, 10=i, 11=e, 100=k, 101=l, 110=o, 111=v, 1000=j, 1001=u, 1010=y, 1011=d），原则是出现次数越多的，则编码越小，但不符合前缀编码
@@ -3818,7 +5388,7 @@ public class HuffmanTree {
   - 赫夫曼编码是按字节来处理的，因此可以处理所有的文件(二进制文件、文本文件)
   - 如果一个文件中的内容，重复的数据不多，压缩效果也不会很明显
 
-#### b）生成赫夫曼编码：
+ b）生成赫夫曼编码：
 
 - 构建赫夫曼树结点类Node(属性Byte data；int weight；Node left；Node right；)
 
@@ -3963,7 +5533,7 @@ private static void getCodes(Node node, String code, StringBuilder stringBuilder
 }
 ```
 
-#### c）使用赫夫曼编码压缩数据：
+ c）使用赫夫曼编码压缩数据：
 
 ```java
 /**
@@ -4028,7 +5598,7 @@ private static byte[] zip(byte[] bytes, Map<Byte, String> huffmanCodes) {
 }
 ```
 
-#### d）使用赫夫曼编码解压数据：
+ d）使用赫夫曼编码解压数据：
 
 ```java
 /**
@@ -4107,7 +5677,7 @@ private static String byteToBitString(boolean flag, byte b) {
 }
 ```
 
-#### e）使用赫夫曼编码压缩文件：
+ e）使用赫夫曼编码压缩文件：
 
 ```java
 /**
@@ -4157,7 +5727,7 @@ public static void zipFile(String srcFile, String dstFile) {
 }
 ```
 
-#### f） 使用赫夫曼编码压缩文件：
+ f） 使用赫夫曼编码压缩文件：
 
 ```java
 /**
@@ -4726,7 +6296,7 @@ public void add(Node node) {
 
 ### 8.10 多路查找树
 
-#### a）二叉树与多叉树
+#### 1 二叉树与多叉树
 
 - 二叉树的问题分析：
   - 二叉树需要加载到内存的，如果二叉树的节点很多，在构建二叉树时，需要多次进行i/o操作(海量数据存在数据库或文件中)，节点海量，构建二叉树时，速度有影响
@@ -4736,7 +6306,7 @@ public void add(Node node) {
   - 多叉树通过重新组织节点，减少树的高度，能对二叉树进行优化
   - ![image-20210802214332593](Datastructureandalgorithm.assets/image-20210802214332593.png)
 
-#### b）2-3树
+#### 2 2-3树
 
 - 2-3树是最简单的B树结构，具有以下特点：
   - 2-3树的所有叶子节点都在同一层(只要是B树都满足这个条件)
@@ -4748,7 +6318,7 @@ public void add(Node node) {
   - 当按照规则插入一个数到某个节点时，不能满足上面2-3树的三个特点，就需要拆，先向上拆，如果上层满，则拆本层，拆后仍然需要满足上面3个特点
   - 对于三节点的子树的值大小仍然遵守(BST 二叉排序树)的规则
 
-#### c）B树
+#### 3 B树
 
 - B-tree树即B树，B即Balanced，平衡的二叉树，2-3树和2-3-4树都是B树
 
@@ -4770,7 +6340,7 @@ public void add(Node node) {
 
   ![image-20210802215328730](Datastructureandalgorithm.assets/image-20210802215328730.png)
 
-#### d）B+树
+#### 4 B+树
 
 - B+树是B树的变体，也是一种多路搜索树，是MySql一些索引的底层原理
 
@@ -4785,7 +6355,7 @@ public void add(Node node) {
 
   ![image-20210802215452159](Datastructureandalgorithm.assets/image-20210802215452159.png)
 
-#### e）B*树
+#### 5 B*树
 
 - B*树是B+树的变体，在B+树的非根和非叶子结点再增加指向兄弟的指针
 
@@ -8090,540 +9660,191 @@ class Solution {
   }
   ```
 
-  ### 11.21 矩阵中的最长递增路径
+### 11.21 矩阵中的最长递增路径
 
-  - 描述
+- 描述
 
-    给定一个 m x n 整数矩阵 matrix ，找出其中 最长递增路径 的长度。对于每个单元格，你可以往上，下，左，右四个方向移动。 你 不能 在 对角线 方向上移动或移动到 边界外（即不允许环绕）。
+  给定一个 m x n 整数矩阵 matrix ，找出其中 最长递增路径 的长度。对于每个单元格，你可以往上，下，左，右四个方向移动。 你 不能 在 对角线 方向上移动或移动到 边界外（即不允许环绕）。
 
-    ![img](Datastructureandalgorithm.assets/grid1.jpg)
-
-    ```java
-    输入：matrix = [[9,9,4],[6,6,8],[2,1,1]]
-    输出：4 
-    解释：最长递增路径为 [1, 2, 6, 9]。
-    ```
-
-    ![img](Datastructureandalgorithm.assets/tmp-grid.jpg)
-
-    ```java
-    输入：matrix = [[3,4,5],[3,2,6],[2,2,1]]
-    输出：4 
-    解释：最长递增路径是 [3, 4, 5, 6]。注意不允许在对角线方向上移动。
-    ```
-
-    
-
-  - 思路（记忆化思路）
-
-    记忆化的思想明确了，回到本题上来看看怎么应用这个思想。首先明确我们记忆化矩阵每一点存的值意味着什么。从深搜的角度入手，我们从i，j这个点出发，返回值为int意味着我们得到从该点出发能够经过的最长递增路径的值。举个一维数组的例子，现在是[1, 2, 3, 4]，我们从3这个点出发，找递增路径，然后求得从3出发的最大递增路径长度为2，现在从2出发，我们会深搜进3，再从3出发，到4，最后回到最开始的层，我们计算出的结果是3。这里就可以利用记忆化去减少时间，当我们从2出发时，到位置3，既然第一遍我们已经算过从3出发的路径长度，那么我们可以直接返回从3出发的路径长度，这样相当于直接是 1 + 从3出发的路径长度 = 3，现在将从2出发的路径长度记录下来存入memo[2]中，我们再从1出发，当1碰到2时，我们看看memo，发现从2出发的长度我们已经计算过了，那么我们不必要再去从2深搜，直接返回memo[2]的值即可。这便是记忆化的应用。
-
-    回到这个题上来，我们是不是也可以类比上面一维数组的例子来进行记忆化呢？
-    我们建立一个memo[][]二维数组，其中`memo[i][j]`意味着，从(i, j)这个点出发最长的递增路径长度。因为`memo[i][j]`最小为1，意味着此时这个点上下左右都没法走，它是上下左右最大的，那么最长也就是1了，这就是为什么代码中我每进入一层首先要给我的`memo[i][j]++`(我初始化将其全部为0了)。现在又有这样一个问题，每当你达到(i, j)这个位置的时候，你都要计算上下左右四个方向，你需要选四个方向中最长的路径长度将其记录进`memo[i][j]`，因此我在每个if里都进行了`max(memo[i][j], dfs(...) + 1)`进行比较，比如我先计算了上方存入memo，再计算左边，发现左边小于上面的memo，因此此时还保留上方的memo的值。当你读到这里时，你应该对记忆化有了一个基本的认知，并且明白这道题该怎么利用记忆化去做了。
-
-  - 代码
-
-    ```java
-    class Solution {
-        int m, n;
-        int[][] matrix, memo;   
-        public int longestIncreasingPath(int[][] _matrix) {
-            /*
-            方法2:记忆化搜索
-            利用dfs将深度优先搜索过程中得到matrix[i][j]的最长路径长度存储到memo[i][j]中
-            然后如果memo[i][j]没有计算才需要dfs,否则说明已经计算过了就不用进一步计算
-            */
-            matrix = _matrix;
-            m = matrix.length;
-            n = matrix[0].length;
-            // 存储matrix的最长递增路经
-            int res = 1;
-            // 记忆载体
-            memo = new int[m][n];        
-            // 遍历每个节点
-            for(int i = 0; i < m; i++) {
-                for(int j = 0; j < n; j++) {
-                    // 若没有搜索过才需要进行搜索
-                    if(memo[i][j] == 0) {
-                        res = Math.max(res, dfs(i, j));   
-                    }
-                    // 这里为什么没有比较memo[i][j]!=0的情况?
-                    // 因为后面matrix[nextI][nextJ]为起点的路径总比matrix[i][j]为起点的短
-                    // 满足matrix[nextI][nextJ]>matrix[i][j]才会进行dfs的
-                }
-            }
-            return res;
-        }
-        /*
-        返回以matrix[i][j]为起点的最长递增路径
-        */
-        private int dfs(int i, int j) {
-            // 若之前搜索过了直接返回之前存储的最大长度
-            if(memo[i][j] != 0) {
-                return memo[i][j];
-            }
-            int[][] dirs = new int[][]{{-1, 0}, {1, 0}, {0, 1}, {0, -1}};
-            // 以matrix[i][j]为起点的最长递增路径
-            int maxLen = 1;
-            for(int[] dir : dirs) {
-                int nextI = i + dir[0];
-                int nextJ = j + dir[1];
-                if(nextI >= 0 && nextI < m && nextJ >= 0 && nextJ < n 
-                && matrix[nextI][nextJ] > matrix[i][j]) {
-                    // 选择4个方向的最大路径的最大值作为maxLen
-                    maxLen = Math.max(maxLen, dfs(nextI, nextJ) + 1);
-                }
-            }
-            // 将以matrix[i][j]为起点的最长递增路径存储在memo[i][j]中
-            // 注意:在递归过程中将matrix[nextI,nextJ]为起点的最长路径都存储在memo了
-            memo[i][j] = maxLen;
-            // 返回该最长路径长度
-            return maxLen;
-        }
-    }
-    ```
-
-    
-
-## 12. JAVA数据类型转化技巧
-
-### 12.1 简单数据类型之间的转换
-
-在Java中整型、实型、字符型被视为简单数据类型，这些类型由低级到高级分别为(byte，short，char)–int–long–float–double
-简单数据类型之间的转换又可以分为：
-●低级到高级的自动类型转换
-●高级到低级的强制类型转换
-●包装类过渡类型能够转换
-低级变量可以直接转换为高级变量，自动类型转换：
-
-```java
-byte b;
-int i=b;
-long l=b;
-float f=b;
-double d=b;
-char c='8';
-int i=c - '0';
-System.out.println("output:" i);
-//输出：output:99;
-```
-对于byte,short,char三种类型而言，他们是平级的，因此不能相互自动转换，可以使用下述的[强制类型转换](https://so.csdn.net/so/search?q=强制类型转换&spm=1001.2101.3001.7020):
-
-```java
-short i=99;
-char c=(char)i;
-System.out.println("output:" c);
-//输出：output:c;
-```
-
-但根据笔者的经验，byte,short,int三种类型都是整型，因此如果操作整型数据时，最好统一使用int型。将高级变量转换为低级变量时，情况会复杂一些，你可以使用强制类型转换。即你必须采用下面这种语句格式：
-
-```java
-int i=99;
-byte b=(byte)i;
-char c=(char)i;
-float f=(float)i;
-```
-
-```java
-//1、float型转换为double型：
-float f1=100.00f;
-Float F1=new Float(f1);
-
-//F1.doubleValue()为Float类的返回double值型的方法
-double d1=F1.doubleValue();
-
-//2、double型转换为int型：
-double d1=100.00;
-Double D1=new Double(d1);
-int i1=D1.intValue();
-
-//3、int型转换为double型：
-int i1=200;
-double d1=i1;
-```
-
-### 12.2 字符串与其它数据类型的转换
-
-#### 1. 其它类型向字符串的转换
-
-①调用类的串转换方法:`X.toString()`;
-       ②自动转换:`X+""`;
-       ③基本类型都可以使用String的方法:`String.volueOf(X)`;
-
-#### 2.字符串作为值,向其它基本类型的转换
-
-①先转换成相应的封装器实例,再调用对应的方法转换成其它类型
-		例如，字符中"32.1"转换double型的值的格式为**:`new Float(“32.1”).doubleValue()`**;
-        也可以用:`Double.valueOf(“32.1”).doubleValue()`;
-       ②静态parseXXX方法
-
-```java
-String s = "1";
-byte b = Byte.parseByte( s );
-short t = Short.parseShort( s );
-int i = Integer.parseInt( s );
-long l = Long.parseLong( s );
-Float f = Float.parseFloat( s );
-Double d = Double.parseDouble( s );
-```
-#### 3. 字符串转化为char[]数组
-
-```java
-String str = 'nx1111';
-char[] chArray = str.toCharArray();
-```
-
-### 12.3 字符数组char[]转String
-
-`String.valueOf(char[] charArray)`
-
-`new String(char[] charArray)`
-
-```java
-char[] str = {'h','e', 'l', 'l', 'o', '  ', '1','2','3'};  //创建一个字符数组
-	String string1 = new String(str);
-	String string2 = String.valueOf(str);
-	System.out.println(string1);  //hello 123
-	System.out.println(string2);
-	System.out.println(string1 == string2);  //false
-	System.out.println(string1.equals(string2));  //true
-/*两者的结果不一样，因为在string1 == string2中，比较的是地址，由于string1 和 string2是两个不同的对象，string1是通过new方法创建的，string2是由valueOf()方法返回的对象，所以二者的地址不一样，等式的结果就是false。
-而String的equals()方法比较的是值
-*/
-
-```
-
-
-
-### 12.4 日期格式设置
-
-```java
-Date date = new Date();
-SimpleDateFormat sy1=new SimpleDateFormat("yyyy-MM-dd");
-String dateFormat=sy1.format(date);
-```
-
-### 12.5 `List<String>`集合转数组`String[]`
-
-调用数组对象的toArray方法，参数传入String数组类型，内部做类型转换
-`strList.toArray(new String[strList.size()])`
-
-```java
-List<String> strList= new ArrayList<>();
-    strList.add("牛八少爷");
-    strList.add("欧阳无敌");
-    strList.add("西门吹雪");
-    String [] strArray = strList.toArray(new String[strList.size()]);
-    for (String string : strArray) {
-        System.out.println(string);
-    }
-```
-
-### 12.6 `String[]`数组转集合`List<String>`
-
-#### 1 数组工具类的asList()
-
-但是这种方法却有其局限性，如果传入的参数是一个数组，那么这个数组一定要是引用类型才能将其转换为List集合，当传入基本数据类型数组时则会将这个数组对象当成一个引用类型对象存进List集合。
-
-![1401949-20190805132932520-555863570](Datastructureandalgorithm.assets/1401949-20190805132932520-555863570.png)
-
-![1660253-20190417223551607-1371188487](Datastructureandalgorithm.assets/1660253-20190417223551607-1371188487.png)
-
-可以看到传入基本数据类型时，打印该列表是打印了传入的数组的地址值。你也可以直接将其传入asList()方法的参数中,就像这样
-
-```java
-//String不是基本数据类型，输出结果是1
-String[] strArray = {"1", "2" ,"3"};
-List list = Arrays.asList(strArray);
-System.out.println(list.get(0));
-```
-
-ArrayList可以存放不同类型的数据
-
-![1660253-20190417224546736-1897541673](Datastructureandalgorithm.assets/1660253-20190417224546736-1897541673.png)
-
-这种方法显然不太好用，那怎么将一组基本数据类型的数组转换成集合呢，我们首先想到的是将该基本类型数组转换成其对应包装类类型的数组(遍历转换也可以)原文链接](https://zhidao.baidu.com/question/628312636366178684.html))。
-
-![1660253-20190417230403671-1142295552](Datastructureandalgorithm.assets/1660253-20190417230403671-1142295552.png)
-
-#### 2 使用Spring框架
-
-```java
-int[]  a = {1,2,3};
-List list = CollectionUtils.arrayToList(a);
-System.out.println(list);
-```
-
-#### 3 JDK8新特性
-
-![img](Datastructureandalgorithm.assets/1660253-20190417230431839-1358725408.png)
-
-#### 4  Collections工具类
-
-```java
-//创建数组与集合
-String[] string=new String[5];
-ArrayList<String> list = new ArrayList<String>();
-//把数组转成集合，也就是把数组里面的数据存进集合；
-Collections.addAll(list, string);
-```
-
-
-
-### 12.7 字符集合`List<Character> path`转字符串`String str`
-
-```java
-//字符集合转为字符串对象
-StringBuilder str = new StringBuilder();
-for (Character character : path) {// 对ArrayList进行遍历，将字符放入StringBuilder中
-	str.append(character);
-	}
-```
-
-### 12.8 二维字符数组`char[][] charArray`转`List<String> list`
-
-```java
-public List Array2List(char[][] chessboard) {
-        List<String> list = new ArrayList<>();
-
-        for (char[] c : chessboard) {
-            list.add(String.copyValueOf(c));
-        }
-        return list;
-    }
-```
-
-### 12.9 字符串截取函数substring()方法
-
-- 语法
+  ![img](Datastructureandalgorithm.assets/grid1.jpg)
 
   ```java
-  public String substring(int beginIndex)
-  或
-  public String substring(int beginIndex, int endIndex)
+  输入：matrix = [[9,9,4],[6,6,8],[2,1,1]]
+  输出：4 
+  解释：最长递增路径为 [1, 2, 6, 9]。
   ```
 
-- 参数
+  ![img](Datastructureandalgorithm.assets/tmp-grid.jpg)
 
-  - **beginIndex** -- 起始索引（包括）, 索引从 0 开始。
-  - **endIndex** -- 结束索引（不包括）。
+  ```java
+  输入：matrix = [[3,4,5],[3,2,6],[2,2,1]]
+  输出：4 
+  解释：最长递增路径是 [3, 4, 5, 6]。注意不允许在对角线方向上移动。
+  ```
 
-  ![img](Datastructureandalgorithm.assets/java-substring-20201208.png)
+  
 
-## 13. 笔试输入输出框架
+- 思路（记忆化思路）
 
-### 13.1 多行输入元素
+  记忆化的思想明确了，回到本题上来看看怎么应用这个思想。首先明确我们记忆化矩阵每一点存的值意味着什么。从深搜的角度入手，我们从i，j这个点出发，返回值为int意味着我们得到从该点出发能够经过的最长递增路径的值。举个一维数组的例子，现在是[1, 2, 3, 4]，我们从3这个点出发，找递增路径，然后求得从3出发的最大递增路径长度为2，现在从2出发，我们会深搜进3，再从3出发，到4，最后回到最开始的层，我们计算出的结果是3。这里就可以利用记忆化去减少时间，当我们从2出发时，到位置3，既然第一遍我们已经算过从3出发的路径长度，那么我们可以直接返回从3出发的路径长度，这样相当于直接是 1 + 从3出发的路径长度 = 3，现在将从2出发的路径长度记录下来存入memo[2]中，我们再从1出发，当1碰到2时，我们看看memo，发现从2出发的长度我们已经计算过了，那么我们不必要再去从2深搜，直接返回memo[2]的值即可。这便是记忆化的应用。
 
-以三行输入为例，第一行输入两个数字m，n，分别表示数组num1和num2的长度，第二行和第三行输入num1和num2的元素，以空格分隔。
+  回到这个题上来，我们是不是也可以类比上面一维数组的例子来进行记忆化呢？
+  我们建立一个memo[][]二维数组，其中`memo[i][j]`意味着，从(i, j)这个点出发最长的递增路径长度。因为`memo[i][j]`最小为1，意味着此时这个点上下左右都没法走，它是上下左右最大的，那么最长也就是1了，这就是为什么代码中我每进入一层首先要给我的`memo[i][j]++`(我初始化将其全部为0了)。现在又有这样一个问题，每当你达到(i, j)这个位置的时候，你都要计算上下左右四个方向，你需要选四个方向中最长的路径长度将其记录进`memo[i][j]`，因此我在每个if里都进行了`max(memo[i][j], dfs(...) + 1)`进行比较，比如我先计算了上方存入memo，再计算左边，发现左边小于上面的memo，因此此时还保留上方的memo的值。当你读到这里时，你应该对记忆化有了一个基本的认知，并且明白这道题该怎么利用记忆化去做了。
 
-```java
-// 输入如下
-3 4
-10 2 3 
-11 4 5 6
-```
+- 代码
 
-```java
-import java.util.Arrays;
-import java.util.Scanner;
+  ```java
+  class Solution {
+      int m, n;
+      int[][] matrix, memo;   
+      public int longestIncreasingPath(int[][] _matrix) {
+          /*
+          方法2:记忆化搜索
+          利用dfs将深度优先搜索过程中得到matrix[i][j]的最长路径长度存储到memo[i][j]中
+          然后如果memo[i][j]没有计算才需要dfs,否则说明已经计算过了就不用进一步计算
+          */
+          matrix = _matrix;
+          m = matrix.length;
+          n = matrix[0].length;
+          // 存储matrix的最长递增路经
+          int res = 1;
+          // 记忆载体
+          memo = new int[m][n];        
+          // 遍历每个节点
+          for(int i = 0; i < m; i++) {
+              for(int j = 0; j < n; j++) {
+                  // 若没有搜索过才需要进行搜索
+                  if(memo[i][j] == 0) {
+                      res = Math.max(res, dfs(i, j));   
+                  }
+                  // 这里为什么没有比较memo[i][j]!=0的情况?
+                  // 因为后面matrix[nextI][nextJ]为起点的路径总比matrix[i][j]为起点的短
+                  // 满足matrix[nextI][nextJ]>matrix[i][j]才会进行dfs的
+              }
+          }
+          return res;
+      }
+      /*
+      返回以matrix[i][j]为起点的最长递增路径
+      */
+      private int dfs(int i, int j) {
+          // 若之前搜索过了直接返回之前存储的最大长度
+          if(memo[i][j] != 0) {
+              return memo[i][j];
+          }
+          int[][] dirs = new int[][]{{-1, 0}, {1, 0}, {0, 1}, {0, -1}};
+          // 以matrix[i][j]为起点的最长递增路径
+          int maxLen = 1;
+          for(int[] dir : dirs) {
+              int nextI = i + dir[0];
+              int nextJ = j + dir[1];
+              if(nextI >= 0 && nextI < m && nextJ >= 0 && nextJ < n 
+              && matrix[nextI][nextJ] > matrix[i][j]) {
+                  // 选择4个方向的最大路径的最大值作为maxLen
+                  maxLen = Math.max(maxLen, dfs(nextI, nextJ) + 1);
+              }
+          }
+          // 将以matrix[i][j]为起点的最长递增路径存储在memo[i][j]中
+          // 注意:在递归过程中将matrix[nextI,nextJ]为起点的最长路径都存储在memo了
+          memo[i][j] = maxLen;
+          // 返回该最长路径长度
+          return maxLen;
+      }
+  }
+  ```
 
-public class myScanner {
-    public static void main(String[] args) {
-        System.out.println("输入：");
-        Scanner sc = new Scanner(System.in);
-        int m = sc.nextInt();
-        int n = sc.nextInt();
-        int[] num1 = new int[m];
-        int[] num2 = new int[n];
-        // 换成其他数据类型也一样，其他数值类型就修改int跟nextInt就可以了，
-        //String就把nextInt()换成next(),nextInt空格分隔读取
-        for(int i = 0; i < m; i ++) {
-            num1[i] = sc.nextInt();  // 一个一个读取
-        }
-        for(int i = 0; i < n; i ++) {
-            num2[i] = sc.nextInt();
-        }
-        System.out.println("输出：");
-        System.out.println(Arrays.toString(num1));
-        System.out.println(Arrays.toString(num2));
-    }
-}
-```
+### 11.21 矩阵中的最长递增路径
 
-### 13.2 单行输入多个参数
+- 描述
 
-以空格（也可用其他的符号）为分割
+  给定一个 m x n 整数矩阵 matrix ，找出其中 最长递增路径 的长度。对于每个单元格，你可以往上，下，左，右四个方向移动。 你 不能 在 对角线 方向上移动或移动到 边界外（即不允许环绕）。
 
-```java
-// 输入如下
-ABB CCC DDD  EEE 123 435
-```
+  ![img](Datastructureandalgorithm.assets/grid1.jpg)
 
-```java
-import java.util.Arrays;
-import java.util.Scanner;
+  ```java
+  输入：matrix = [[9,9,4],[6,6,8],[2,1,1]]
+  输出：4 
+  解释：最长递增路径为 [1, 2, 6, 9]。
+  ```
 
-public class myScanner {
-	Scanner sc = new Scanner(System.in);
-	public static void main(String[] args) {
-		System.out.println("输入：");
-		Scanner sc = new Scanner(System.in);
-		String str = sc.nextLine();  // 读取一行
-		System.out.println("输出：");
-		System.out.println(str);
-		String[] strIn = str.trim().split(" ");  // 以空格分割
-		System.out.println(Arrays.toString(strIn));
-	}
-}
-```
+  ![img](Datastructureandalgorithm.assets/tmp-grid.jpg)
 
-### 13.3 多行输入多个参数，每行参数个数不定
+  ```java
+  输入：matrix = [[3,4,5],[3,2,6],[2,2,1]]
+  输出：4 
+  解释：最长递增路径是 [3, 4, 5, 6]。注意不允许在对角线方向上移动。
+  ```
 
-假设第一行输入m，n，m表示后面有m行，n表示每行最多有n个(可用来截断某一行多输入的参数，不详细分析了)
+  
 
-```java
-// 输入如下
-3 4
-AA bcd 123 54
-AA BB
-A B C
+- 思路（记忆化思路）
 
-```
+  记忆化的思想明确了，回到本题上来看看怎么应用这个思想。首先明确我们记忆化矩阵每一点存的值意味着什么。从深搜的角度入手，我们从i，j这个点出发，返回值为int意味着我们得到从该点出发能够经过的最长递增路径的值。举个一维数组的例子，现在是[1, 2, 3, 4]，我们从3这个点出发，找递增路径，然后求得从3出发的最大递增路径长度为2，现在从2出发，我们会深搜进3，再从3出发，到4，最后回到最开始的层，我们计算出的结果是3。这里就可以利用记忆化去减少时间，当我们从2出发时，到位置3，既然第一遍我们已经算过从3出发的路径长度，那么我们可以直接返回从3出发的路径长度，这样相当于直接是 1 + 从3出发的路径长度 = 3，现在将从2出发的路径长度记录下来存入memo[2]中，我们再从1出发，当1碰到2时，我们看看memo，发现从2出发的长度我们已经计算过了，那么我们不必要再去从2深搜，直接返回memo[2]的值即可。这便是记忆化的应用。
 
-```java
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
+  回到这个题上来，我们是不是也可以类比上面一维数组的例子来进行记忆化呢？
+  我们建立一个memo[][]二维数组，其中`memo[i][j]`意味着，从(i, j)这个点出发最长的递增路径长度。因为`memo[i][j]`最小为1，意味着此时这个点上下左右都没法走，它是上下左右最大的，那么最长也就是1了，这就是为什么代码中我每进入一层首先要给我的`memo[i][j]++`(我初始化将其全部为0了)。现在又有这样一个问题，每当你达到(i, j)这个位置的时候，你都要计算上下左右四个方向，你需要选四个方向中最长的路径长度将其记录进`memo[i][j]`，因此我在每个if里都进行了`max(memo[i][j], dfs(...) + 1)`进行比较，比如我先计算了上方存入memo，再计算左边，发现左边小于上面的memo，因此此时还保留上方的memo的值。当你读到这里时，你应该对记忆化有了一个基本的认知，并且明白这道题该怎么利用记忆化去做了。
 
-public class myScanner {
-	Scanner sc = new Scanner(System.in);
-	public static void main(String[] args) {
-		System.out.println("输入：");
-		Scanner sc = new Scanner(System.in);
-		int m = sc.nextInt();
-		sc.nextLine();  // 很重要，跳到第二行
-		// 若直接确定行数，注释掉上面两行，加入下面一行
-		// int m = 3;
-		String[] strArr = new String[m];
-		// 从第二行开始读取
-		for(int i = 0; i < m; i++) {
-			strArr[i] = sc.nextLine();
-		}
-		System.out.println("输出：");
-		System.out.println(Arrays.toString(strArr));
-		ArrayList<String[]> strToOne = new ArrayList<String[]>();
-		for(int i = 0; i < m; i ++) {
-			String[] tmp = strArr[i].trim().split(" ");
-			strToOne.add(tmp);
-		}
-		System.out.println(strToOne);
-		// 形象点显示
-		System.out.print("[");
-		for(int i = 0; i < strToOne.size(); i++) {
-			System.out.print(Arrays.toString(strToOne.get(i)));
-			if(i != strToOne.size()-1)
-				System.out.print(", ");
-		}
-		System.out.print("]");
-	}
-}
+- 代码
 
-```
+  ```java
+  class Solution {
+      int m, n;
+      int[][] matrix, memo;   
+      public int longestIncreasingPath(int[][] _matrix) {
+          /*
+          方法2:记忆化搜索
+          利用dfs将深度优先搜索过程中得到matrix[i][j]的最长路径长度存储到memo[i][j]中
+          然后如果memo[i][j]没有计算才需要dfs,否则说明已经计算过了就不用进一步计算
+          */
+          matrix = _matrix;
+          m = matrix.length;
+          n = matrix[0].length;
+          // 存储matrix的最长递增路经
+          int res = 1;
+          // 记忆载体
+          memo = new int[m][n];        
+          // 遍历每个节点
+          for(int i = 0; i < m; i++) {
+              for(int j = 0; j < n; j++) {
+                  // 若没有搜索过才需要进行搜索
+                  if(memo[i][j] == 0) {
+                      res = Math.max(res, dfs(i, j));   
+                  }
+                  // 这里为什么没有比较memo[i][j]!=0的情况?
+                  // 因为后面matrix[nextI][nextJ]为起点的路径总比matrix[i][j]为起点的短
+                  // 满足matrix[nextI][nextJ]>matrix[i][j]才会进行dfs的
+              }
+          }
+          return res;
+      }
+      /*
+      返回以matrix[i][j]为起点的最长递增路径
+      */
+      private int dfs(int i, int j) {
+          // 若之前搜索过了直接返回之前存储的最大长度
+          if(memo[i][j] != 0) {
+              return memo[i][j];
+          }
+          int[][] dirs = new int[][]{{-1, 0}, {1, 0}, {0, 1}, {0, -1}};
+          // 以matrix[i][j]为起点的最长递增路径
+          int maxLen = 1;
+          for(int[] dir : dirs) {
+              int nextI = i + dir[0];
+              int nextJ = j + dir[1];
+              if(nextI >= 0 && nextI < m && nextJ >= 0 && nextJ < n 
+              && matrix[nextI][nextJ] > matrix[i][j]) {
+                  // 选择4个方向的最大路径的最大值作为maxLen
+                  maxLen = Math.max(maxLen, dfs(nextI, nextJ) + 1);
+              }
+          }
+          // 将以matrix[i][j]为起点的最长递增路径存储在memo[i][j]中
+          // 注意:在递归过程中将matrix[nextI,nextJ]为起点的最长路径都存储在memo了
+          memo[i][j] = maxLen;
+          // 返回该最长路径长度
+          return maxLen;
+      }
+  }
+  ```
 
-### 13.4 输入矩阵
-
-```java
-3 4 
-请输入数组元素
-1 2 3 4
-5 6 7 8
-9 10 11 12
-```
-
-```java
-public class Main {
-
-    public static void main(String arg[]) {
-        Scanner s = new Scanner(System.in);
-        System.out.println("请输入数组行数和列数");
-        int x = s.nextInt();//行数
-        int y = s.nextInt();//列数
-        int[][] awarry = new int[x][y];
-        System.out.println("请输入数组元素");
-
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
-                awarry[i][j] = s.nextInt();
-            }
-        }
-        System.out.println("你输入的数组为");
-
-        for (int i = 0; i < x; i++) {
-            for (int j = 0; j < y; j++) {
-                System.out.print(awarry[i][j] + "\t");
-            }
-            System.out.println();
-        }
-    }
-
-}
-```
-
-### 13.5 两行输入
-
-**遇到的问题：**在调用了nextInt()后，我们可以先调用一次nextLine(),将该行剩下的内容抛弃；
-
-```java
-int option = input.nextInt();
-input.nextLine();  // Consume newline left-over
-String str1 = input.nextLine();
-```
-
-全部都使用nextLine()读入，然后将其读入的数据转换为Integer。
-
-```java
-int option = 0;
-try {
-    option = Integer.parseInt(input.nextLine());
-} catch (NumberFormatException e) {
-    e.printStackTrace();
-}
-String str1 = input.nextLine();
-```
-
-```java
- public static void main(String arg[]) {
-        System.out.println("输出：");
-        Scanner sc = new Scanner(System.in);
-        int m = Integer.parseInt(sc.nextLine().trim());
-        String s = sc.nextLine();
-        String[] s1 = s.trim().split(" ");
-        int[] num1 = new int[s1.length];
-
-        for(int i = 0; i < s1.length; i ++) {
-            num1[i] = Integer.parseInt(s1[i]);
-        }
-        System.out.println("输出：");
-        System.out.println(Arrays.toString(num1));
-    }
-```
-
-```java
-public static void main(String arg[]) {
-        System.out.println("输出：");
-        Scanner sc = new Scanner(System.in);
-        int m = sc.nextInt();
-        sc.nextLine();//丢弃读取Int的这一行
-        String s = sc.nextLine();
-        String[] s1 = s.trim().split(" ");
-        int[] num1 = new int[s1.length];
-
-        for(int i = 0; i < s1.length; i ++) {
-            num1[i] = Integer.parseInt(s1[i]);
-        }
-        System.out.println("输出：");
-        System.out.println(Arrays.toString(num1));
-    }
-```
+  
 
