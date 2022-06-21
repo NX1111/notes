@@ -9,7 +9,300 @@
   <meta name="description" content="Description">
   <meta name="viewport"
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/katex@latest/dist/katex.min.css"/>
+    <link rel="stylesheet" href="https://cyc-1256109796.cos.ap-guangzhou.myqcloud.com/vue.css">
+
+    <style type="text/css">
+    	
+      /* 隐藏头部的目录 */
+      #main>ul:nth-child(1) {
+          display: none;
+      }
+  
+      #main>ul:nth-child(2) {
+          display: none;
+      }
+  
+      h1+ul {
+          display: block !important;
+      }
+  
+      .markdown-section h1 {
+          margin: 3rem 0 2rem 0;
+      }
+  
+      .markdown-section h2 {
+          margin: 2rem 0 1rem;
+      }
+  
+      img,
+      pre {
+          border-radius: 5px;
+      }
+  
+      .markdown-section p.tip,
+      .markdown-section tr:nth-child(1n) {
+        background-color: #f8f8f8 !important;
+    }
+  
+      .content,
+      .sidebar,
+      .markdown-section,
+      body,
+      .search input {
+          background-color: rgba(243, 242, 238, 1) !important;
+      }
+  
+      @media (min-width:600px) {
+          .sidebar-toggle {
+              background-color: #f3f2ee;
+          }
+      }
+  
+      .docsify-copy-code-button {
+          background: #f8f8f8 !important;
+          color: #7a7a7a !important;
+      }
+  
+      body {
+          /*font-family: Microsoft YaHei, Source Sans Pro, Helvetica Neue, Arial, sans-serif !important;*/
+      }
+  
+      .markdown-section pre>code {
+        font-size: 13px;
+    }
+  
+    code,
+    pre {
+        background-color: #fff !important;
+    }
+  
+      .markdown-section>p {
+          font-size: 16px !important;
+      }
+  
+      .markdown-section pre>code {
+          font-family: Consolas, Roboto Mono, Monaco, courier, monospace !important;
+      }
+  
+      p, h1, h2, h3, h4, ol, ul {
+        letter-spacing: 2px !important;
+    }
+  
+    p, ol, ul {
+        line-height: 30px !important;
+    }
+  
+      @media (min-width:600px) {
+          .markdown-section pre>code {
+              font-size: .9rem !important;
+              letter-spacing: 1.1px !important;
+          }
+      }
+  
+      @media (max-width:600px) {
+          .markdown-section pre>code {
+              padding-top: 5px;
+              padding-bottom: 5px;
+              padding-left: 15px !important;
+          }
+  
+          pre:after {
+              content: "" !important;
+          }
+      }
+  
+  
+      /*.anchor span {
+      color: rgb(66, 185, 131);
+      }*/
+  
+      section.cover h1 {
+          margin: 0;
+      }
+  
+      body>section>div.cover-main>ul>li>a {
+          color: #42b983;
+      }
+  
+      .markdown-section > div > img,
+      .markdown-section pre {
+          box-shadow: 0px 0px 20px 11px #eaeaea;
+      }
+  
+      pre {
+          background-color: #f3f2ee !important;
+      }
+  
+      @media (min-width:600px) {
+          pre code {
+              /*box-shadow: 2px 1px 20px 2px #aaa;*/
+              /*border-radius: 10px !important;*/
+              padding-left: 20px !important;
+          }
+      }
+  
+      @media (max-width:600px) {
+          pre {
+            padding-left: 3px !important;
+          padding-right: 3px !important;
+          margin-left: -20px !important;
+          margin-right: -20px !important;
+          box-shadow: 0px 0px 20px 0px #eee !important;
+          }
+  
+  
+          .docsify-copy-code-button {
+              display: none;
+          }
+      }
+  
+      .markdown-section pre {
+          padding-left: 0 !important;
+          padding-right: 0px !important;
+      }
+      </style>
+      <style type="text/css">
+      /**
+   * prism.js Coy theme for JavaScript, CoffeeScript, CSS and HTML
+   * Based on https://github.com/tshedor/workshop-wp-theme (Example: http://workshop.kansan.com/category/sessions/basics or http://workshop.timshedor.com/category/sessions/basics);
+   * @author Tim  Shedor
+   */
+  
+   code[class*="language-"],
+pre[class*="language-"] {
+	color: black;
+	background: none;
+	text-shadow: 0 1px white;
+	font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+	text-align: left;
+	white-space: pre;
+	word-spacing: normal;
+	word-break: normal;
+	word-wrap: normal;
+	line-height: 1.5;
+
+	-moz-tab-size: 4;
+	-o-tab-size: 4;
+	tab-size: 4;
+
+	-webkit-hyphens: none;
+	-moz-hyphens: none;
+	-ms-hyphens: none;
+	hyphens: none;
+}
+
+pre[class*="language-"]::-moz-selection, pre[class*="language-"] ::-moz-selection,
+code[class*="language-"]::-moz-selection, code[class*="language-"] ::-moz-selection {
+	text-shadow: none;
+	background: #b3d4fc;
+}
+
+pre[class*="language-"]::selection, pre[class*="language-"] ::selection,
+code[class*="language-"]::selection, code[class*="language-"] ::selection {
+	text-shadow: none;
+	background: #b3d4fc;
+}
+
+@media print {
+	code[class*="language-"],
+	pre[class*="language-"] {
+		text-shadow: none;
+	}
+}
+
+/* Code blocks */
+pre[class*="language-"] {
+	padding: 1em;
+	margin: .5em 0;
+	overflow: auto;
+}
+
+:not(pre) > code[class*="language-"],
+pre[class*="language-"] {
+	background: #f5f2f0;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+	padding: .1em;
+	border-radius: .3em;
+	white-space: normal;
+}
+
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+	color: slategray;
+}
+
+.token.punctuation {
+	color: #999;
+}
+
+.namespace {
+	opacity: .7;
+}
+
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+	color: #905;
+}
+
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+	color: #690;
+}
+
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+	color: #9a6e3a;
+	background: hsla(0, 0%, 100%, .5);
+}
+
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+	color: #07a;
+}
+
+.token.function,
+.token.class-name {
+	color: #DD4A68;
+}
+
+.token.regex,
+.token.important,
+.token.variable {
+	color: #e90;
+}
+
+.token.important,
+.token.bold {
+	font-weight: bold;
+}
+.token.italic {
+	font-style: italic;
+}
+
+.token.entity {
+	cursor: help;
+}
+
+      </style>
+
 </head>
 
 <body>
@@ -30,19 +323,18 @@
       search: {
         //maxAge: 86400000, // 过期时间，单位毫秒，默认一天
         paths: 'auto',
-        placeholder: '搜索',
+        placeholder: '🔍 Type to search ',
         noData: '找不到结果',
         // 搜索标题的最大程级, 1 - 6
-        depth: 3,
+        depth: 6,
       },
       plugins: [
         EditOnGithubPlugin.create('https://github.com/NX1111/notes/blob/master/')
       ],
     }
   </script>
-    <!-- CDN files for docsify-katex -->
-  <script src="//cdn.jsdelivr.net/npm/docsify-katex@latest/dist/docsify-katex.js"></script>
-  <script src="//unpkg.com/docsify/lib/docsify.min.js"></script>
+    
+  <script src="https://cyc-1256109796.cos.ap-guangzhou.myqcloud.com/docsify.min.js"></script>
   <!--Java代码高亮-->
   <script src="//unpkg.com/prismjs/components/prism-java.js"></script>
   <!--全文搜索,直接用官方提供的无法生效-->
