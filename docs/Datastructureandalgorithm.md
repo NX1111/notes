@@ -119,7 +119,7 @@ SimpleDateFormat sy1=new SimpleDateFormat("yyyy-MM-dd");
 String dateFormat=sy1.format(date);
 ```
 
-### 5 `List<String>`集合转数组`String[]`
+### 5 List< String >集合转数组String[ ]
 
 调用数组对象的toArray方法，参数传入String数组类型，内部做类型转换
 `strList.toArray(new String[strList.size()])`
@@ -135,7 +135,7 @@ List<String> strList= new ArrayList<>();
     }
 ```
 
-### 6 `String[]`数组转集合`List<String>`
+### 6  String[ ]数组转集合List < String >
 
 #### 1 数组工具类的asList()
 
@@ -186,7 +186,7 @@ Collections.addAll(list, string);
 
 
 
-### 7 字符集合`List<Character> path`转字符串`String str`
+### 7 字符集合List< Character > path转字符串String str
 
 ```java
 //字符集合转为字符串对象
@@ -196,7 +196,7 @@ for (Character character : path) {// 对ArrayList进行遍历，将字符放入S
 	}
 ```
 
-### 8 二维字符数组`char[][] charArray`转`List<String> list`
+### 8 二维字符数组char[][] charArray转List< String >
 
 ```java
 public List Array2List(char[][] chessboard) {
@@ -8409,7 +8409,7 @@ class Solution {
 }
 ```
 
-### [11.7 全排列 II](https://leetcode-cn.com/problems/permutations-ii/)(剪枝思想)
+### [11.7 全排列 II(剪枝思想)](https://leetcode-cn.com/problems/permutations-ii/)
 
 给定一个可包含重复数字的序列，返回所有不重复的全排列。
 输入: [1,2,2]
@@ -8492,7 +8492,7 @@ class Solution {
 }
 ```
 
-### [11.8 字符串的全排列](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)(剪枝思想)
+### [11.8 字符串的全排列(剪枝思想)](https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/)
 
 输入一个字符串，打印出该字符串中字符的所有排列。你可以以任意顺序返回这个字符串数组，但里面不能有重复元素。
 示例:
@@ -8588,7 +8588,7 @@ class Solution {
 }
 ```
 
-### 11.10 [解数独](https://leetcode.cn/problems/sudoku-solver/solution/hui-su-fa-jie-shu-du-by-i_use_python/)
+### [11.10 解数独](https://leetcode.cn/problems/sudoku-solver/solution/hui-su-fa-jie-shu-du-by-i_use_python/)
 
 ![img](Datastructureandalgorithm.assets/250px-sudoku-by-l2g-20050714svg.png)
 
@@ -8672,7 +8672,7 @@ class Solution {
 
 ```
 
-### 11.11 [单词搜索](https://leetcode.cn/problems/word-search/comments/)
+###  [11.11 单词搜索](https://leetcode.cn/problems/word-search/comments/)
 
 给定一个 m x n 二维字符网格 board 和一个字符串单词 word 。如果 word 存在于网格中，返回 true ；否则，返回 false 。单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。
 
