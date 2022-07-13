@@ -11971,5 +11971,1027 @@ class Solution {
   
   ```
 
+
+## 13.字符串
+
+### 13.1 字符串变形
+
+- 描述
+
+  对于一个长度为n的字符串，我们需要对它做一些变形。首先这个字符串中包含着一些空格，就像“Hello world”一样，然后我们要做的就是把这个字符串中由空格隔开的单词反序，同时反转每个字符的大小写。
+
+  比如“Hello World”变形后就变成了“wORLD hELLO”
+
+  数据范围：1≤n≤10^6^,字符串中包含大写英文字母、小写英文字母、空格
+
+  空间复杂度O(n),时间复杂度O(n)
+
+- 思路
+
+  使用split进行字符串切分的时候需要注意
+
+  - 空格分隔成字符串
+  - 对字符串数组反转大小写
+  - StringBuilder对字符串数组反向拼接，并且加上空格，最后stringBuilder.toString()，返回字符串结果
+
+- 代码
+
+  ```java
+  import java.util.*;
+  
+  public class Solution {
+      
+      // 反转字符串大小写
+      public String reverse(String str){
+          StringBuilder stringBuilder = new StringBuilder();
+          for(int i = 0; i < str.length(); i++){
+              if(Character.isUpperCase(str.charAt(i))){
+                  stringBuilder.append(Character.toLowerCase(str.charAt(i)));
+              }else{
+                  stringBuilder.append(Character.toUpperCase(str.charAt(i)));
+              }
+          }
+          return stringBuilder.toString();
+      }
+      
+      public String trans(String s, int n) {
+          // write code here
+          String[] tmp = s.split(" ", -1);// 这里，limit设置为-1，模式可以应用无数次
+          StringBuilder stringBuilder = new StringBuilder();
+          for(int i = tmp.length - 1; i >= 0; i--){
+              stringBuilder.append(reverse(tmp[i]));
+              if(i != 0){
+                  stringBuilder.append(" ");
+              }
+          }
+          return stringBuilder.toString();
+      }
+  }
+  ```
+
+### 13.2 最长公共前缀
+
+- 描述
+
+  给你一个大小为 n 的字符串数组 strs ，其中包含n个字符串 , 编写一个函数来查找字符串数组中的最长公共前缀，返回这个公共前缀。
+
+  数据范围： 0≤*n*≤5000，0≤len(strs~i~)≤5000
+
+  进阶：空间复杂度 O(n)，时间复杂度 O(n)
+
+  ```java
+  输入：["abca","abc","abca","abc","abcc"]
+  返回值："abc"
+  ```
+
+- 思路
+
+  - 将字符串数组看作一个二维空间，每一次从第一列开始。
+
+  - 确定所有字符子串中第一列字符。
+
+  - 逐层扫描后面每一列，遇到不同字符停止扫描。
+
+  - 图解：
+
+    ![图片说明](Datastructureandalgorithm.assets/3E866D7DC0F594B37D675D8164116AB5.png)
+
+  
+
+- 代码
+
+  ```java
+  import java.util.*;
+  
+  
+  public class Solution {
+      /**
+       * 
+       * @param strs string字符串一维数组 
+       * @return string字符串
+       */
+      public String longestCommonPrefix (String[] strs) {
+          // //纵向扫描
+          if(strs.length==0 || strs==null){
+              return "";
+          }
+  
+          int rows = strs.length;
+          int cols = strs[0].length();
+          //开始扫描
+          for(int i=0;i<cols;i++){
+              char firstChar = strs[0].charAt(i);
+              for(int j=1;j<rows;j++){
+                  if(strs[j].length()==i || strs[j].charAt(i)!=firstChar){
+                      return strs[0].substring(0,i);
+                  }
+              }
+          }
+          return strs[0];
+      }
+  }
+  ```
+
+### 13.3 验证IP地址
+
+- 描述
+
+  编写一个函数来验证输入的字符串是否是有效的 IPv4 或 IPv6 地址
+
+  IPv4 地址由十进制数和点来表示，每个地址包含4个十进制数，其范围为 0 - 255， 用(".")分割。比如，172.16.254.1；
+  同时，IPv4 地址内的数不会以 0 开头。比如，地址 172.16.254.01 是不合法的。
+
+  IPv6 地址由8组16进制的数字来表示，每组表示 16 比特。这些组数字通过 (":")分割。比如, 2001:0db8:85a3:0000:0000:8a2e:0370:7334 是一个有效的地址。而且，我们可以加入一些以 0 开头的数字，字母可以使用大写，也可以是小写。所以， 2001:db8:85a3:0:0:8A2E:0370:7334 也是一个有效的 IPv6 address地址 (即，忽略 0 开头，忽略大小写)。
+
+  然而，我们不能因为某个组的值为 0，而使用一个空的组，以至于出现 (::) 的情况。 比如， 2001:0db8:85a3::8A2E:0370:7334 是无效的 IPv6 地址。
+  同时，在 IPv6 地址中，多余的 0 也是不被允许的。比如， 02001:0db8:85a3:0000:0000:8a2e:0370:7334 是无效的。
+
+  说明: 你可以认为给定的字符串里没有空格或者其他特殊字符。
+
+  数据范围：字符串长度满足5≤*n*≤50
+
+  进阶：空间复杂度 O(n)，时间复杂度 O(n)
+
+  ```java
+  输入："172.16.254.1"
+  返回值："IPv4"
+  说明：这是一个有效的 IPv4 地址, 所以返回 "IPv4"  
+  
+  输入："172.16.254.1"
+  返回值："IPv4"
+  说明：这是一个有效的 IPv4 地址, 所以返回 "IPv4"  
+  
+  输入："256.256.256.256"
+  返回值："Neither"
+  说明：这个地址既不是 IPv4 也不是 IPv6 地址   
+  ```
+
+- 思路
+
+  - 1.分别验证IPv4和IPv6
+  - 2.注意事项
+    - 2.1 分割字符串时，使用limit = -1的split函数，使得字符串末尾或开头有一个'.'或':'也能分割出空的字符串
+    - 2.2 使用Integer.parseInt()函数检查异常
+
+- 代码1
+
+  ```java
+      public String validIPAddress(String queryIP) {
+          if (queryIP.indexOf('.') >= 0) {
+              return isIpV4(queryIP) ? "IPv4" : "Neither";
+          } else {
+              return isIpV6(queryIP) ? "IPv6" : "Neither";
+          }
+      }
+  
+      public boolean isIpV4(String queryIP) {
+          //加-1是防止出现空字符串无法计数 比如192.168.1.1. 后边多了一个点，不加-1会被忽略后边的空串
+          String[] split = queryIP.split("\\.",-1);
+          //个数不是4个
+          if (split.length != 4) {
+              return false;
+          }
+          for (String s : split) {
+              //每个长度不在 1-3之间
+              if (s.length() > 3 || s.length() == 0) {
+                  return false;
+              }
+              //有前导0 并且长度不为1
+              if (s.charAt(0) == '0' && s.length() != 1) {
+                  return false;
+              }
+              //计算数字
+              int ans = 0;
+              for (int j = 0; j < s.length(); j++) {
+                  char c = s.charAt(j);
+                  //不是数字
+                  if (!Character.isDigit(c)) {
+                      return false;
+                  }
+                  ans = ans * 10 + (c - '0');
+              }
+              //数字超过255
+              if (ans > 255) {
+                  return false;
+              }
+          }
+          return true;
+      }
+  
+      public boolean isIpV6(String queryIP) {
+          String[] split = queryIP.split(":",-1);
+          //数量不是8个
+          if (split.length != 8) {
+              return false;
+          }
+          for (String s : split) {
+              //每个串 长度不在1-4之间
+              if (s.length() > 4 || s.length() == 0) {
+                  return false;
+              }
+              for (int i = 0; i < s.length(); i++) {
+                  char c = s.charAt(i);
+                  //不是数字并且字母不在 a-f之间
+                  if (!Character.isDigit(c) && !(Character.toLowerCase(c) >= 'a') || !(Character.toLowerCase(c) <= 'f')) {
+                      return false;
+                  }
+              }
+          }
+          return true;
+      }
+  ```
+
+- 代码2(优雅)
+
+  ```java
+  public String validIPAddress(String IP) {
+      return validIPv4(IP) ? "IPv4" : (validIPv6(IP) ? "IPv6" : "Neither");
+  }
+  
+  private boolean validIPv4(String IP) {
+      String[] strs = IP.split("\\.", -1);
+      if (strs.length != 4) {
+          return false;
+      }
+  
+      for (String str : strs) {
+          if (str.length() > 1 && str.startsWith("0")) {
+              return false;
+          }
+          try {
+              int val = Integer.parseInt(str);
+              if (!(val >= 0 && val <= 255)) {
+                  return false;
+              }
+          } catch (NumberFormatException numberFormatException) {
+              return false;
+          }
+      }
+      return true;
+  }
+  
+  private boolean validIPv6(String IP) {
+      String[] strs = IP.split(":", -1);
+      if (strs.length != 8) {
+          return false;
+      }
+  
+      for (String str : strs) {
+          if (str.length() > 4 || str.length() == 0) {
+              return false;
+          }
+          try {
+              int val = Integer.parseInt(str, 16);
+          } catch (NumberFormatException numberFormatException) {
+              return false;
+          }
+      }
+      return true;
+  }
+  ```
+
+### 13.4 大数加法
+
+- 描述
+
+  以字符串的形式读入两个数字，编写一个函数计算它们的和，以字符串的形式返回。
+
+  数据范围：s.length,t.length ≤100000，字符串仅由0-9构成
+
+  时间复杂度：O(n)
+
+- 思路
+
+  - 两个字符串末尾依次转为Integer数据相加，设置进位项top，结果大于10，将个位数入栈，top置1
+  - 依次加到末尾，对未加完的字符串，继续入栈操作，同时注意对进位项top的处理
+
+- 代码（自己的）
+
+  ```java
+  import java.util.*;
+  public class Solution {
+      public String solve (String s, String t) {
+          Stack<Integer> temp = new Stack();
+          int i = s.length() - 1;
+          int j =  t.length() - 1;
+          int top = 0;
+          int add = 0;
+          while(i>=0&&j>=0){
+               add = s.charAt(i) - '0' + t.charAt(j) - '0' + top;
+              if(add<10){
+                  temp.push(add);
+                  top = 0;
+              }else{
+                  temp.push(add-10);
+                  top = 1;
+              }
+              i--;
+              j--;
+              
+          }
+          
+          if(i<0&&j>=0){
+              while(j>=0){
+                   add = t.charAt(j) - '0' + top;
+                  if(add<10){
+                  temp.push(add);
+                  top = 0;
+              }else{
+                  temp.push(add-10);
+                  top = 1;
+              }
+                  j--;
+              }
+          }else if(j<0&&i>=0){
+              while(i>=0){
+                   add = s.charAt(i) - '0' + top;
+                  if(add<10){
+                  temp.push(add);
+                  top = 0;
+              }else{
+                  temp.push(add-10);
+                  top = 1;
+              }
+                  i--;
+              }
+          }
+          if(top==1){
+              temp.push(top);
+          }
+          StringBuilder s1 = new StringBuilder();
+          while(!temp.empty()){
+              s1.append(temp.pop());
+          }
+          return s1.toString();
+      }
+  }
+  ```
+
+
+## 14.模拟
+
+### 14.1 旋转数组
+
+- 描述
+
+  一个数组A中存有n个整数，在不允许使用另外数组的前提下，将每个整数循环向右移M≥0个位置，如果需要考虑程序移动数据的次数尽量少，要如何设计移动的方法？
+
+  数据范围：0<n≤100,0≤m≤1000
+
+  空间复杂度O(1),时间复杂度O(n)
+
+- 思路
+
+  该方法基于如下的事实：将数组的元素向右移动 k 次后，尾部 m mod n 个元素会移动至数组头部，其余元素向后移动 m mod n 个位置。
+  该方法为数组的翻转：翻转算法参考 反转链表中的双指针方法 https://blog.nowcoder.net/n/d259b250747b4085bc7975f102d248c4
+
+  1、可以先将所有元素翻转，这样尾部的 m mod n 个元素就被移至数组头部，
+
+  2、然后再翻转 [0,m mod n−1] 区间的元素
+
+  3、 最后翻转[m mod n,n−1] 区间的元素即能得到最后的答案。
+
+  **实例：**
+  以 n=7，m=3 为例进行如下展示：
+
+  | 操作                            | 结果                    |
+  | ------------------------------- | ----------------------- |
+  | 原始数据                        | 【1，2，3，4，5，6，7】 |
+  | 翻转所有元素                    | 【7，6，5，4，3，2，1】 |
+  | 翻转 [0,m mod n −1] 区间的元素  | 【5，6，7，4，3，2，1】 |
+  | 翻转 [m mod n, n −1] 区间的元素 | 【5，6，7，1，2，3，4】 |
+
+  ![alt](Datastructureandalgorithm.assets/3E6A48137367D997F49AB13EF302653A.gif)
+
+  最后返回：【5，6，7，1，2，3，4】
+
+- 代码(优雅)
+
+  ```java
+  public class Solution {
+      public int[] solve (int n, int m, int[] a) {
+          //取余，因为每次长度为n的旋转数组相当于没有变化
+          m = m % n; 
+          //第一次逆转全部数组元素
+          reverse(a, 0, n - 1); 
+          //第二次只逆转开头m个
+          reverse(a, 0, m - 1); 
+          //第三次只逆转结尾m个
+          reverse(a, m, n - 1); 
+          return a;
+      }
+      //反转函数
+      public void reverse(int[] nums, int start, int end){ 
+          while(start < end){
+              swap(nums, start++, end--);
+          }
+      }
+      //交换函数
+      public void swap(int[] nums, int a, int b){ 
+          int temp = nums[a];
+          nums[a] = nums[b];
+          nums[b] = temp;
+      }
+  }
+  
+  ```
+
+### 14.2 螺旋矩阵
+
+- 描述
+
+  给定一个mxn大小的矩阵，按照螺旋的顺序返回矩阵中的所有元素
+
+  数据范围：0≤n，m≤10，矩阵中任意元素都满足|val|≤100
+
+  空间复杂度：O(nm),时间复杂度O(nm)
+
+- 思路
+
+  - step 1：首先排除特殊情况，即矩阵为空的情况。
+
+  - step 2：设置矩阵的四个边界值，开始准备螺旋遍历矩阵，遍历的截止点是左右边界或者上下边界重合。
+
+  - step 3：首先对最上面一排从左到右进行遍历输出，到达最右边后第一排就输出完了，上边界相应就往下一行，要判断上下边界是否相遇相交。
+
+  - step 4：然后输出到了右边，正好就对最右边一列从上到下输出，到底后最右边一列已经输出完了，右边界就相应往左一列，要判断左右边界是否相遇相交。
+
+  - step 5：然后对最下面一排从右到左进行遍历输出，到达最左边后最下一排就输出完了，下边界相应就往上一行，要判断上下边界是否相遇相交。
+
+  - step 6：然后输出到了左边，正好就对最左边一列从下到上输出，到顶后最左边一列已经输出完了，左边界就相应往右一列，要判断左右边界是否相遇相交。
+
+  - step 7：重复上述3-6步骤直到循环结束。
+
+    ![alt](Datastructureandalgorithm.assets/34EC0DBACF8E56532AF5EE41BC84C258-165760662136933.gif)
+
+- 代码
+
+  ```java
+  import java.util.ArrayList;
+  
+  public class Solution {
+      public ArrayList<Integer> spiralOrder(int[][] matrix) {
+          ArrayList<Integer> res = new ArrayList<>();
+           //先排除特殊情况
+          if(matrix.length == 0) {
+              return res;
+          }
+          //左边界
+          int left = 0; 
+          //右边界
+          int right = matrix[0].length - 1; 
+          //上边界
+          int up = 0; 
+          //下边界
+          int down = matrix.length - 1; 
+          //直到边界重合
+          while(left <= right && up <= down){ 
+              //上边界的从左到右
+              for(int i = left; i <= right; i++) 
+                  res.add(matrix[up][i]); 
+              //上边界向下
+              up++; 
+              if(up > down)
+                  break;
+              //右边界的从上到下
+              for(int i = up; i <= down; i++) 
+                  res.add(matrix[i][right]);
+              //右边界向左
+              right--; 
+              if(left > right)
+                  break;
+              //下边界的从右到左
+              for(int i = right; i >= left; i--) 
+                  res.add(matrix[down][i]);
+              //下边界向上
+              down--; 
+              if(up > down)
+                  break; 
+              //左边界的从下到上
+              for(int i = down; i >= up; i--) 
+                  res.add(matrix[i][left]);
+              //左边界向右
+              left++; 
+              if(left > right)
+                  break;
+          }
+          return res;
+      }
+  }
+  
+  ```
+
+### 14.3 顺时针旋转矩阵
+
+- 描述
+
+  有一个nxn整数矩阵，请编写一个算法，将矩阵顺时针旋转90°，给定一个nxn的矩阵，和矩阵的阶数n，请返回旋转后的nxn矩阵。
+
+  数据范围：0＜n＜300，矩阵中的值满足0≤val≤1000
+
+  空间复杂度O(n^2^),时间复杂度O(n^2^) , 进阶：空间复杂度O(1),时间复杂度O(n^2^)
+
+- 思路1（找出原矩阵和返回矩阵的位置关系）
+
+  ![图片说明](Datastructureandalgorithm.assets/D41A5BF71032A625E80110D9E5546216.jpeg)
+
+  从上图中的矩阵旋转来看：原矩阵元素的列数变成新矩阵元素的行数；原矩阵元素的行数是第2行，旋转后元素的列数是从右往左倒数第2列。因此对于原矩阵mat[i] [j]，旋转后该值应该在新矩阵ans[j] [n-i-1]的位置。
+
+  - 代码(空间：O(n^2^),时间O(n^2^))
+
+    ```java
+    import java.util.*;
+    
+    public class Rotate {
+        public int[][] rotateMatrix(int[][] mat, int n) {
+            // write code here
+            int[][] temp = new int[n][n];//新建temp对象，作为最终返回的对象
+            for(int i = 0;i < n;i++){
+                for(int j = 0;j < n;j++){
+                    temp[j][n-1-i] = mat[i][j];//直接交换
+                }
+            }
+            return temp;
+        }
+    }
+    ```
+
+- 思路2(主对角线翻转，再左右翻转)
+
+  - 代码(空间：O(1),时间O(n^2^))
+
+    ```java
+    public int[][] rotateMatrix(int[][] mat, int n) {
+            //先按主对角线翻转，再左右翻转
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < i; j++) {
+                    int tmp = mat[i][j];
+                    mat[i][j] = mat[j][i];
+                    mat[j][i] = tmp;
+                }
+            }
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n/2; j++) {
+                    int tmp = mat[i][(n-1) - j];
+                    mat[i][(n-1) - j] = mat[i][j];
+                    mat[i][j] = tmp;
+                }
+            }
+            return mat;
+        }
+    ```
+
+- 举一反三
+
+  如果是逆时针旋转矩阵
+
+  - 思路2(主对角线翻转，再上下翻转)
+
+### 14.4 设计LRU缓存结构(最近最少使用)
+
+- 描述
+
+  设计LRU(最近最少使用)缓存结构，该结构在构造时确定大小，假设大小为 capacity ，操作次数是 n ，并有如下功能:
+
+  1. Solution(int capacity) 以正整数作为容量 capacity 初始化 LRU 缓存
+  2. get(key)：如果关键字 key 存在于缓存中，则返回key对应的value值，否则返回 -1 。
+  3. set(key, value)：将记录(key, value)插入该结构，如果关键字 key 已经存在，则变更其数据值 value，如果不存在，则向缓存中插入该组 key-value ，如果key-value的数量超过capacity，弹出最久未使用的key-value
+
+  关键点：
+
+  1、一个最大容量、两个API
+
+  2、保证都是O(1)的时间复杂度
+
+  3、上一次访问的元素在第一个
+
+  查找快、插入快、删除快、有顺序之分
+
+- 思路
+
+  1、显然 cache 中的元素必须有时序，以区分最近使用的和久未使用的数据，当容量满了之后要删除最久未使用的那个元素腾位置。
+
+  2、我们要在 cache 中快速找某个 key 是否已存在并得到对应的 val；
+
+  3、每次访问 cache 中的某个 key，需要将这个元素变为最近使用的，也就是说 cache 要支持在任意位置快速插入和删除元素。
+
+  那么，什么数据结构同时符合上述条件呢？哈希表查找快，但是数据无固定顺序；链表有顺序之分，插入删除快，但是查找慢。所以结合一下，形成一种新的数据结构：哈希链表 LinkedHashMap。
+
+  LRU 缓存算法的核心数据结构就是哈希链表，双向链表和哈希表的结合体。这个数据结构长这样：
+
+  ![img](Datastructureandalgorithm.assets/1647580694-NAtygG-4.jpg)
+
+  
+
+- 代码
+
+  ```java
+  public class LRUCache {
+      //自定义双向链表
+      class DLinkedNode {
+          int key;
+          int value;
+          DLinkedNode prev;
+          DLinkedNode next;
+          public DLinkedNode() {}
+          public DLinkedNode(int _key, int _value) {key = _key; value = _value;}
+      }
+  
+      //定义哈希表，映射key-node，方便在双向链表中快速找到对应节点
+      private Map<Integer, DLinkedNode> cache = new HashMap<Integer, DLinkedNode>();
+      private int size;
+      private int capacity;
+      private DLinkedNode head, tail;
+  
+      public LRUCache(int capacity) {
+          this.size = 0;
+          this.capacity = capacity;
+          // 使用伪头部和伪尾部节点
+          head = new DLinkedNode();
+          tail = new DLinkedNode();
+          head.next = tail;
+          tail.prev = head;
+      }
+  
+      public int get(int key) {
+          DLinkedNode node = cache.get(key);
+          if (node == null) {
+              return -1;
+          }
+          // 如果 key 存在，先通过哈希表定位，再移到头部
+          moveToHead(node);
+          return node.value;
+      }
+  
+      public void put(int key, int value) {
+          DLinkedNode node = cache.get(key);
+          if (node == null) {
+              // 如果 key 不存在，创建一个新的节点
+              DLinkedNode newNode = new DLinkedNode(key, value);
+              // 添加进哈希表
+              cache.put(key, newNode);
+              // 添加至双向链表的头部
+              addToHead(newNode);
+              ++size;
+              if (size > capacity) {
+                  // 如果超出容量，删除双向链表的尾部节点
+                  DLinkedNode tail = removeTail();
+                  // 删除哈希表中对应的项
+                  cache.remove(tail.key);
+                  --size;
+              }
+          }
+          else {
+              // 如果 key 存在，先通过哈希表定位，再修改 value，并移到头部
+              node.value = value;
+              moveToHead(node);
+          }
+      }
+  
+      private void addToHead(DLinkedNode node) {
+          node.prev = head;
+          node.next = head.next;
+          head.next.prev = node;
+          head.next = node;
+      }
+  
+      private void removeNode(DLinkedNode node) {
+          node.prev.next = node.next;
+          node.next.prev = node.prev;
+      }
+  
+      private void moveToHead(DLinkedNode node) {
+          removeNode(node);
+          addToHead(node);
+      }
+  
+      private DLinkedNode removeTail() {
+          DLinkedNode res = tail.prev;
+          removeNode(res);
+          return res;
+      }
+  }
+  
+  ```
+
+### 14.5 设计LFU缓存结构(最近最不经常使用)
+
+- 描述
+
+  一个缓存结构需要实现如下功能。
+
+  - set(key, value)：将记录(key, value)插入该结构
+  - get(key)：返回key对应的value值
+
+  但是缓存结构中最多放K条记录，如果新的第K+1条记录要加入，就需要根据策略删掉一条记录，然后才能把新记录加入。这个策略为：在缓存结构的K条记录中，哪一个key从进入缓存结构的时刻开始，被调用set或者get的次数最少，就删掉这个key的记录；
+
+  如果调用次数最少的key有多个，上次调用发生最早的key被删除
+
+  这就是LFU缓存替换算法。实现这个结构，K作为参数给出
+
+  数据范围：0<*k*≤10^5^，∣val∣≤2×10^9^
+
+  要求：get和set的时间复杂度都是 O(logn)，空间复杂度是 O(n)
+
+- 代码
+
+  ```java
+  class LFUCache {
+  
+      Map<Integer, Node> cache;  // 存储缓存的内容，Node中除了value值外，还有key、freq、所在doublyLinkedList、所在doublyLinkedList中的postNode、所在doublyLinkedList中的preNode，具体定义在下方。
+  
+      DoublyLinkedList firstLinkedList; // firstLinkedList.post 是频次最大的双向链表
+  
+      DoublyLinkedList lastLinkedList;  // lastLinkedList.pre 是频次最小的双向链表，满了之后删除 lastLinkedList.pre.tail.pre 这个Node即为频次最小且访问最早的Node
+  
+      int size;
+  
+      int capacity;
+  
+  
+  
+      public LFUCache(int capacity) {
+  
+          cache = new HashMap<> (capacity);
+  
+          firstLinkedList = new DoublyLinkedList();
+  
+          lastLinkedList = new DoublyLinkedList();
+  
+          firstLinkedList.post = lastLinkedList;
+  
+          lastLinkedList.pre = firstLinkedList;
+  
+          this.capacity = capacity;
+  
+      }
+  
+  
+  
+      public int get(int key) {
+  
+          Node node = cache.get(key);
+  
+          if (node == null) {
+  
+              return -1;
+  
+          }
+  
+          // 该key访问频次+1
+  
+          freqInc(node);
+  
+          return node.value;
+  
+      }
+  
+  
+  
+      public void put(int key, int value) {
+  
+          if (capacity == 0) {
+  
+              return;
+  
+          }
+  
+          Node node = cache.get(key);
+  
+          // 若key存在，则更新value，访问频次+1
+  
+          if (node != null) {
+  
+              node.value = value;
+  
+              freqInc(node);
+  
+          } else {
+  
+              // 若key不存在
+  
+              if (size == capacity) {
+  
+                  // 如果缓存满了，删除lastLinkedList.pre这个链表（即表示最小频次的链表）中的tail.pre这个Node（即最小频次链表中最先访问的Node），如果该链表中的元素删空了，则删掉该链表。
+  
+                  cache.remove(lastLinkedList.pre.tail.pre.key);
+  
+                  lastLinkedList.removeNode(lastLinkedList.pre.tail.pre);
+  
+                  size--;
+  
+                  if (lastLinkedList.pre.head.post == lastLinkedList.pre.tail) {
+  
+                      removeDoublyLinkedList(lastLinkedList.pre);
+  
+                  } 
+  
+              }
+  
+              // cache中put新Key-Node对儿，并将新node加入表示freq为1的DoublyLinkedList中，若不存在freq为1的DoublyLinkedList则新建。
+  
+              Node newNode = new Node(key, value);
+  
+              cache.put(key, newNode);
+  
+              if (lastLinkedList.pre.freq != 1) {
+  
+                  DoublyLinkedList newDoublyLinedList = new DoublyLinkedList(1);
+  
+                  addDoublyLinkedList(newDoublyLinedList, lastLinkedList.pre);
+  
+                  newDoublyLinedList.addNode(newNode);
+  
+              } else {
+  
+                  lastLinkedList.pre.addNode(newNode);
+  
+              }
+  
+              size++;
+  
+          }
+  
+      }
+  
+  
+      /**
+     * node的访问频次 + 1
+     */
+      void freqInc(Node node) {
+  
+          // 将node从原freq对应的双向链表里移除, 如果链表空了则删除链表。
+  
+          DoublyLinkedList linkedList = node.doublyLinkedList;
+  
+          DoublyLinkedList preLinkedList = linkedList.pre;
+  
+          linkedList.removeNode(node);
+  
+          if (linkedList.head.post == linkedList.tail) { 
+  
+              removeDoublyLinkedList(linkedList);
+  
+          }
+  
+  
+          // 将node加入新freq对应的双向链表，若该链表不存在，则先创建该链表。
+  
+          node.freq++;
+  
+          if (preLinkedList.freq != node.freq) {
+  
+              DoublyLinkedList newDoublyLinedList = new DoublyLinkedList(node.freq);
+  
+              addDoublyLinkedList(newDoublyLinedList, preLinkedList);
+  
+              newDoublyLinedList.addNode(node);
+  
+          } else {
+  
+              preLinkedList.addNode(node);
+  
+          }
+  
+      }
+  
+  
+      /**
+     * 增加代表某1频次的双向链表
+     */
+      void addDoublyLinkedList(DoublyLinkedList newDoublyLinedList, DoublyLinkedList preLinkedList) {
+  
+          newDoublyLinedList.post = preLinkedList.post;
+  
+          newDoublyLinedList.post.pre = newDoublyLinedList;
+  
+          newDoublyLinedList.pre = preLinkedList;
+  
+          preLinkedList.post = newDoublyLinedList; 
+  
+      }
+  
+  
+      /**
+     * 删除代表某1频次的双向链表
+     */
+      void removeDoublyLinkedList(DoublyLinkedList doublyLinkedList) {
+  
+          doublyLinkedList.pre.post = doublyLinkedList.post;
+  
+          doublyLinkedList.post.pre = doublyLinkedList.pre;
+  
+      }
+  
+  }
+  
+  
+  
+  class Node {
+  
+      int key;
+  
+      int value;
+  
+      int freq = 1;
+  
+      Node pre; // Node所在频次的双向链表的前继Node 
+  
+      Node post; // Node所在频次的双向链表的后继Node
+  
+      DoublyLinkedList doublyLinkedList;  // Node所在频次的双向链表
+  
+  
+  
+      public Node() {}
+  
+  
+  
+      public Node(int key, int value) {
+  
+          this.key = key;
+  
+          this.value = value;
+  
+      }
+  
+  }
+  
+  
+  
+  class DoublyLinkedList {
+  
+      int freq; // 该双向链表表示的频次
+  
+      DoublyLinkedList pre;  // 该双向链表的前继链表（pre.freq < this.freq）
+  
+      DoublyLinkedList post; // 该双向链表的后继链表 (post.freq > this.freq)
+  
+      Node head; // 该双向链表的头节点，新节点从头部加入，表示最近访问
+  
+      Node tail; // 该双向链表的尾节点，删除节点从尾部删除，表示最久访问
+  
+  
+  
+      public DoublyLinkedList() {
+  
+          head = new Node();
+  
+          tail = new Node();
+  
+          head.post = tail;
+  
+          tail.pre = head;
+  
+      }
+  
+  
+  
+      public DoublyLinkedList(int freq) {
+  
+          head = new Node();
+  
+          tail = new Node();
+  
+          head.post = tail;
+  
+          tail.pre = head;
+  
+          this.freq = freq;
+  
+      }
+  
+  
+  
+      void removeNode(Node node) {
+  
+          node.pre.post = node.post;
+  
+          node.post.pre = node.pre;
+  
+      }
+  
+  
+  
+      void addNode(Node node) {
+  
+          node.post = head.post;
+  
+          head.post.pre = node;
+  
+          head.post = node;
+  
+          node.pre = head;
+  
+          node.doublyLinkedList = this;
+  
+      }
+  
+  
+  
+  }
+  
+  ```
+
   
 
