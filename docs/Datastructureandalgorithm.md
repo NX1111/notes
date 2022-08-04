@@ -1,3 +1,5 @@
+
+
 ## 一. 数据类型转化技巧
 
 ### 1 简单数据类型之间的转换
@@ -592,8 +594,10 @@ public static void main(String arg[]) {
 
 - 链表是真实存在于内存中的，在栈中可以存在多个指向链表的指针，手动将其中的一个指针赋值为null，其他指针依然指向该链表。只有真实地修改了链表的结构，其他指向的链表的全指针才会部发生改变，
 
+**迭代：**
+
 ```java
- public ListNode reverseList(ListNode head) {
+public ListNode reverseList(ListNode head) {
         if (head == null || head.next == null) return head;
         ListNode pre = null;//前一个节点
         ListNode cur = head;//当前节点
@@ -611,6 +615,38 @@ public static void main(String arg[]) {
 
 ```
 
+**辅助栈：**
+
+```java
+import java.util.Stack;
+public class Solution {
+public ListNode ReverseList(ListNode head) {
+    Stack<ListNode> stack= new Stack<>();
+    //把链表节点全部摘掉放到栈中
+    while (head != null) {
+        stack.push(head);
+        head = head.next;
+    }
+    if (stack.isEmpty())
+        return null;
+    ListNode node = stack.pop();
+    ListNode dummy = node;
+    //栈中的结点全部出栈，然后重新连成一个新的链表
+    while (!stack.isEmpty()) {
+        ListNode tempNode = stack.pop();
+        node.next = tempNode;
+        node = node.next;
+    }
+    //最后一个结点就是反转前的头结点，一定要让他的next
+    //等于空，否则会构成环
+    node.next = null;
+    return dummy;
+}
+}
+```
+
+
+
 ### 2.2 链表指定区间反转
 
 - 将一个节点数为 size 链表 m 位置到 n 位置之间的区间反转，要求时间复杂度 O(n)*O*(*n*)，空间复杂度 O(1)*O*(1)。
@@ -623,6 +659,8 @@ public static void main(String arg[]) {
   要求：时间复杂度 O*(*n*) ，空间复杂度 O*(n)
 
   进阶：时间复杂度 O*(*n*)，空间复杂度 O*(1)
+
+**思路1**
 
 ```java
 public class Solution {
@@ -648,22 +686,100 @@ public class Solution {
 	
 ```
 
+**思路2**
+
+- 要反转局部链表，可以将该局部部分当作完整链表进行反转
+- 再将已经反转好的局部链表与其他节点建立连接，重构链表
+- 建议使用虚拟头节点的技巧，可以避免对头节点复杂的分类考虑，简化操作。
+
+```java
+import java.util.*;
+
+/*
+ * public class ListNode {
+ *   int val;
+ *   ListNode next = null;
+ * }
+ */
+
+public class Solution {
+    /**
+     * 
+     * @param head ListNode类 
+     * @param m int整型 
+     * @param n int整型 
+     * @return ListNode类
+     */
+       // 解法一：双指针(两次遍历)
+       //说明：方便理解，以下注释中将用left，right分别代替m,n节点 
+
+    public ListNode reverseBetween (ListNode head, int m, int n) {
+             //设置虚拟头节点
+        ListNode dummyNode = new ListNode(-1);
+        dummyNode.next = head;
+
+        ListNode pre = dummyNode;
+        //1.走left-1步到left的前一个节点
+        for(int i=0;i<m-1;i++){
+            pre = pre.next;
+        }
+
+        //2.走roght-left+1步到right节点
+        ListNode rigthNode = pre;
+        for(int i=0;i<n-m+1;i++){
+            rigthNode = rigthNode.next;
+        }
+
+        //3.截取出一个子链表
+        ListNode leftNode = pre.next;
+        ListNode cur = rigthNode.next;
+
+        //4.切断链接
+        pre.next=null;
+        rigthNode.next=null;
+
+        //5.反转局部链表
+        reverseLinkedList(leftNode);
+
+        //6.接回原来的链表
+        pre.next = rigthNode;
+        leftNode.next = cur;
+        return dummyNode.next;
+    }
+    //反转局部链表
+    private void reverseLinkedList(ListNode head){
+        ListNode pre = null;
+        ListNode cur = head;
+        while(cur!=null){
+            //Cur_next 指向cur节点的下一个节点
+            ListNode Cur_next = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = Cur_next ;
+        }
+    }
+}
+
+```
+
+
+
 ### 2.3 链表中的节点每K个一组翻转
 
 - 将给出的链表中的节点每 k 个一组翻转，返回翻转后的链表
   如果链表中的节点数不是 k 的倍数，将最后剩下的节点保持原样
   你不能更改节点中的值，只能更改节点本身。
 
-  数据范围： \ 0 \le n \le 2000 0≤*n*≤2000 ， 1 \le k \le 20001≤*k*≤2000 ，链表中每个元素都满足 0 \le val \le 10000≤*v**a**l*≤1000
-  要求空间复杂度 O(1)*O*(1)，时间复杂度 O(n)*O*(*n*)
+  数据范围：  0≤n≤2000 ， 1≤k≤2000 ，链表中每个元素都满足 0≤val≤1000
+  要求空间复杂度 O(1)，时间复杂度 O(n)
 
   例如：
 
-  给定的链表是 1\to2\to3\to4\to51→2→3→4→5
+  给定的链表是 1→2→3→4→5
 
-  对于 k = 2*k*=2 , 你应该返回 2\to 1\to 4\to 3\to 52→1→4→3→5
+  对于k=2 , 你应该返回 2→1→4→3→5
 
-  对于 k = 3*k*=3 , 你应该返回 3\to2 \to1 \to 4\to 53→2→1→4→5
+  对于 k=3 , 你应该返回 3→2→1→4→5
 
 ```java
 public class Solution {
@@ -696,8 +812,8 @@ public class Solution {
 
 - 输入两个递增的链表，单个链表的长度为n，合并这两个链表并使新链表中的节点仍然是递增排序的。
 
-  数据范围： 0 \le n \le 10000≤*n*≤1000，-1000 \le 节点值 \le 1000−1000≤节点值≤1000
-  要求：空间复杂度 O(1)*O*(1)，时间复杂度 O(n)*O*(*n*)
+  数据范围：0≤*n*≤1000，−1000≤节点值≤1000
+  要求：空间复杂度 O(1)，时间复杂度 O(n)
 
   如输入{1,3,5},{2,4,6}时，合并后的链表为{1,2,3,4,5,6}，所以对应的输出为{1,2,3,4,5,6}
 
@@ -881,15 +997,15 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
 
 ### 2.8 链表中倒数最后K个节点
 
-- 输入一个长度为 n 的链表，设链表中的元素的值为 ai ，返回该链表中倒数第k个节点。
+- 输入一个长度为 n 的链表，设链表中的元素的值为 a ，返回该链表中倒数第k个节点。
 
   如果该链表长度小于k，请返回一个长度为 0 的链表。
 
-  数据范围：0 \leq n \leq 10^50≤*n*≤105，0 \leq a_i \leq 10^90≤*a**i*≤109，0 \leq k \leq 10^90≤*k*≤109
+  数据范围：0≤*n*≤10^5^，0≤a≤10^9^，0≤*k*≤10^9^
 
-  要求：空间复杂度 O(n)*O*(*n*)，时间复杂度 O(n)*O*(*n*)
+  要求：空间复杂度 O(n)，时间复杂度 O(n)
 
-  进阶：空间复杂度 O(1)*O*(1)，时间复杂度 O(n)*O*(*n*)
+  进阶：空间复杂度 O(1)，时间复杂度 O(n)
 
   例如输入{1,2,3,4,5},2时，对应的链表结构如下图所示：
 
@@ -899,7 +1015,12 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
 
 - 快慢指针法
 
+  - fast指针先往后面移动k
+  - slow和fast同时移动n-k，直到fast到链表尾部，slow移动了n-k，此时slow所在的位置也就是倒数第k个节点的位置
+  - 返回slow
+  
   ![B27699765EEF6CA0E75AF0D1A4B9BCAC](Datastructureandalgorithm.assets/B27699765EEF6CA0E75AF0D1A4B9BCAC.png)
+  
 
 ```java
  public ListNode FindKthToTail (ListNode pHead, int k) {
@@ -976,19 +1097,33 @@ public ListNode EntryNodeOfLoop(ListNode pHead) {
 
 ![img](Datastructureandalgorithm.assets/394BB7AFD5CEA3DC64D610F62E6647A6.png)
 
+- 有公共节点的时候，N1和N2必会相遇，因为长度一样嘛，速度也一定，必会走到相同的地方的，所以当两者相等的时候，则会第一个公共的节点
+
+- 无公共节点的时候，此时N1和N2则都会走到终点，那么他们此时都是null，所以也算是相等了。
+
+  ![36](Datastructureandalgorithm.assets/36.gif)
+
 ```java
-示例1：
-输入：
-{1,2,3},{4,5},{6,7}
-复制
-返回值：
-{6,7}
-复制
+输入：{1,2,3},{4,5},{6,7}
+返回值：{6,7}
 说明：
 第一个参数{1,2,3}代表是第一个链表非公共部分，第二个参数{4,5}代表是第二个链表非公共部分，最后的{6,7}表示的是2个链表的公共部分
 这3个参数最后在后台会组装成为2个两个无环的单链表，且是有公共节点的    
 如果没有公共节点，返回null
 ```
+
+```java
+public ListNode FindFirstCommonNode(ListNode pHead1, ListNode pHead2) {
+        ListNode l1 = pHead1, l2 = pHead2;
+        while(l1 != l2){
+            l1 = (l1==null)?pHead2:l1.next;
+            l2 = (l2==null)?pHead1:l2.next;
+        }
+        return l1;
+    }
+```
+
+
 
 ### 2.11 链表相加
 
@@ -1171,7 +1306,7 @@ public class Solution {
 1->4->6->3->7->NULL
 重排后为
 1->6->7->4->3->NULL
-奇数位节点有1,6,7，偶数位节点有4,3。重排后为1,6,7,4,3
+奇数位节点有 1,6,7，偶数位节点有 4,3。重排后为 1,6,7,4,3
 ```
 
 
@@ -1325,31 +1460,20 @@ public class Solution {
 
 给定一个无序链表，删除其中值重复出现的节点(保留当中顺序遍历第一个出现的节点)。
 
-- 输入描述:
-
-```
+```java
+输入描述:
 第一行一个整数 n，表示单链表的节点数量。
 第二行 n 个整数表示单链表的节点的值。
-```
-
-- 输出描述:
-
-```
+输出描述:
 顺序输出单链表每个节点的值。
-```
-
-- 输入
-
-```
+输入
 5
 1 3 2 3 1
-```
-
-- 输出
-
-```
+ 输出
 1 3 2
 ```
+
+
 
 - 思路：不考虑空间复杂度的话还是比较容易实现O(n)时间复杂度的，直接重构一个链表就行： 遍历原始链表，并用一个集合记录已经出现过的节点值，如果当前值已经出现过，就直接跳过，否则创建一个新的节点追加在当前链表的后面。
 
